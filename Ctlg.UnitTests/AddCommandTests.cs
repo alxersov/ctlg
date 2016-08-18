@@ -30,10 +30,10 @@ namespace Ctlg.UnitTests
         public void Execute_WhenDirectoryWithFiles_SavesAll()
         {
             var fakeDir = CreateFakeEmptyDir();
-            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<FilesystemEntry>
+            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
             {
-                new FilesystemEntry {File = new File("1.txt"), FullPath = @"c:\some\full\path\1.txt"},
-                new FilesystemEntry {File = new File("foo.bar"), FullPath = @"c:\some\full\path\foo.bar"},
+                new File("1.txt") { FullPath = @"c:\some\full\path\1.txt"},
+                new File("foo.bar") { FullPath = @"c:\some\full\path\foo.bar"}
             });
 
             var addedDirectory = AddedDirectory(fakeDir);
@@ -49,9 +49,9 @@ namespace Ctlg.UnitTests
         public void Execute_WhenDirectoryWithSubdirectories_SavesAll()
         {
             var fakeSubdir = CreateFakeEmptyDir();
-            fakeSubdir.Setup(d => d.EnumerateFiles()).Returns(new List<FilesystemEntry>
+            fakeSubdir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
             {
-                new FilesystemEntry {File = new File("1.txt"), FullPath = @"c:\some\full\path\1.txt"}
+                new File("1.txt") {FullPath = @"c:\some\full\path\1.txt"}
             });
 
             var fakeDir = CreateFakeEmptyDir();
@@ -76,10 +76,9 @@ namespace Ctlg.UnitTests
         private static Mock<IFilesystemDirectory> CreateFakeEmptyDir()
         {
             var fakeDir = new Mock<IFilesystemDirectory>();
-            fakeDir.Setup(d => d.FullPath).Returns(@"c:\some\full\path");
-            fakeDir.Setup(d => d.File).Returns(new File("path", true));
+            fakeDir.Setup(d => d.Directory).Returns(new File("path", true) {FullPath = @"c:\some\full\path" });
             fakeDir.Setup(d => d.EnumerateDirectories()).Returns(new List<FilesystemDirectory>());
-            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<FilesystemEntry>());
+            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>());
             return fakeDir;
         }
 

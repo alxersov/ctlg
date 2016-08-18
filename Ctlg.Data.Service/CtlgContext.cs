@@ -18,6 +18,8 @@ namespace Ctlg.Data.Service
                 .WithMany(f => f.Contents)
                 .HasForeignKey(f => f.ParentFileId);
 
+            modelBuilder.Entity<File>().Ignore(f => f.FullPath);
+
             base.OnModelCreating(modelBuilder);
         }
 
