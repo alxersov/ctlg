@@ -41,10 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FilesystemDirectory.cs" />
-    <Compile Include="FilesystemEntry.cs" />
     <Compile Include="FilesystemService.cs" />
     <Compile Include="IFilesystemDirectory.cs" />
-    <Compile Include="IFilesystemEntry.cs" />
     <Compile Include="IFilesystemService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

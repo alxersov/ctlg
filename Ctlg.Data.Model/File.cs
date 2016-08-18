@@ -30,5 +30,7 @@ namespace Ctlg.Data.Model
         public DateTime RecordUpdatedDateTime { get; set; }
 
         public IList<File> Contents { get; set; }
+
+        public string FullPath { get; set; }
     }
 }

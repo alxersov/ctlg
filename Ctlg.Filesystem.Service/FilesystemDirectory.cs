@@ -6,8 +6,10 @@ using File = Ctlg.Data.Model.File;
 
 namespace Ctlg.Filesystem.Service
 {
-    public class FilesystemDirectory : FilesystemEntry, IFilesystemDirectory
+    public class FilesystemDirectory : IFilesystemDirectory
     {
+        public File Directory { get; set; }
+
         public FilesystemDirectory(string path)
         {
             Initialize(new DirectoryInfo(path));
@@ -21,11 +23,11 @@ namespace Ctlg.Filesystem.Service
         private void Initialize(DirectoryInfo directoryInfo)
         {
             _directoryInfo = directoryInfo;
-            FullPath = directoryInfo.FullName;
-            File = new File
+            Directory = new File
             {
                 IsDirectory = true,
                 Name = directoryInfo.Name,
+                FullPath = directoryInfo.FullName,
                 FileCreatedDateTime = directoryInfo.CreationTimeUtc,
                 FileModifiedDateTime = directoryInfo.LastWriteTimeUtc,
                 RecordUpdatedDateTime = DateTime.UtcNow
@@ -39,7 +41,7 @@ namespace Ctlg.Filesystem.Service
                 yield return new FilesystemDirectory(dir);
             }
         }
-        public IEnumerable<IFilesystemEntry> EnumerateFiles()
+        public IEnumerable<File> EnumerateFiles()
         {
             foreach (var file in _directoryInfo.GetFiles())
             {
@@ -49,20 +51,17 @@ namespace Ctlg.Filesystem.Service
 
         private DirectoryInfo _directoryInfo;
 
-        protected static FilesystemEntry CreateFilesystemEntry(FileInfo fileInfo)
+        protected static File CreateFilesystemEntry(FileInfo fileInfo)
         {
-            return new FilesystemEntry
+            return new File
             {
                 FullPath = fileInfo.FullName,
-                File = new File
-                {
-                    IsDirectory = false,
-                    Name = fileInfo.Name,
-                    FileCreatedDateTime = fileInfo.CreationTimeUtc,
-                    FileModifiedDateTime = fileInfo.LastWriteTimeUtc,
-                    Size = fileInfo.Length,
-                    RecordUpdatedDateTime = DateTime.UtcNow
-                }
+                IsDirectory = false,
+                Name = fileInfo.Name,
+                FileCreatedDateTime = fileInfo.CreationTimeUtc,
+                FileModifiedDateTime = fileInfo.LastWriteTimeUtc,
+                Size = fileInfo.Length,
+                RecordUpdatedDateTime = DateTime.UtcNow
             };
         }
     }

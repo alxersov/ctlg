@@ -11,7 +11,7 @@ namespace Ctlg.Service.Commands
         {
             var di = svc.FilesystemService.GetDirectory(Path);
             var root = ParseDirectory(di);
-            root.Name = di.FullPath;
+            root.Name = di.Directory.FullPath;
 
             svc.DataService.AddDirectory(root);
             
@@ -20,11 +20,11 @@ namespace Ctlg.Service.Commands
 
         private static File ParseDirectory(IFilesystemDirectory fsDirectory)
         {
-            var directory = fsDirectory.File;
+            var directory = fsDirectory.Directory;
 
             foreach (var file in fsDirectory.EnumerateFiles())
             {
-                directory.Contents.Add(file.File);
+                directory.Contents.Add(file);
             }
 
             foreach (var dir in fsDirectory.EnumerateDirectories())
