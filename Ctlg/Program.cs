@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using Autofac;
 using Ctlg.Data.Service;
 using Ctlg.Db.Migrations;
@@ -41,6 +42,7 @@ namespace Ctlg
             builder.RegisterType<FilesystemService>().As<IFilesystemService>();
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
+            builder.RegisterType<ConsoleOutput>().As<IOutput>();
 
             return builder.Build();
         }

@@ -9,6 +9,7 @@ namespace Ctlg.Service.Commands
         
         public void Execute(ICtlgService svc)
         {
+            _output = svc.Output;
             var di = svc.FilesystemService.GetDirectory(Path);
             var root = ParseDirectory(di);
             root.Name = di.Directory.FullPath;
@@ -18,12 +19,14 @@ namespace Ctlg.Service.Commands
             svc.DataService.SaveChanges();
         }
 
-        private static File ParseDirectory(IFilesystemDirectory fsDirectory)
+        private File ParseDirectory(IFilesystemDirectory fsDirectory)
         {
             var directory = fsDirectory.Directory;
+            _output.WriteLine(directory.FullPath);
 
             foreach (var file in fsDirectory.EnumerateFiles())
             {
+                _output.WriteLine(file.FullPath);
                 directory.Contents.Add(file);
             }
 
@@ -34,5 +37,7 @@ namespace Ctlg.Service.Commands
 
             return directory;
         }
+
+        private IOutput _output;
     }
 }
