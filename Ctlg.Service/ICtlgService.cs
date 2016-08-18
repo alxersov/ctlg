@@ -8,6 +8,7 @@ namespace Ctlg.Service
     {
         IDataService DataService { get; }
         IFilesystemService FilesystemService { get; }
+        IOutput Output { get; }
 
         void Execute(ICommand command);
         void ApplyDbMigrations();

@@ -6,10 +6,11 @@ namespace Ctlg.Service
 {
     public class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService)
+        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IOutput output)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
+            Output = output;
         }
 
         public void ApplyDbMigrations()
@@ -25,5 +26,6 @@ namespace Ctlg.Service
 
         public IDataService DataService { get; }
         public IFilesystemService FilesystemService { get; }
+        public IOutput Output { get; }
     }
 }
