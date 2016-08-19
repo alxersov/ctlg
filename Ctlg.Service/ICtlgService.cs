@@ -6,6 +6,8 @@ namespace Ctlg.Service
     {
         void Execute(ICommand command);
         void ApplyDbMigrations();
+
         void AddDirectory(string path);
+        void ListFiles();
     }
 }

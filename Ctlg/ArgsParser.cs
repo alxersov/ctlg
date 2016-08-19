@@ -17,6 +17,11 @@ namespace Ctlg
                 };
             }
 
+            if (args.Length == 1 && args[0].Equals("list", StringComparison.OrdinalIgnoreCase))
+            {
+                command = new ListCommand();
+            }
+        
             return command;
         }
     }

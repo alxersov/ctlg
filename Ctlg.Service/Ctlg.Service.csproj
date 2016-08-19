@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Commands\AddCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\ListCommand.cs" />
     <Compile Include="CtlgService.cs" />
     <Compile Include="ICtlgService.cs" />
     <Compile Include="IOutput.cs" />
