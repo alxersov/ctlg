@@ -1,4 +1,5 @@
-﻿using Ctlg.Data.Model;
+﻿using System.Collections.Generic;
+using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service.Commands;
@@ -28,6 +29,23 @@ namespace Ctlg.Service
             DataService.AddDirectory(root);
 
             DataService.SaveChanges();
+        }
+
+        public void ListFiles()
+        {
+            OutputFiles(DataService.GetFiles());
+
+        }
+
+        private void OutputFiles(IList<File> files, int level = 0)
+        {
+            var padding = "".PadLeft(level*4);
+            foreach (var file in files)
+            {
+                Output.Write(padding);
+                Output.WriteLine(file.Name);
+                OutputFiles(file.Contents, level + 1);
+            }
         }
 
         private File ParseDirectory(IFilesystemDirectory fsDirectory)

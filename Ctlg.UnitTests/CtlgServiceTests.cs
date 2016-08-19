@@ -91,6 +91,67 @@ namespace Ctlg.UnitTests
             Assert.That(output, Does.Contain(@"c:\some\full\path"));
         }
 
+        [Test]
+        public void List_WhenOneEmptyDirectoryInDb_OutputsItsName()
+        {
+            var files = new List<File> { new File("test-dir", true) };
+
+            var output = ListFilesAndGetOutput(files);
+
+            Assert.That(output, Does.Contain("test-dir"));
+        }
+
+        [Test]
+        public void List_WhenDirectoryWithSubdirInDb_OutputsAllNames()
+        {
+            var files = new List<File>
+            {
+                new File("test-dir", true)
+                {
+                    Contents = new List<File>
+                    {
+                        new File("test-subdir")
+                        {
+                            Contents = new List<File>
+                            {
+                                new File("test-file")
+                            }
+                        }
+                    }
+                }
+            };
+
+            var output = ListFilesAndGetOutput(files);
+
+            Assert.That(output, Does.Contain("test-dir"));
+            Assert.That(output, Does.Contain("test-subdir"));
+            Assert.That(output, Does.Contain("test-file"));
+        }
+
+        private string ListFilesAndGetOutput(IList<File> files)
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.Mock<IDataService>()
+                    .Setup(d => d.GetFiles())
+                    .Returns(files);
+
+                var stringBuilder = new StringBuilder();
+
+                mock.Mock<IOutput>()
+                    .Setup(f => f.Write(It.IsAny<string>()))
+                    .Callback<string>(message => stringBuilder.Append(message));
+                mock.Mock<IOutput>()
+                    .Setup(f => f.WriteLine(It.IsAny<string>()))
+                    .Callback<string>(message => stringBuilder.AppendLine(message));
+
+                var ctlg = mock.Create<CtlgService>();
+                ctlg.ListFiles();
+
+                return stringBuilder.ToString();
+            }
+        }
+
         private static Mock<IFilesystemDirectory> CreateFakeEmptyDir()
         {
             var fakeDir = new Mock<IFilesystemDirectory>();

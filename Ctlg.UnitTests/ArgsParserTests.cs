@@ -32,5 +32,13 @@ namespace Ctlg.UnitTests
             var addCommand = command as AddCommand;
             Assert.That(addCommand.Path, Is.EqualTo("some path"));
         }
+
+        [Test]
+        public void Pares_WhenListCommandWithoutParameters_RetrusnListCommand()
+        {
+            var parser = new ArgsParser();
+            var command = parser.Parse(new[] {"list"});
+            Assert.That(command, Is.InstanceOf(typeof(ListCommand)));
+        }
     }
 }

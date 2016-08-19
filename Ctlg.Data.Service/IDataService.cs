@@ -1,4 +1,5 @@
-﻿using Ctlg.Data.Model;
+﻿using System.Collections.Generic;
+using Ctlg.Data.Model;
 
 namespace Ctlg.Data.Service
 {
@@ -6,6 +7,8 @@ namespace Ctlg.Data.Service
     {
         void ApplyDbMigrations();
         void AddDirectory(File directory);
+        IList<File> GetFiles();
+
         void SaveChanges();
     }
 }
