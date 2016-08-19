@@ -95,6 +95,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AddCommandTests.cs" />
+    <Compile Include="CtlgServiceTests.cs" />
     <Compile Include="ArgsParserTests.cs" />
     <Compile Include="DataServiceTests.cs" />
     <Compile Include="MigrationServiceTests.cs" />

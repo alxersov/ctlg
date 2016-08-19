@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using Autofac;
 using Ctlg.Data.Service;
 using Ctlg.Db.Migrations;
