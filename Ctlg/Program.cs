@@ -48,7 +48,9 @@ namespace Ctlg
 
         private static void ShowUsageInfo()
         {
-            Console.WriteLine("Usage: ctlg.exe add <path to directory>");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("\tctlg.exe add <path to directory>");
+            Console.WriteLine("\tctlg.exe list");
         }
     }
 }
