@@ -27,7 +27,7 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void AddDirectory_WhenDirectoryWithFiles_SavesAll()
+        public void AddDirectory_WhenDirectoryWithFiles_SavesAllFiles()
         {
             var fakeDir = CreateFakeDirWithTwoFiles();
 
@@ -53,7 +53,7 @@ namespace Ctlg.UnitTests
 
 
         [Test]
-        public void AddDirectory_WhenDirectoryWithSubdirectories_SavesAll()
+        public void AddDirectory_WhenDirectoryWithSubdirectories_SavesAllFiles()
         {
             var fakeSubdir = CreateFakeEmptyDir();
             fakeSubdir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
@@ -182,11 +182,11 @@ namespace Ctlg.UnitTests
                     .Callback<File>(f => addedDirectory = f);
 
                 mock.Mock<IFilesystemService>()
-                    .Setup(f => f.GetDirectory(It.IsAny<string>()))
+                    .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
 
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("");
+                ctlg.AddDirectory("somepath");
 
                 return addedDirectory;
             }
@@ -206,11 +206,11 @@ namespace Ctlg.UnitTests
                     .Callback<string>(message => stringBuilder.AppendLine(message));
 
                 mock.Mock<IFilesystemService>()
-                    .Setup(f => f.GetDirectory(It.IsAny<string>()))
+                    .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
 
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("");
+                ctlg.AddDirectory("somepath");
 
                 return stringBuilder.ToString();
             }
