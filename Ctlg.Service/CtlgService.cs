@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
@@ -26,6 +27,8 @@ namespace Ctlg.Service
             var root = ParseDirectory(di);
             root.Name = di.Directory.FullPath;
 
+            CalculateHashes(root);
+
             DataService.AddDirectory(root);
 
             DataService.SaveChanges();
@@ -34,7 +37,6 @@ namespace Ctlg.Service
         public void ListFiles()
         {
             OutputFiles(DataService.GetFiles());
-
         }
 
         private void OutputFiles(IList<File> files, int level = 0)
@@ -65,6 +67,30 @@ namespace Ctlg.Service
             }
 
             return directory;
+        }
+
+        private void CalculateHashes(File directory)
+        {
+            foreach (var file in directory.Contents)
+            {
+                if (file.IsDirectory)
+                {
+                    CalculateHashes(file);
+                }
+                else
+                {
+                    try
+                    {
+                        var hash = FilesystemService.CalculateSha1(file.FullPath);
+
+                        file.Hashes.Add(new Hash(1, hash));
+                    }
+                    catch (Exception e)
+                    {
+                        Output.WriteLine(e.ToString());
+                    }
+                }
+            }
         }
 
 

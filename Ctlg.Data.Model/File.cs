@@ -8,11 +8,13 @@ namespace Ctlg.Data.Model
         public File()
         {
             Contents = new List<File>();
+            Hashes = new List<Hash>();
         }
 
         public File(string name, bool isDirectory = false)
         {
             Contents = new List<File>();
+            Hashes = new List<Hash>();
 
             Name = name;
             IsDirectory = isDirectory;
@@ -30,6 +32,7 @@ namespace Ctlg.Data.Model
         public DateTime RecordUpdatedDateTime { get; set; }
 
         public IList<File> Contents { get; set; }
+        public IList<Hash> Hashes { get; set; }
 
         public string FullPath { get; set; }
     }

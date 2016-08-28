@@ -26,7 +26,42 @@ namespace Ctlg.Data.Service
 
         public void AddDirectory(File directory)
         {
+            var dict = new Dictionary<Hash, Hash>();
+
+            LoadExistingHashes(directory, dict);
             _ctlgContext.Files.Add(directory);
+        }
+
+        private void LoadExistingHashes(File file, Dictionary<Hash, Hash> dict)
+        {
+            for (int i = 0; i < file.Hashes.Count; ++i)
+            {
+                var hash = file.Hashes[i];
+                var hashInDb =
+                    _ctlgContext.Hashes.FirstOrDefault(
+                        h => h.HashAlgorithmId == hash.HashAlgorithmId && h.Value == hash.Value);
+                if (hashInDb != null)
+                {
+                    file.Hashes[i] = hashInDb;
+                }
+                else
+                {
+                    Hash hashProcessed;
+                    if (dict.TryGetValue(hash, out hashProcessed))
+                    {
+                        file.Hashes[i] = hashProcessed;
+                    }
+                    else
+                    {
+                        dict.Add(hash, hash);
+                    }
+                }
+            }
+
+            foreach (var f in file.Contents)
+            {
+                LoadExistingHashes(f, dict);
+            }
         }
 
         public IList<File> GetFiles()
@@ -53,6 +88,6 @@ namespace Ctlg.Data.Service
         protected ICtlgContext _ctlgContext;
         protected IMigrationService _migrationService;
 
-        public const int RequiredDbVersion = 1;
+        public const int RequiredDbVersion = 2;
     }
 }

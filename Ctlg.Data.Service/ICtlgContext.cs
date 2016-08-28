@@ -9,7 +9,9 @@ namespace Ctlg.Data.Service
     {
         SQLiteConnection Connection { get; }
         int DbVersion { get; }
+
         DbSet<File> Files { get; set; }
+        DbSet<Hash> Hashes { get; set; }
 
         DbEntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
         DbEntityEntry Entry(object entity);

@@ -41,6 +41,18 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
+        public void AddDirectory_WhenDirectoryWithFiles_FilesHaveHashValues()
+        {
+            var fakeDir = CreateFakeDirWithOneFiles();
+
+            var addedDirectory = AddDirectory(fakeDir);
+
+            Assert.That(addedDirectory.Contents[0].Hashes.Count, Is.EqualTo(1));
+            Assert.That(addedDirectory.Contents[0].Hashes[0], Is.EqualTo(new Hash(1, new byte[] {1, 2, 3, 4})));
+        }
+
+
+        [Test]
         public void AddDirectory_WhenDirectoryWithFiles_OutputsTheirNames()
         {
             var fakeDir = CreateFakeDirWithTwoFiles();
@@ -161,6 +173,17 @@ namespace Ctlg.UnitTests
             return fakeDir;
         }
 
+        private static Mock<IFilesystemDirectory> CreateFakeDirWithOneFiles()
+        {
+            var fakeDir = CreateFakeEmptyDir();
+            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
+            {
+                new File("1.txt") {FullPath = @"c:\some\full\path\1.txt"},
+            });
+            return fakeDir;
+        }
+
+
         private static Mock<IFilesystemDirectory> CreateFakeDirWithTwoFiles()
         {
             var fakeDir = CreateFakeEmptyDir();
@@ -184,6 +207,9 @@ namespace Ctlg.UnitTests
                 mock.Mock<IFilesystemService>()
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
+                mock.Mock<IFilesystemService>()
+                    .Setup(f => f.CalculateSha1(It.Is<string>(s => s == @"c:\some\full\path\1.txt")))
+                    .Returns(new byte[] {1, 2, 3, 4});
 
                 var ctlg = mock.Create<CtlgService>();
                 ctlg.AddDirectory("somepath");
