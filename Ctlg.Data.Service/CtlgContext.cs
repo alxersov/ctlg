@@ -2,23 +2,49 @@
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Data.SQLite;
+using System.Diagnostics;
 using Ctlg.Data.Model;
 
 namespace Ctlg.Data.Service
 {
     public class CtlgContext : DbContext, ICtlgContext
     {
+        public CtlgContext()
+        {
+            Database.Log = s => Debug.WriteLine(s);
+        }
+
         public DbSet<File> Files { get; set; }
+        public DbSet<Hash> Hashes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+
+            modelBuilder.Entity<File>()
+                .Property(f => f.Name)
+                .IsRequired();
+
             modelBuilder.Entity<File>()
                 .HasOptional(f => f.ParentFile)
                 .WithMany(f => f.Contents)
                 .HasForeignKey(f => f.ParentFileId);
 
+            modelBuilder.Entity<File>()
+                .HasMany(f => f.Hashes)
+                .WithMany()
+                .Map(m =>
+                {
+                    m.ToTable("FileHash");
+                    m.MapLeftKey("FileId");
+                    m.MapRightKey("HashId");
+                });
+
             modelBuilder.Entity<File>().Ignore(f => f.FullPath);
+
+            modelBuilder.Entity<Hash>()
+                .Property(h => h.Value)
+                .IsRequired();
 
             base.OnModelCreating(modelBuilder);
         }
