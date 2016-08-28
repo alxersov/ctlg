@@ -63,6 +63,16 @@ namespace Ctlg.UnitTests
             Assert.That(output, Does.Contain("foo.bar"));
         }
 
+        [Test]
+        public void AddDirectory_WhenDirectoryWithFiles_OutputsFileHashes()
+        {
+            var fakeDir = CreateFakeDirWithTwoFiles();
+
+            var output = AddDirectoryAndGetOutput(fakeDir);
+
+            Assert.That(output, Does.Contain("01020304"));
+        }
+
 
         [Test]
         public void AddDirectory_WhenDirectoryWithSubdirectories_SavesAllFiles()
@@ -234,6 +244,9 @@ namespace Ctlg.UnitTests
                 mock.Mock<IFilesystemService>()
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
+                mock.Mock<IFilesystemService>()
+                    .Setup(f => f.CalculateSha1(It.IsAny<string>()))
+                    .Returns(new byte[] { 1, 2, 3, 4 });
 
                 var ctlg = mock.Create<CtlgService>();
                 ctlg.AddDirectory("somepath");
