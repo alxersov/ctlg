@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service.Commands;
+using Ctlg.Service.Utils;
 
 namespace Ctlg.Service
 {
@@ -44,8 +46,14 @@ namespace Ctlg.Service
             var padding = "".PadLeft(level*4);
             foreach (var file in files)
             {
-                Output.Write(padding);
-                Output.WriteLine(file.Name);
+                var hashes = string.Join(" ", file.Hashes.Select(h => FormatBytes.ToHexString(h.Value)));
+
+                if (string.IsNullOrEmpty(hashes))
+                {
+                    hashes = "".PadLeft(40);
+                }
+
+                Output.WriteLine(string.Format("{0} {1} {2}", hashes, padding, file.Name));
                 OutputFiles(file.Contents, level + 1);
             }
         }
@@ -82,6 +90,10 @@ namespace Ctlg.Service
                     try
                     {
                         var hash = FilesystemService.CalculateSha1(file.FullPath);
+
+                        Output.WriteLine(string.Format("{0} {1}",
+                            FormatBytes.ToHexString(hash),
+                            file.FullPath));
 
                         file.Hashes.Add(new Hash(1, hash));
                     }

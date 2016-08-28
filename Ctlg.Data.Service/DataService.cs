@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using Ctlg.Data.Model;
 using Ctlg.Db.Migrations;
@@ -66,7 +67,7 @@ namespace Ctlg.Data.Service
 
         public IList<File> GetFiles()
         {
-            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).ToList();
+            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).Include(f => f.Hashes).ToList();
             LoadContents(rootDirs);
             return rootDirs;
         }
@@ -76,6 +77,7 @@ namespace Ctlg.Data.Service
             foreach (var dir in rootDirs)
             {
                 _ctlgContext.Entry(dir).Collection(d => d.Contents).Load();
+                _ctlgContext.Entry(dir).Collection(d => d.Hashes).Load();
                 LoadContents(dir.Contents);
             }
         }
