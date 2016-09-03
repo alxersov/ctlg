@@ -6,6 +6,7 @@ using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service;
+using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
 
@@ -148,6 +149,55 @@ namespace Ctlg.UnitTests
             Assert.That(output, Does.Contain("test-dir"));
             Assert.That(output, Does.Contain("test-subdir"));
             Assert.That(output, Does.Contain("test-file"));
+        }
+
+        [Test]
+        public void List_FileHasHash_OutputsHash()
+        {
+            var files = new List<File>
+            {
+                new File("test-dir", true)
+                {
+                    Contents = new List<File>
+                    {
+                        new File("test-file")
+                    }
+                }
+            };
+
+            files[0].Contents[0].Hashes = new List<Hash> {new Hash(1, new byte[] {1, 0, 0xAB})};
+
+            var output = ListFilesAndGetOutput(files);
+
+            Assert.That(output, Does.Contain("0100AB").IgnoreCase);
+        }
+
+        [Test]
+        public void ApplyDbMigrations_CallsDataService()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var ctlg = mock.Create<CtlgService>();
+
+                ctlg.ApplyDbMigrations();
+
+                mock.Mock<IDataService>().Verify(s => s.ApplyDbMigrations(), Times.Once);
+            }
+        }
+
+        [Test]
+        public void Execute_CallsCommandExecute()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var ctlg = mock.Create<CtlgService>();
+
+                var command = new Mock<ICommand>();
+
+                ctlg.Execute(command.Object);
+
+                command.Verify(c => c.Execute(ctlg), Times.Once);
+            }
         }
 
         private string ListFilesAndGetOutput(IList<File> files)

@@ -1,4 +1,5 @@
-﻿using Ctlg.Data.Service;
+﻿using System;
+using Ctlg.Data.Service;
 using Ctlg.Db.Migrations;
 using NUnit.Framework;
 
@@ -17,6 +18,16 @@ namespace Ctlg.UnitTests
                 var migration = migrationService.LoadMigration(v);
                 Assert.That(migration, Is.Not.Null);
             }
+        }
+
+        [Test]
+        public void LoadMigration_LoadingMigrationThatDoesNotExists_ThrowsException()
+        {
+            var migrationService = new MigrationService();
+            var badMigrationVersion = DataService.RequiredDbVersion + 1;
+            Assert.That(() => { migrationService.LoadMigration(badMigrationVersion); },
+                Throws.InstanceOf<Exception>().With
+                .Message.Contain("not found"));
         }
     }
 }
