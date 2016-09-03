@@ -10,12 +10,9 @@ namespace Ctlg.Filesystem.Service
             Sha1 = sha1;
         }
 
-        public byte[] CalculateSha1(string path)
+        public byte[] CalculateSha1(Stream stream)
         {
-            using (var stream = File.OpenRead(path))
-            {
-                return Sha1.ComputeHash(stream);
-            }
+            return Sha1.ComputeHash(stream);
         }
 
         private SHA1 Sha1 { get; }

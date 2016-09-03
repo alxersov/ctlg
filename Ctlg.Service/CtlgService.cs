@@ -90,13 +90,16 @@ namespace Ctlg.Service
                 {
                     try
                     {
-                        var hash = HashService.CalculateSha1(file.FullPath);
+                        using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
+                        {
+                            var hash = HashService.CalculateSha1(stream);
 
-                        Output.WriteLine(string.Format("{0} {1}",
-                            FormatBytes.ToHexString(hash),
-                            file.FullPath));
+                            Output.WriteLine(string.Format("{0} {1}",
+                                FormatBytes.ToHexString(hash),
+                                file.FullPath));
 
-                        file.Hashes.Add(new Hash(1, hash));
+                            file.Hashes.Add(new Hash(1, hash));
+                        }
                     }
                     catch (Exception e)
                     {
