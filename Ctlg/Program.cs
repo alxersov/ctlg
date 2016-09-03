@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using Autofac;
 using Ctlg.Data.Service;
 using Ctlg.Db.Migrations;
@@ -43,6 +44,8 @@ namespace Ctlg
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
             builder.RegisterType<ConsoleOutput>().As<IOutput>();
+
+            builder.RegisterType<SHA1Cng>().As<SHA1>();
 
             return builder.Build();
         }

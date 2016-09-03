@@ -5,15 +5,19 @@ namespace Ctlg.Filesystem.Service
 {
     public class HashService: IHashService
     {
+        public HashService(SHA1 sha1)
+        {
+            Sha1 = sha1;
+        }
+
         public byte[] CalculateSha1(string path)
         {
-            var sha1 = new SHA1Cng();
-
             using (var stream = File.OpenRead(path))
             {
-                return sha1.ComputeHash(stream);
+                return Sha1.ComputeHash(stream);
             }
         }
 
+        private SHA1 Sha1 { get; }
     }
 }
