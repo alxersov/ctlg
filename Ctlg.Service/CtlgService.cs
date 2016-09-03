@@ -11,10 +11,11 @@ namespace Ctlg.Service
 {
     public class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IOutput output)
+        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IHashService hashService, IOutput output)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
+            HashService = hashService;
             Output = output;
         }
 
@@ -89,7 +90,7 @@ namespace Ctlg.Service
                 {
                     try
                     {
-                        var hash = FilesystemService.CalculateSha1(file.FullPath);
+                        var hash = HashService.CalculateSha1(file.FullPath);
 
                         Output.WriteLine(string.Format("{0} {1}",
                             FormatBytes.ToHexString(hash),
@@ -113,6 +114,7 @@ namespace Ctlg.Service
 
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
+        private IHashService HashService { get; }
         private IOutput Output { get; }
     }
 }

@@ -42,8 +42,10 @@
   <ItemGroup>
     <Compile Include="FilesystemDirectory.cs" />
     <Compile Include="FilesystemService.cs" />
+    <Compile Include="HashService.cs" />
     <Compile Include="IFilesystemDirectory.cs" />
     <Compile Include="IFilesystemService.cs" />
+    <Compile Include="IHashService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

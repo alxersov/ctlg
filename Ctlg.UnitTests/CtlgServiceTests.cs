@@ -267,7 +267,7 @@ namespace Ctlg.UnitTests
                 mock.Mock<IFilesystemService>()
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
-                mock.Mock<IFilesystemService>()
+                mock.Mock<IHashService>()
                     .Setup(f => f.CalculateSha1(It.Is<string>(s => s == @"c:\some\full\path\1.txt")))
                     .Returns(new byte[] {1, 2, 3, 4});
 
@@ -294,7 +294,7 @@ namespace Ctlg.UnitTests
                 mock.Mock<IFilesystemService>()
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
-                mock.Mock<IFilesystemService>()
+                mock.Mock<IHashService>()
                     .Setup(f => f.CalculateSha1(It.IsAny<string>()))
                     .Returns(new byte[] { 1, 2, 3, 4 });
 
