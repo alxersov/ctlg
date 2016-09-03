@@ -36,13 +36,22 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void HashIsNotEqualToNull()
+        public void HashIsNotEqualToNullHash()
         {
             Hash a = new Hash(1, new byte[] { 1, 2, 3 });
             Hash b = null;
 
             Assert.That(a.Equals(b), Is.False);
             AssertEqualityOperator(a, b, false);
+        }
+
+        [Test]
+        public void HashIsNotEqualToNullObject()
+        {
+            Hash a = new Hash(1, new byte[] { 1, 2, 3 });
+            object b = null;
+
+            Assert.That(a.Equals(b), Is.False);
         }
 
         [Test]
