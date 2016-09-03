@@ -39,6 +39,7 @@ namespace Ctlg
             builder.RegisterType<DataService>().As<IDataService>();
             builder.RegisterType<MigrationService>().As<IMigrationService>();
             builder.RegisterType<FilesystemService>().As<IFilesystemService>();
+            builder.RegisterType<HashService>().As<IHashService>();
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
             builder.RegisterType<ConsoleOutput>().As<IOutput>();
