@@ -1,7 +1,9 @@
-﻿namespace Ctlg.Filesystem.Service
+﻿using System.IO;
+
+namespace Ctlg.Filesystem.Service
 {
     public interface IHashService
     {
-        byte[] CalculateSha1(string path);
+        byte[] CalculateSha1(Stream stream);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Autofac.Extras.Moq;
@@ -9,6 +10,7 @@ using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
+using File = Ctlg.Data.Model.File;
 
 namespace Ctlg.UnitTests
 {
@@ -268,7 +270,7 @@ namespace Ctlg.UnitTests
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
                 mock.Mock<IHashService>()
-                    .Setup(f => f.CalculateSha1(It.Is<string>(s => s == @"c:\some\full\path\1.txt")))
+                    .Setup(f => f.CalculateSha1(It.IsAny<Stream>()))
                     .Returns(new byte[] {1, 2, 3, 4});
 
                 var ctlg = mock.Create<CtlgService>();
@@ -295,7 +297,7 @@ namespace Ctlg.UnitTests
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
                 mock.Mock<IHashService>()
-                    .Setup(f => f.CalculateSha1(It.IsAny<string>()))
+                    .Setup(f => f.CalculateSha1(It.IsAny<Stream>()))
                     .Returns(new byte[] { 1, 2, 3, 4 });
 
                 var ctlg = mock.Create<CtlgService>();
