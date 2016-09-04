@@ -52,7 +52,7 @@ namespace Ctlg.Service
             }
         }
 
-        private void OutputFiles(IList<File> files, int level = 0)
+        private void OutputFiles(IEnumerable<File> files, int level = 0)
         {
             var padding = "".PadLeft(level*4);
             foreach (var file in files)

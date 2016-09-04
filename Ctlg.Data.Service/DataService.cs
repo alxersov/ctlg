@@ -65,11 +65,14 @@ namespace Ctlg.Data.Service
             }
         }
 
-        public IList<File> GetFiles()
+        public IEnumerable<File> GetFiles()
         {
-            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).Include(f => f.Hashes).ToList();
-            LoadContents(rootDirs);
-            return rootDirs;
+            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).Include(f => f.Hashes);
+            foreach (var dir in rootDirs)
+            {
+                LoadContents(dir);
+                yield return dir;
+            }
         }
 
         public IEnumerable<File> GetFiles(byte[] hash)
@@ -83,13 +86,14 @@ namespace Ctlg.Data.Service
             }
         }
 
-        private void LoadContents(IList<File> rootDirs)
+        private void LoadContents(File file)
         {
-            foreach (var dir in rootDirs)
+            _ctlgContext.Entry(file).Collection(d => d.Contents).Load();
+            _ctlgContext.Entry(file).Collection(d => d.Hashes).Load();
+
+            foreach (var child in file.Contents)
             {
-                _ctlgContext.Entry(dir).Collection(d => d.Contents).Load();
-                _ctlgContext.Entry(dir).Collection(d => d.Hashes).Load();
-                LoadContents(dir.Contents);
+                LoadContents(child);
             }
         }
 

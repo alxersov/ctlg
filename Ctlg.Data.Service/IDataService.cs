@@ -7,7 +7,7 @@ namespace Ctlg.Data.Service
     {
         void ApplyDbMigrations();
         void AddDirectory(File directory);
-        IList<File> GetFiles();
+        IEnumerable<File> GetFiles();
         IEnumerable<File> GetFiles(byte[] hash);
 
         void SaveChanges();
