@@ -54,6 +54,7 @@ namespace Ctlg
         {
             Console.WriteLine("Usage:");
             Console.WriteLine("\tctlg.exe add <path to directory>");
+            Console.WriteLine("\tctlg.exe find <hash>");
             Console.WriteLine("\tctlg.exe list");
         }
     }

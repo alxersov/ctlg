@@ -72,6 +72,17 @@ namespace Ctlg.Data.Service
             return rootDirs;
         }
 
+        public IEnumerable<File> GetFiles(byte[] hash)
+        {
+            var foundFiles = _ctlgContext.Files.Where(f => f.Hashes.Any(h => h.Value == hash));
+
+            foreach (var file in foundFiles)
+            {
+                LoadParentFile(file);
+                yield return file;
+            }
+        }
+
         private void LoadContents(IList<File> rootDirs)
         {
             foreach (var dir in rootDirs)
@@ -79,6 +90,16 @@ namespace Ctlg.Data.Service
                 _ctlgContext.Entry(dir).Collection(d => d.Contents).Load();
                 _ctlgContext.Entry(dir).Collection(d => d.Hashes).Load();
                 LoadContents(dir.Contents);
+            }
+        }
+
+        private void LoadParentFile(File file)
+        {
+            if (file.ParentFileId != null &&  file.ParentFile == null)
+            {
+                _ctlgContext.Entry(file).Reference(f => f.ParentFile).Load();
+
+                LoadParentFile(file.ParentFile);
             }
         }
 

@@ -27,18 +27,28 @@ namespace Ctlg.UnitTests
         {
             var parser = new ArgsParser();
             var command = parser.Parse(new [] {"add", "some path"});
-            Assert.That(command, Is.InstanceOf(typeof(AddCommand)));
+            Assert.That(command, Is.InstanceOf<AddCommand>());
 
-            var addCommand = command as AddCommand;
+            var addCommand = (AddCommand) command;
             Assert.That(addCommand.Path, Is.EqualTo("some path"));
         }
 
         [Test]
-        public void Pares_WhenListCommandWithoutParameters_RetrusnListCommand()
+        public void Parse_WhenListCommandWithoutParameters_RetrusnListCommand()
         {
             var parser = new ArgsParser();
             var command = parser.Parse(new[] {"list"});
-            Assert.That(command, Is.InstanceOf(typeof(ListCommand)));
+            Assert.That(command, Is.InstanceOf<ListCommand>());
+        }
+
+        [Test]
+        public void Parse_WhenFindCommandWithArugment_ReturnsFindCommand()
+        {
+            var parser = new ArgsParser();
+            var command = parser.Parse(new[] {"find", "01ff"});
+            Assert.That(command, Is.InstanceOf<FindCommand>());
+            var findCommand = (FindCommand) command;
+            Assert.That(findCommand.Hash, Is.EqualTo("01ff"));
         }
     }
 }

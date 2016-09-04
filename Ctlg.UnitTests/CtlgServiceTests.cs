@@ -175,6 +175,46 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
+        public void Find_FileFound_OtputsFullPath()
+        {
+            var file = new File
+            {
+                Name = "1.txt",
+                ParentFile = new File
+                {
+                    Name = "B",
+                    ParentFile = new File
+                    {
+                        Name = "A"
+                    }
+                }
+            };
+
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.Mock<IDataService>()
+                    .Setup(d => d.GetFiles(It.IsAny<byte[]>()))
+                    .Returns(new List<File> {file});
+
+                var stringBuilder = new StringBuilder();
+
+                mock.Mock<IOutput>()
+                    .Setup(f => f.Write(It.IsAny<string>()))
+                    .Callback<string>(message => stringBuilder.Append(message));
+                mock.Mock<IOutput>()
+                    .Setup(f => f.WriteLine(It.IsAny<string>()))
+                    .Callback<string>(message => stringBuilder.AppendLine(message));
+
+                var ctlg = mock.Create<CtlgService>();
+                ctlg.FindFiles(new byte[0]);
+
+                var output = stringBuilder.ToString();
+
+                Assert.That(output, Does.Contain(@"A\B\1.txt"));
+            }
+        }
+
+        [Test]
         public void ApplyDbMigrations_CallsDataService()
         {
             using (var mock = AutoMock.GetLoose())

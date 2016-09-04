@@ -21,6 +21,14 @@ namespace Ctlg
             {
                 command = new ListCommand();
             }
+
+            if (args.Length == 2 && args[0].Equals("find", StringComparison.OrdinalIgnoreCase))
+            {
+                command = new FindCommand
+                {
+                    Hash = args[1]
+                };
+            }
         
             return command;
         }

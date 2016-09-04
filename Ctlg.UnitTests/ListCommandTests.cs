@@ -11,12 +11,12 @@ namespace Ctlg.UnitTests
         [Test]
         public void Execute_WhenCalled_CallsListFiles()
         {
-            var addCommand = new ListCommand();
+            var command = new ListCommand();
 
             var serviceMock = new Mock<ICtlgService>(MockBehavior.Strict);
             serviceMock.Setup(s => s.ListFiles());
 
-            addCommand.Execute(serviceMock.Object);
+            command.Execute(serviceMock.Object);
 
             serviceMock.VerifyAll();
         }

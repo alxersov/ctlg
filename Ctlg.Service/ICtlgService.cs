@@ -9,5 +9,6 @@ namespace Ctlg.Service
 
         void AddDirectory(string path);
         void ListFiles();
+        void FindFiles(byte[] hash);
     }
 }
