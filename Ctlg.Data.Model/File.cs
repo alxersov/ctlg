@@ -35,5 +35,27 @@ namespace Ctlg.Data.Model
         public IList<Hash> Hashes { get; set; }
 
         public string FullPath { get; set; }
+
+        public string BuildFullPath()
+        {
+            if (FullPath == null)
+            {
+                if (ParentFile == null && ParentFileId != null)
+                {
+                    throw new InvalidOperationException("BuildFullPath failed because ParentFile is not loaded.");
+                }
+
+                if (ParentFile == null)
+                {
+                    FullPath = Name;
+                }
+                else
+                {
+                    FullPath = string.Format("{0}\\{1}", ParentFile.BuildFullPath(), Name);
+                }
+            }
+
+            return FullPath;
+        }
     }
 }

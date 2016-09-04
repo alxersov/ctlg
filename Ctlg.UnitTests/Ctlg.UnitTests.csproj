@@ -107,6 +107,8 @@
     <Compile Include="CtlgServiceTests.cs" />
     <Compile Include="ArgsParserTests.cs" />
     <Compile Include="DataServiceTests.cs" />
+    <Compile Include="FileTests.cs" />
+    <Compile Include="FindCommandTests.cs" />
     <Compile Include="HashTests.cs" />
     <Compile Include="ListCommandTests.cs" />
     <Compile Include="MigrationServiceTests.cs" />

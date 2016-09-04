@@ -42,6 +42,16 @@ namespace Ctlg.Service
             OutputFiles(DataService.GetFiles());
         }
 
+        public void FindFiles(byte[] hash)
+        {
+            var files = DataService.GetFiles(hash);
+
+            foreach (var f in files)
+            {
+                Output.WriteLine(string.Format("{0} {1}", f.BuildFullPath(), f.RecordUpdatedDateTime));
+            }
+        }
+
         private void OutputFiles(IList<File> files, int level = 0)
         {
             var padding = "".PadLeft(level*4);
