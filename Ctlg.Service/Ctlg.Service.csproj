@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.0.0\lib\net451\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,10 +49,20 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ListCommand.cs" />
     <Compile Include="CtlgService.cs" />
+    <Compile Include="DomainEvents.cs" />
+    <Compile Include="Events\AddCommandFinished.cs" />
+    <Compile Include="Events\DirectoryFound.cs" />
+    <Compile Include="Events\ExceptionEvent.cs" />
+    <Compile Include="Events\FileFound.cs" />
+    <Compile Include="Events\FileFoundInDb.cs" />
+    <Compile Include="Events\HashCalculated.cs" />
+    <Compile Include="Events\TreeItemEnumerated.cs" />
+    <Compile Include="IDomainEvent.cs" />
+    <Compile Include="IHandle.cs" />
     <Compile Include="ICtlgService.cs" />
-    <Compile Include="IOutput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\FormatBytes.cs" />
+    <Compile Include="Utils\TypeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
@@ -68,6 +82,10 @@
       <Name>Ctlg.Filesystem.Service</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

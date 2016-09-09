@@ -71,7 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgsParser.cs" />
-    <Compile Include="ConsoleOutput.cs" />
+    <Compile Include="ConsoleTextAttributesScope.cs" />
+    <Compile Include="EventHandlers\ErrorOutput.cs" />
+    <Compile Include="EventHandlers\ConsoleOutput.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

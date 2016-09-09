@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service.Commands;
-using Ctlg.Service.Utils;
+using Ctlg.Service.Events;
 
 namespace Ctlg.Service
 {
     public class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IHashService hashService, IOutput output)
+        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IHashService hashService)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
             HashService = hashService;
-            Output = output;
         }
 
         public void ApplyDbMigrations()
@@ -35,6 +33,8 @@ namespace Ctlg.Service
             DataService.AddDirectory(root);
 
             DataService.SaveChanges();
+
+            DomainEvents.Raise(new AddCommandFinished());
         }
 
         public void ListFiles()
@@ -48,23 +48,16 @@ namespace Ctlg.Service
 
             foreach (var f in files)
             {
-                Output.WriteLine(string.Format("{0} {1}", f.BuildFullPath(), f.RecordUpdatedDateTime));
+                DomainEvents.Raise(new FileFoundInDb(f));
             }
         }
 
         private void OutputFiles(IEnumerable<File> files, int level = 0)
         {
-            var padding = "".PadLeft(level*4);
             foreach (var file in files)
             {
-                var hashes = string.Join(" ", file.Hashes.Select(h => FormatBytes.ToHexString(h.Value)));
+                DomainEvents.Raise(new TreeItemEnumerated(file, level));
 
-                if (string.IsNullOrEmpty(hashes))
-                {
-                    hashes = "".PadLeft(40);
-                }
-
-                Output.WriteLine(string.Format("{0} {1} {2}", hashes, padding, file.Name));
                 OutputFiles(file.Contents, level + 1);
             }
         }
@@ -72,11 +65,13 @@ namespace Ctlg.Service
         private File ParseDirectory(IFilesystemDirectory fsDirectory)
         {
             var directory = fsDirectory.Directory;
-            Output.WriteLine(directory.FullPath);
+
+            DomainEvents.Raise(new DirectoryFound(directory.FullPath));
 
             foreach (var file in fsDirectory.EnumerateFiles())
             {
-                Output.WriteLine(file.FullPath);
+                DomainEvents.Raise(new FileFound(file.FullPath));
+
                 directory.Contents.Add(file);
             }
 
@@ -104,16 +99,14 @@ namespace Ctlg.Service
                         {
                             var hash = HashService.CalculateSha1(stream);
 
-                            Output.WriteLine(string.Format("{0} {1}",
-                                FormatBytes.ToHexString(hash),
-                                file.FullPath));
+                            DomainEvents.Raise(new HashCalculated(file.FullPath, hash));
 
                             file.Hashes.Add(new Hash(1, hash));
                         }
                     }
                     catch (Exception e)
                     {
-                        Output.WriteLine(e.ToString());
+                        DomainEvents.Raise(new ExceptionEvent(e));
                     }
                 }
             }
@@ -128,6 +121,5 @@ namespace Ctlg.Service
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
         private IHashService HashService { get; }
-        private IOutput Output { get; }
     }
 }
