@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Autofac.Extras.Moq;
 using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
+using Ctlg.Service.Events;
 using Moq;
 using NUnit.Framework;
 using File = Ctlg.Data.Model.File;
@@ -17,6 +17,12 @@ namespace Ctlg.UnitTests
     [TestFixture]
     public class CtlgServiceTests
     {
+        [TearDown]
+        public void ClearEventHandlers()
+        {
+            DomainEvents.ClearCallbacks();
+        }
+
         [Test]
         public void AddDirectory_WhenEmptyDirectory_SavesItWihtFullPathAsName()
         {
@@ -46,7 +52,7 @@ namespace Ctlg.UnitTests
         [Test]
         public void AddDirectory_WhenDirectoryWithFiles_FilesHaveHashValues()
         {
-            var fakeDir = CreateFakeDirWithOneFiles();
+            var fakeDir = CreateFakeDirWithOneFile();
 
             var addedDirectory = AddDirectory(fakeDir);
 
@@ -56,24 +62,37 @@ namespace Ctlg.UnitTests
 
 
         [Test]
-        public void AddDirectory_WhenDirectoryWithFiles_OutputsTheirNames()
+        public void AddDirectory_WhenDirectoryWithFiles_Raises2FileFoundEvents()
         {
+            var events = GatherEvents<FileFound>();
+
             var fakeDir = CreateFakeDirWithTwoFiles();
+            
+            AddDirectory(fakeDir);
 
-            var output = AddDirectoryAndGetOutput(fakeDir);
+            Assert.That(events.Count, Is.EqualTo(2));
+            Assert.That(events[0].FullPath, Does.Contain("1.txt"));
+            Assert.That(events[1].FullPath, Does.Contain("foo.bar"));
+        }
 
-            Assert.That(output, Does.Contain("1.txt"));
-            Assert.That(output, Does.Contain("foo.bar"));
+        private static IList<T> GatherEvents<T>() where T : IDomainEvent
+        {
+            var events = new List<T>();
+            DomainEvents.Register<T>(events.Add);
+            return events;
         }
 
         [Test]
-        public void AddDirectory_WhenDirectoryWithFiles_OutputsFileHashes()
+        public void AddDirectory_WhenDirectoryWithFiles_RaisesHashCalculatedEvent()
         {
-            var fakeDir = CreateFakeDirWithTwoFiles();
+            var events = GatherEvents<HashCalculated>();
 
-            var output = AddDirectoryAndGetOutput(fakeDir);
+            var fakeDir = CreateFakeDirWithOneFile();
 
-            Assert.That(output, Does.Contain("01020304"));
+            AddDirectory(fakeDir);
+
+            Assert.That(events.Count, Is.EqualTo(1));
+            Assert.That(events[0].Hash, Is.EquivalentTo(new byte[] {1,2,3,4}));
         }
 
 
@@ -106,29 +125,22 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void AddDirectory_WhenEmptyDirectory_OutputFullPath()
+        public void AddDirectory_WhenEmptyDirectory_RaisesDirectoryFoundEvent()
         {
+            var events = GatherEvents<DirectoryFound>();
+
             var fakeDir = CreateFakeEmptyDir();
+            AddDirectory(fakeDir);
 
-            var output = AddDirectoryAndGetOutput(fakeDir);
-
-            Assert.That(output, Is.Not.Empty);
-            Assert.That(output, Does.Contain(@"c:\some\full\path"));
+            Assert.That(events.Count, Is.EqualTo(1));
+            Assert.That(events[0].FullPath, Is.EqualTo(@"c:\some\full\path"));
         }
 
         [Test]
-        public void List_WhenOneEmptyDirectoryInDb_OutputsItsName()
+        public void List_WhenDirectoryWithSubdirInDb_RaisesTreeItemEnumerated()
         {
-            var files = new List<File> { new File("test-dir", true) };
+            var events = GatherEvents<TreeItemEnumerated>();
 
-            var output = ListFilesAndGetOutput(files);
-
-            Assert.That(output, Does.Contain("test-dir"));
-        }
-
-        [Test]
-        public void List_WhenDirectoryWithSubdirInDb_OutputsAllNames()
-        {
             var files = new List<File>
             {
                 new File("test-dir", true)
@@ -146,37 +158,19 @@ namespace Ctlg.UnitTests
                 }
             };
 
-            var output = ListFilesAndGetOutput(files);
+            ListFiles(files);
 
-            Assert.That(output, Does.Contain("test-dir"));
-            Assert.That(output, Does.Contain("test-subdir"));
-            Assert.That(output, Does.Contain("test-file"));
+            Assert.That(events.Count, Is.EqualTo(3));
+            Assert.That(events[0].File.Name, Is.EqualTo("test-dir"));
+            Assert.That(events[1].File.Name, Is.EqualTo("test-subdir"));
+            Assert.That(events[2].File.Name, Is.EqualTo("test-file"));
         }
 
         [Test]
-        public void List_FileHasHash_OutputsHash()
+        public void Find_FileFound_RaisesFileFoundInDbEvent()
         {
-            var files = new List<File>
-            {
-                new File("test-dir", true)
-                {
-                    Contents = new List<File>
-                    {
-                        new File("test-file")
-                    }
-                }
-            };
+            var events = GatherEvents<FileFoundInDb>();
 
-            files[0].Contents[0].Hashes = new List<Hash> {new Hash(1, new byte[] {1, 0, 0xAB})};
-
-            var output = ListFilesAndGetOutput(files);
-
-            Assert.That(output, Does.Contain("0100AB").IgnoreCase);
-        }
-
-        [Test]
-        public void Find_FileFound_OtputsFullPath()
-        {
             var file = new File
             {
                 Name = "1.txt",
@@ -196,21 +190,11 @@ namespace Ctlg.UnitTests
                     .Setup(d => d.GetFiles(It.IsAny<byte[]>()))
                     .Returns(new List<File> {file});
 
-                var stringBuilder = new StringBuilder();
-
-                mock.Mock<IOutput>()
-                    .Setup(f => f.Write(It.IsAny<string>()))
-                    .Callback<string>(message => stringBuilder.Append(message));
-                mock.Mock<IOutput>()
-                    .Setup(f => f.WriteLine(It.IsAny<string>()))
-                    .Callback<string>(message => stringBuilder.AppendLine(message));
-
                 var ctlg = mock.Create<CtlgService>();
                 ctlg.FindFiles(new byte[0]);
 
-                var output = stringBuilder.ToString();
-
-                Assert.That(output, Does.Contain(@"A\B\1.txt"));
+                Assert.That(events.Count, Is.EqualTo(1));
+                Assert.That(events[0].File.BuildFullPath(), Does.Contain(@"A\B\1.txt"));
             }
         }
 
@@ -242,7 +226,7 @@ namespace Ctlg.UnitTests
             }
         }
 
-        private string ListFilesAndGetOutput(IList<File> files)
+        private void ListFiles(IList<File> files)
         {
             using (var mock = AutoMock.GetLoose())
             {
@@ -250,19 +234,8 @@ namespace Ctlg.UnitTests
                     .Setup(d => d.GetFiles())
                     .Returns(files);
 
-                var stringBuilder = new StringBuilder();
-
-                mock.Mock<IOutput>()
-                    .Setup(f => f.Write(It.IsAny<string>()))
-                    .Callback<string>(message => stringBuilder.Append(message));
-                mock.Mock<IOutput>()
-                    .Setup(f => f.WriteLine(It.IsAny<string>()))
-                    .Callback<string>(message => stringBuilder.AppendLine(message));
-
                 var ctlg = mock.Create<CtlgService>();
                 ctlg.ListFiles();
-
-                return stringBuilder.ToString();
             }
         }
 
@@ -275,7 +248,7 @@ namespace Ctlg.UnitTests
             return fakeDir;
         }
 
-        private static Mock<IFilesystemDirectory> CreateFakeDirWithOneFiles()
+        private static Mock<IFilesystemDirectory> CreateFakeDirWithOneFile()
         {
             var fakeDir = CreateFakeEmptyDir();
             fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
@@ -317,33 +290,6 @@ namespace Ctlg.UnitTests
                 ctlg.AddDirectory("somepath");
 
                 return addedDirectory;
-            }
-        }
-
-        private static string AddDirectoryAndGetOutput(Mock<IFilesystemDirectory> fakeDir)
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                var stringBuilder = new StringBuilder();
-
-                mock.Mock<IOutput>()
-                    .Setup(f => f.Write(It.IsAny<string>()))
-                    .Callback<string>(message => stringBuilder.Append(message));
-                mock.Mock<IOutput>()
-                    .Setup(f => f.WriteLine(It.IsAny<string>()))
-                    .Callback<string>(message => stringBuilder.AppendLine(message));
-
-                mock.Mock<IFilesystemService>()
-                    .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
-                    .Returns(fakeDir.Object);
-                mock.Mock<IHashService>()
-                    .Setup(f => f.CalculateSha1(It.IsAny<Stream>()))
-                    .Returns(new byte[] { 1, 2, 3, 4 });
-
-                var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("somepath");
-
-                return stringBuilder.ToString();
             }
         }
     }

@@ -5,6 +5,7 @@ using Ctlg.Data.Service;
 using Ctlg.Db.Migrations;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service;
+using Ctlg.Service.Utils;
 
 namespace Ctlg
 {
@@ -17,8 +18,11 @@ namespace Ctlg
             if (command != null)
             {
                 var container = BuildIocContainer();
+
                 using (var scope = container.BeginLifetimeScope())
                 {
+                    DomainEvents.Container = scope;
+
                     var svc = scope.Resolve<ICtlgService>();
                     svc.ApplyDbMigrations();
                     svc.Execute(command);
@@ -43,7 +47,12 @@ namespace Ctlg
             builder.RegisterType<HashService>().As<IHashService>();
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
-            builder.RegisterType<ConsoleOutput>().As<IOutput>();
+
+            var genericHandlerType = typeof(IHandle<>);
+            builder.RegisterAssemblyTypes(typeof(Program).Assembly)
+                .Where(t => TypeHelper.IsAssignableToGenericType(t, genericHandlerType))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<SHA1Cng>().As<SHA1>();
 
