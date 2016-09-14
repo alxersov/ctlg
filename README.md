@@ -5,9 +5,17 @@ Catalog files and folders, search files by hash value.
 
 ## Usage
 
-    ctlg.exe add <path to directory>
-    ctlg.exe find <hash>
-    ctlg.exe list
+    ctlg <command> [<args>]
+
+    ctlg add <path to directory>
+    ctlg find <hash>
+    ctlg list
+
+### Available commands:
+
+ - add - Add directory to the catalog.
+ - find - Find file in the catalog.
+ - list - List all files in the catalog.
 
 ## Implementation details
 
