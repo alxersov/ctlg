@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using Autofac;
+using Ctlg.CommandLineOptions;
 using Ctlg.Data.Service;
 using Ctlg.Db.Migrations;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service;
+using Ctlg.Service.Commands;
 using Ctlg.Service.Utils;
+
 
 namespace Ctlg
 {
@@ -13,28 +17,66 @@ namespace Ctlg
     {
         static int Main(string[] args)
         {
-            var parser = new ArgsParser();
-            var command = parser.Parse(args);
-            if (command != null)
-            {
-                var container = BuildIocContainer();
-
-                using (var scope = container.BeginLifetimeScope())
+            var options = new Options();
+            ICommand command = null;
+            CommandLine.Parser.Default.ParseArguments(args, options,
+                (verb, subOptions) =>
                 {
-                    DomainEvents.Container = scope;
-
-                    var svc = scope.Resolve<ICtlgService>();
-                    svc.ApplyDbMigrations();
-                    svc.Execute(command);
-                }
-            }
-            else
+                    command = CreateCommand(verb, subOptions);
+                });
+            
+            if (command == null)
             {
-                ShowUsageInfo();
                 return 1;
             }
 
+            var container = BuildIocContainer();
+            using (var scope = container.BeginLifetimeScope())
+            {
+                DomainEvents.Container = scope;
+
+                var svc = scope.Resolve<ICtlgService>();
+                svc.ApplyDbMigrations();
+                svc.Execute(command);
+            }
+
             return 0;
+        }
+
+        private static ICommand CreateCommand(string commandName, object options)
+        {
+            if (commandName == null || options == null)
+            {
+                return null;
+            }
+
+            commandName = commandName.ToLowerInvariant();
+
+            ICommand command = null;
+
+            try
+            {
+                switch (commandName)
+                {
+                    case "add":
+                        var add = (Add) options;
+                        command = new AddCommand {Path = add.Path.First()};
+                        break;
+                    case "find":
+                        var find = (Find) options;
+                        command = new FindCommand {Hash = find.Hash};
+                        break;
+                    case "list":
+                        command = new ListCommand();
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", command);
+            }
+
+            return command;
         }
 
         private static IContainer BuildIocContainer()
@@ -57,14 +99,6 @@ namespace Ctlg
             builder.RegisterType<SHA1Cng>().As<SHA1>();
 
             return builder.Build();
-        }
-
-        private static void ShowUsageInfo()
-        {
-            Console.WriteLine("Usage:");
-            Console.WriteLine("\tctlg.exe add <path to directory>");
-            Console.WriteLine("\tctlg.exe find <hash>");
-            Console.WriteLine("\tctlg.exe list");
         }
     }
 }
