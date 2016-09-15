@@ -22,10 +22,15 @@ namespace Ctlg.Service
             DataService.ApplyDbMigrations();
         }
 
-        public void AddDirectory(string path)
+        public void AddDirectory(string path, string searchPattern)
         {
+            if (string.IsNullOrEmpty(searchPattern))
+            {
+                searchPattern = "*";
+            }
+
             var di = FilesystemService.GetDirectory(path);
-            var root = ParseDirectory(di);
+            var root = ParseDirectory(di, searchPattern);
             root.Name = di.Directory.FullPath;
 
             CalculateHashes(root);
@@ -62,13 +67,13 @@ namespace Ctlg.Service
             }
         }
 
-        private File ParseDirectory(IFilesystemDirectory fsDirectory)
+        private File ParseDirectory(IFilesystemDirectory fsDirectory, string searchPattern)
         {
             var directory = fsDirectory.Directory;
 
             DomainEvents.Raise(new DirectoryFound(directory.FullPath));
 
-            foreach (var file in fsDirectory.EnumerateFiles())
+            foreach (var file in fsDirectory.EnumerateFiles(searchPattern))
             {
                 DomainEvents.Raise(new FileFound(file.FullPath));
 
@@ -77,7 +82,7 @@ namespace Ctlg.Service
 
             foreach (var dir in fsDirectory.EnumerateDirectories())
             {
-                directory.Contents.Add(ParseDirectory(dir));
+                directory.Contents.Add(ParseDirectory(dir, searchPattern));
             }
 
             return directory;

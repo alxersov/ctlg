@@ -100,7 +100,7 @@ namespace Ctlg.UnitTests
         public void AddDirectory_WhenDirectoryWithSubdirectories_SavesAllFiles()
         {
             var fakeSubdir = CreateFakeEmptyDir();
-            fakeSubdir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
+            fakeSubdir.Setup(d => d.EnumerateFiles(It.IsAny<string>())).Returns(new List<File>
             {
                 new File("1.txt") {FullPath = @"c:\some\full\path\1.txt"}
             });
@@ -244,14 +244,14 @@ namespace Ctlg.UnitTests
             var fakeDir = new Mock<IFilesystemDirectory>();
             fakeDir.Setup(d => d.Directory).Returns(new File("path", true) {FullPath = @"c:\some\full\path"});
             fakeDir.Setup(d => d.EnumerateDirectories()).Returns(new List<FilesystemDirectory>());
-            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>());
+            fakeDir.Setup(d => d.EnumerateFiles(It.IsAny<string>())).Returns(new List<File>());
             return fakeDir;
         }
 
         private static Mock<IFilesystemDirectory> CreateFakeDirWithOneFile()
         {
             var fakeDir = CreateFakeEmptyDir();
-            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
+            fakeDir.Setup(d => d.EnumerateFiles(It.IsAny<string>())).Returns(new List<File>
             {
                 new File("1.txt") {FullPath = @"c:\some\full\path\1.txt"},
             });
@@ -262,7 +262,7 @@ namespace Ctlg.UnitTests
         private static Mock<IFilesystemDirectory> CreateFakeDirWithTwoFiles()
         {
             var fakeDir = CreateFakeEmptyDir();
-            fakeDir.Setup(d => d.EnumerateFiles()).Returns(new List<File>
+            fakeDir.Setup(d => d.EnumerateFiles(It.IsAny<string>())).Returns(new List<File>
             {
                 new File("1.txt") {FullPath = @"c:\some\full\path\1.txt"},
                 new File("foo.bar") {FullPath = @"c:\some\full\path\foo.bar"}
@@ -287,7 +287,7 @@ namespace Ctlg.UnitTests
                     .Returns(new byte[] {1, 2, 3, 4});
 
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("somepath");
+                ctlg.AddDirectory("somepath", It.IsAny<string>());
 
                 return addedDirectory;
             }

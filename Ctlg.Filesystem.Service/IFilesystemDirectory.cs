@@ -8,6 +8,6 @@ namespace Ctlg.Filesystem.Service
         File Directory { get; set; }
 
         IEnumerable<IFilesystemDirectory> EnumerateDirectories();
-        IEnumerable<File> EnumerateFiles();
+        IEnumerable<File> EnumerateFiles(string searchPattern);
     }
 }
