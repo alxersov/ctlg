@@ -3,10 +3,11 @@
     public class AddCommand: ICommand
     {
         public string Path { get; set; }
+        public string SearchPattern { get; set; }
         
         public void Execute(ICtlgService svc)
         {
-            svc.AddDirectory(Path);
+            svc.AddDirectory(Path, SearchPattern);
         }
     }
 }

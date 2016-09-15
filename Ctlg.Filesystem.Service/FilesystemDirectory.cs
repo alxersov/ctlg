@@ -41,9 +41,10 @@ namespace Ctlg.Filesystem.Service
                 yield return new FilesystemDirectory(dir);
             }
         }
-        public IEnumerable<File> EnumerateFiles()
+
+        public IEnumerable<File> EnumerateFiles(string searchPattern)
         {
-            foreach (var file in _directoryInfo.GetFiles())
+            foreach (var file in _directoryInfo.GetFiles(searchPattern))
             {
                 yield return CreateFilesystemEntry(file);
             }

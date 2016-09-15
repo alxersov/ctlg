@@ -60,7 +60,11 @@ namespace Ctlg
                 {
                     case "add":
                         var add = (Add) options;
-                        command = new AddCommand {Path = add.Path.First()};
+                        command = new AddCommand
+                        {
+                            Path = add.Path.First(),
+                            SearchPattern = add.SearchPattern
+                        };
                         break;
                     case "find":
                         var find = (Find) options;

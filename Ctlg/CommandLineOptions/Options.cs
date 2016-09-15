@@ -29,7 +29,7 @@ namespace Ctlg.CommandLineOptions
                     usage = "ctlg <command> [<args>]\n\nAvailable commands:";
                     break;
                 case "add":
-                    usage = "ctlg add <directory>";
+                    usage = "ctlg add [<options>] <directory>\n\nAvailable options:";
                     break;
                 case "find":
                     usage = "ctlg find [<options>]\n\nAvailable options:";
