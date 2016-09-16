@@ -280,6 +280,13 @@ namespace Ctlg.UnitTests
                     .Setup(d => d.AddDirectory(It.IsAny<File>()))
                     .Callback<File>(f => addedDirectory = f);
 
+                mock.Mock<IDataService>()
+                    .Setup(d => d.GetHashAlgorithm(It.IsAny<string>())).Returns(new HashAlgorithm()
+                    {
+                        HashAlgorithmId = 1,
+                        Name = "XHASH"
+                    });
+
                 mock.Mock<IFilesystemService>()
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
@@ -288,13 +295,12 @@ namespace Ctlg.UnitTests
                 hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
                     .Returns(new byte[] {1, 2, 3, 4});
 
-                var indexMock = new Mock<IIndex<string, IHashFunction>>();
-                indexMock.SetupGet(p => p[It.IsAny<string>()]).Returns(hashFunctionMock.Object);
-
-                mock.Provide(indexMock.Object);
+                var index = new Index<string, IHashFunction>();
+                index.Add("XHASH", hashFunctionMock.Object);
+                mock.Provide<IIndex<string, IHashFunction>>(index);
 
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("somepath", It.IsAny<string>());
+                ctlg.AddDirectory("somepath", null, "XHASH");
 
                 return addedDirectory;
             }

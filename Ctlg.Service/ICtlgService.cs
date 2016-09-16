@@ -7,7 +7,7 @@ namespace Ctlg.Service
         void Execute(ICommand command);
         void ApplyDbMigrations();
 
-        void AddDirectory(string path, string searchPattern);
+        void AddDirectory(string path, string searchPattern, string hashFunctionName);
         void ListFiles();
         void FindFiles(byte[] hash);
     }

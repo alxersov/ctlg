@@ -23,9 +23,18 @@ namespace Ctlg.Service
             DataService.ApplyDbMigrations();
         }
 
-        public void AddDirectory(string path, string searchPattern)
+        public void AddDirectory(string path, string searchPattern, string hashFunctionName)
         {
-            var hashFunction = HashFunctions["SHA-1"];
+            hashFunctionName = hashFunctionName ?? "SHA-1";
+            hashFunctionName = hashFunctionName.ToUpperInvariant();
+
+            IHashFunction hashFunction;
+            if (!HashFunctions.TryGetValue(hashFunctionName, out hashFunction))
+            {
+                throw new Exception($"Unsupported hash function {hashFunctionName}");
+            }
+
+            var hashAlgorithm = DataService.GetHashAlgorithm(hashFunctionName);
 
             if (string.IsNullOrEmpty(searchPattern))
             {
@@ -36,7 +45,7 @@ namespace Ctlg.Service
             var root = ParseDirectory(di, searchPattern);
             root.Name = di.Directory.FullPath;
 
-            CalculateHashes(root, hashFunction);
+            CalculateHashes(root, hashFunction, hashAlgorithm.HashAlgorithmId);
 
             DataService.AddDirectory(root);
 
@@ -91,13 +100,13 @@ namespace Ctlg.Service
             return directory;
         }
 
-        private void CalculateHashes(File directory, IHashFunction hashFunction)
+        private void CalculateHashes(File directory, IHashFunction hashFunction, int hashAlgorithmId)
         {
             foreach (var file in directory.Contents)
             {
                 if (file.IsDirectory)
                 {
-                    CalculateHashes(file, hashFunction);
+                    CalculateHashes(file, hashFunction, hashAlgorithmId);
                 }
                 else
                 {
@@ -109,7 +118,7 @@ namespace Ctlg.Service
 
                             DomainEvents.Raise(new HashCalculated(file.FullPath, hash));
 
-                            file.Hashes.Add(new Hash(1, hash));
+                            file.Hashes.Add(new Hash(hashAlgorithmId, hash));
                         }
                     }
                     catch (Exception e)
@@ -123,7 +132,14 @@ namespace Ctlg.Service
 
         public void Execute(ICommand command)
         {
-            command.Execute(this);
+            try
+            {
+                command.Execute(this);
+            }
+            catch (Exception e)
+            {
+                DomainEvents.Raise(new ExceptionEvent(e));
+            }
         }
 
         private IDataService DataService { get; }

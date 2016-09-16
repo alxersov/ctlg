@@ -63,7 +63,8 @@ namespace Ctlg
                         command = new AddCommand
                         {
                             Path = add.Path.First(),
-                            SearchPattern = add.SearchPattern
+                            SearchPattern = add.SearchPattern,
+                            HashFunctionName = add.HashFunctionName
                         };
                         break;
                     case "find":
@@ -91,6 +92,7 @@ namespace Ctlg
             builder.RegisterType<MigrationService>().As<IMigrationService>();
             builder.RegisterType<FilesystemService>().As<IFilesystemService>();
             builder.RegisterType<Sha1HashFunction>().Named<IHashFunction>("SHA-1");
+            builder.RegisterType<Sha256HashFunction>().Named<IHashFunction>("SHA-256");
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
 
@@ -101,6 +103,7 @@ namespace Ctlg
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<SHA1Cng>().As<SHA1>();
+            builder.RegisterType<SHA256Cng>().As<SHA256>();
 
             return builder.Build();
         }

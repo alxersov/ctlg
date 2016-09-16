@@ -7,7 +7,7 @@ Catalog files and folders, search files by hash value.
 
     ctlg <command> [<args>]
 
-    ctlg add <path to directory>
+    ctlg add -s <mask> -f <hash function> <directory>
     ctlg find -h <hash>
     ctlg list
 
