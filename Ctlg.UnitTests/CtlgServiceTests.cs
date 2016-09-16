@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
+using Autofac.Features.Indexed;
 using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
@@ -282,9 +283,15 @@ namespace Ctlg.UnitTests
                 mock.Mock<IFilesystemService>()
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
-                mock.Mock<IHashService>()
-                    .Setup(f => f.CalculateSha1(It.IsAny<Stream>()))
+
+                var hashFunctionMock = new Mock<IHashFunction>();
+                hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
                     .Returns(new byte[] {1, 2, 3, 4});
+
+                var indexMock = new Mock<IIndex<string, IHashFunction>>();
+                indexMock.SetupGet(p => p[It.IsAny<string>()]).Returns(hashFunctionMock.Object);
+
+                mock.Provide(indexMock.Object);
 
                 var ctlg = mock.Create<CtlgService>();
                 ctlg.AddDirectory("somepath", It.IsAny<string>());
