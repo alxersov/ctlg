@@ -9,6 +9,7 @@ namespace Ctlg.Data.Service
         void AddDirectory(File directory);
         IEnumerable<File> GetFiles();
         IEnumerable<File> GetFiles(byte[] hash);
+        HashAlgorithm GetHashAlgorithm(string name);
 
         void SaveChanges();
     }

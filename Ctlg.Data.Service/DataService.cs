@@ -86,6 +86,11 @@ namespace Ctlg.Data.Service
             }
         }
 
+        public HashAlgorithm GetHashAlgorithm(string name)
+        {
+            return _ctlgContext.HashAlgorithm.First(a => a.Name == name);
+        }
+
         private void LoadContents(File file)
         {
             _ctlgContext.Entry(file).Collection(d => d.Contents).Load();

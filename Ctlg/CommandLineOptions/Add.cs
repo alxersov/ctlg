@@ -10,5 +10,8 @@ namespace Ctlg.CommandLineOptions
 
         [Option('s', "search", HelpText = "Search pattern.")]
         public string SearchPattern { get; set; }
+
+        [Option('f', "function", HelpText = "Hash function.")]
+        public string HashFunctionName { get; set; }
     }
 }

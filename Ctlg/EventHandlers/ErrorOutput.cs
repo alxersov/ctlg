@@ -11,7 +11,7 @@ namespace Ctlg.EventHandlers
             using (new ConsoleTextAttributesScope())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine(args.Exception.ToString());
+                Console.Error.WriteLine(args.Exception.Message);
             }
         }
     }

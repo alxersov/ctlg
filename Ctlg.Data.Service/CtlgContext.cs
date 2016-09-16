@@ -16,6 +16,7 @@ namespace Ctlg.Data.Service
 
         public DbSet<File> Files { get; set; }
         public DbSet<Hash> Hashes { get; set; }
+        public DbSet<HashAlgorithm> HashAlgorithm { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -44,6 +45,10 @@ namespace Ctlg.Data.Service
 
             modelBuilder.Entity<Hash>()
                 .Property(h => h.Value)
+                .IsRequired();
+
+            modelBuilder.Entity<HashAlgorithm>()
+                .Property(h => h.Name)
                 .IsRequired();
 
             base.OnModelCreating(modelBuilder);

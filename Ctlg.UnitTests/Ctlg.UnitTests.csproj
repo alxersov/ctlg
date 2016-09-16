@@ -109,6 +109,7 @@
     <Compile Include="FileTests.cs" />
     <Compile Include="FindCommandTests.cs" />
     <Compile Include="HashTests.cs" />
+    <Compile Include="Index.cs" />
     <Compile Include="ListCommandTests.cs" />
     <Compile Include="MigrationServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
