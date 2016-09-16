@@ -3,14 +3,16 @@ using System.Security.Cryptography;
 
 namespace Ctlg.Filesystem.Service
 {
-    public class HashService: IHashService
+    public class Sha1HashFunction: IHashFunction
     {
-        public HashService(SHA1 sha1)
+        public Sha1HashFunction(SHA1 sha1)
         {
             Sha1 = sha1;
         }
 
-        public byte[] CalculateSha1(Stream stream)
+        public string Name => "SHA-1";
+
+        public byte[] CalculateHash(Stream stream)
         {
             return Sha1.ComputeHash(stream);
         }

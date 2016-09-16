@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac.Features.Indexed;
 using Ctlg.Data.Model;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
@@ -10,11 +11,11 @@ namespace Ctlg.Service
 {
     public class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IHashService hashService)
+        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IIndex<string, IHashFunction> hashFunction)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
-            HashService = hashService;
+            HashFunctions = hashFunction;
         }
 
         public void ApplyDbMigrations()
@@ -24,6 +25,8 @@ namespace Ctlg.Service
 
         public void AddDirectory(string path, string searchPattern)
         {
+            var hashFunction = HashFunctions["SHA-1"];
+
             if (string.IsNullOrEmpty(searchPattern))
             {
                 searchPattern = "*";
@@ -33,7 +36,7 @@ namespace Ctlg.Service
             var root = ParseDirectory(di, searchPattern);
             root.Name = di.Directory.FullPath;
 
-            CalculateHashes(root);
+            CalculateHashes(root, hashFunction);
 
             DataService.AddDirectory(root);
 
@@ -88,13 +91,13 @@ namespace Ctlg.Service
             return directory;
         }
 
-        private void CalculateHashes(File directory)
+        private void CalculateHashes(File directory, IHashFunction hashFunction)
         {
             foreach (var file in directory.Contents)
             {
                 if (file.IsDirectory)
                 {
-                    CalculateHashes(file);
+                    CalculateHashes(file, hashFunction);
                 }
                 else
                 {
@@ -102,7 +105,7 @@ namespace Ctlg.Service
                     {
                         using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
                         {
-                            var hash = HashService.CalculateSha1(stream);
+                            var hash = hashFunction.CalculateHash(stream);
 
                             DomainEvents.Raise(new HashCalculated(file.FullPath, hash));
 
@@ -125,6 +128,6 @@ namespace Ctlg.Service
 
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
-        private IHashService HashService { get; }
+        private IIndex<string, IHashFunction> HashFunctions { get; }
     }
 }
