@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Pri.LongPath, Version=2.0.32.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Pri.LongPath.2.0.32\lib\net45\Pri.LongPath.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,7 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FilesystemDirectory.cs" />
+    <Compile Include="FilesystemDirectoryLongPath.cs" />
     <Compile Include="FilesystemService.cs" />
+    <Compile Include="FileSystemServiceLongPath.cs" />
     <Compile Include="Sha1HashFunction.cs" />
     <Compile Include="IFilesystemDirectory.cs" />
     <Compile Include="IFilesystemService.cs" />
@@ -54,6 +60,9 @@
       <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
       <Name>Ctlg.Data.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
