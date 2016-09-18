@@ -9,6 +9,7 @@ using Ctlg.Filesystem.Service;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Utils;
+using Force.Crc32;
 
 
 namespace Ctlg
@@ -90,9 +91,15 @@ namespace Ctlg
 
             builder.RegisterType<DataService>().As<IDataService>();
             builder.RegisterType<MigrationService>().As<IMigrationService>();
-            builder.RegisterType<FilesystemService>().As<IFilesystemService>();
-            builder.RegisterType<Sha1HashFunction>().Named<IHashFunction>("SHA-1");
-            builder.RegisterType<Sha256HashFunction>().Named<IHashFunction>("SHA-256");
+            builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
+
+            builder.RegisterCryptographyHashFunction<MD5Cng>("MD5");
+            builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1");
+            builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256");
+            builder.RegisterCryptographyHashFunction<SHA384Cng>("SHA-384");
+            builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512");
+            builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32");
+
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
 
@@ -101,9 +108,6 @@ namespace Ctlg
                 .Where(t => TypeHelper.IsAssignableToGenericType(t, genericHandlerType))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
-
-            builder.RegisterType<SHA1Cng>().As<SHA1>();
-            builder.RegisterType<SHA256Cng>().As<SHA256>();
 
             return builder.Build();
         }
