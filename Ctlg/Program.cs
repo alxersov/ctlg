@@ -90,7 +90,7 @@ namespace Ctlg
 
             builder.RegisterType<DataService>().As<IDataService>();
             builder.RegisterType<MigrationService>().As<IMigrationService>();
-            builder.RegisterType<FileSystemServiceLongPath>().As<IFilesystemService>();
+            builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
             builder.RegisterType<Sha1HashFunction>().Named<IHashFunction>("SHA-1");
             builder.RegisterType<Sha256HashFunction>().Named<IHashFunction>("SHA-256");
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
