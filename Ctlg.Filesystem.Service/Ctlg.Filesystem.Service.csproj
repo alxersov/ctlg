@@ -47,7 +47,7 @@
     <Compile Include="FilesystemDirectory.cs" />
     <Compile Include="FilesystemDirectoryLongPath.cs" />
     <Compile Include="FilesystemService.cs" />
-    <Compile Include="FileSystemServiceLongPath.cs" />
+    <Compile Include="FilesystemServiceLongPath.cs" />
     <Compile Include="Sha1HashFunction.cs" />
     <Compile Include="IFilesystemDirectory.cs" />
     <Compile Include="IFilesystemService.cs" />
