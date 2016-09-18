@@ -21,6 +21,7 @@ Catalog files and folders, search files by hash value.
 
  - .NET console application. 
  - Entity Framework with SQLite DB, database migrations in SQL.
+ - Pri.LongPath is used to support long paths.
  - Autofac is used to inject dpendencies. 
  - NUnit and Moq for testing.
  - Command and Event patterns.
