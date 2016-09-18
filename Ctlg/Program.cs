@@ -9,6 +9,7 @@ using Ctlg.Filesystem.Service;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Utils;
+using Force.Crc32;
 
 
 namespace Ctlg
@@ -97,6 +98,7 @@ namespace Ctlg
             builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256");
             builder.RegisterCryptographyHashFunction<SHA384Cng>("SHA-384");
             builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512");
+            builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32");
 
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
