@@ -1,7 +1,8 @@
 # ctlg
 ![Build Status badge](https://ersh.visualstudio.com/_apis/public/build/definitions/c9754d86-e84f-486e-a3b3-f7f42d31c01d/1/badge)
 
-Catalog files and folders, search files by hash value.
+Catalog files and folders, search files by checksum. 
+Supported hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32.
 
 ## Usage
 
@@ -13,7 +14,7 @@ Catalog files and folders, search files by hash value.
 
 ### Available commands:
 
- - add - Add directory to the catalog.
+ - add - Scan directory and add files to the catalog.
  - find - Find file in the catalog.
  - list - List all files in the catalog.
 
