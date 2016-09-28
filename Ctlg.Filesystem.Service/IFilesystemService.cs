@@ -6,5 +6,7 @@ namespace Ctlg.Filesystem.Service
     {
         IFilesystemDirectory GetDirectory(string path);
         Stream OpenFileForRead(string path);
+        bool IsArchiveExtension(string path);
+        IArchive OpenArchive(Stream stream);
     }
 }
