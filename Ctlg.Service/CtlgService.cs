@@ -147,9 +147,14 @@ namespace Ctlg.Service
                 using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
                 {
                     var archive = FilesystemService.OpenArchive(stream);
+
+                    DomainEvents.Raise(new ArchiveFound(file.FullPath));
+
                     foreach (var entry in archive.EnumerateEntries())
                     {
                         file.Contents.Add(entry);
+
+                        DomainEvents.Raise(new ArchiveEntryFound(entry.Name));
                     }
                 }
             }
