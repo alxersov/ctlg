@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Ctlg.Data.Model;
 using SharpCompress.Archive;
 using File = Ctlg.Data.Model.File;
 
@@ -18,12 +19,16 @@ namespace Ctlg.Filesystem.Service
             {
                 if (!entry.IsDirectory)
                 {
-                    yield return new File(entry.Key)
+                    var file = new File(entry.Key)
                     {
                         FileCreatedDateTime = entry.CreatedTime,
                         FileModifiedDateTime = entry.LastModifiedTime,
                         Size = entry.Size
                     };
+
+                    file.Hashes.Add(new Hash(HashAlgorithmId.CRC32, (uint)entry.Crc));
+
+                    yield return file;
                 }
             }
         }
