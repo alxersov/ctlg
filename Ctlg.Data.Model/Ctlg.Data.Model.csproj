@@ -43,6 +43,7 @@
     <Compile Include="File.cs" />
     <Compile Include="Hash.cs" />
     <Compile Include="HashAlgorithm.cs" />
+    <Compile Include="HashAlgorithmId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

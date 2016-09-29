@@ -9,19 +9,16 @@ namespace Ctlg.EventHandlers
     public class ConsoleOutput : 
         IHandle<FileFound>, 
         IHandle<DirectoryFound>,
+        IHandle<ArchiveFound>,
+        IHandle<ArchiveEntryFound>,
         IHandle<HashCalculated>,
         IHandle<TreeItemEnumerated>,
         IHandle<AddCommandFinished>,
         IHandle<FileFoundInDb>
     {
-        public ConsoleOutput()
-        {
-            _filesFound = 0;
-        }
-
-
         public void Handle(DirectoryFound args)
         {
+            ++_directoriesFound;
             using (new ConsoleTextAttributesScope())
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -33,6 +30,22 @@ namespace Ctlg.EventHandlers
         {
             ++_filesFound;
             Console.WriteLine(args.FullPath);
+        }
+
+        public void Handle(ArchiveFound args)
+        {
+            ++_archivesFound;
+            Console.Write("Archive: ");
+            Console.WriteLine(args.FullPath);
+        }
+
+        public void Handle(ArchiveEntryFound args)
+        {
+            using (new ConsoleTextAttributesScope())
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine(args.EntryKey);
+            }
         }
 
         public void Handle(HashCalculated args)
@@ -63,14 +76,19 @@ namespace Ctlg.EventHandlers
 
         public void Handle(AddCommandFinished args)
         {
+            Console.WriteLine("{0} directories processed.",_directoriesFound);
+            Console.WriteLine("{0} archives found.",_archivesFound);
             Console.WriteLine("{0} files found.",_filesFound);
         }
 
-        private int _filesFound;
         public void Handle(FileFoundInDb args)
         {
             var f = args.File;
             Console.WriteLine("{0} {1}", f.BuildFullPath(), f.RecordUpdatedDateTime);
         }
+
+        private int _filesFound = 0;
+        private int _directoriesFound = 0;
+        private int _archivesFound = 0;
     }
 }

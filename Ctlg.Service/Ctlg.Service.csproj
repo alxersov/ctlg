@@ -51,6 +51,8 @@
     <Compile Include="CtlgService.cs" />
     <Compile Include="DomainEvents.cs" />
     <Compile Include="Events\AddCommandFinished.cs" />
+    <Compile Include="Events\ArchiveEntryFound.cs" />
+    <Compile Include="Events\ArchiveFound.cs" />
     <Compile Include="Events\DirectoryFound.cs" />
     <Compile Include="Events\ExceptionEvent.cs" />
     <Compile Include="Events\FileFound.cs" />

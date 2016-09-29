@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Ctlg.Data.Model
 {
@@ -10,9 +11,23 @@ namespace Ctlg.Data.Model
             Value = value;
         }
 
+        public Hash(int hashAlgorithmId, uint value)
+        {
+            HashAlgorithmId = hashAlgorithmId;
+            Value = BitConverter.GetBytes(value).Reverse().ToArray();
+        }
+
+
+        public Hash(HashAlgorithmId id, byte[] value) : this((int)id, value)
+        {
+        }
+
+        public Hash(HashAlgorithmId id, uint value) : this((int)id, value)
+        {
+        }
+
         protected Hash()
         {
-
         }
 
         public int HashId { get; protected set; }
