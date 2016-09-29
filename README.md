@@ -1,8 +1,13 @@
 # ctlg
 ![Build Status badge](https://ersh.visualstudio.com/_apis/public/build/definitions/c9754d86-e84f-486e-a3b3-f7f42d31c01d/1/badge)
 
-Catalog files and folders, search files by checksum. 
-Supported hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32.
+A tool to catalog files and folders.
+
+## Features
+ - Calculates checksums. You can search files in catalog by checksum.
+ - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32. 
+ - Can work with long paths. 
+ - Catalogs files inside archives. Supports common archive types: Zip, 7Zip, Rar.
 
 ## Usage
 
