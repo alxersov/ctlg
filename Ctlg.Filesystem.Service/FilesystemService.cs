@@ -2,7 +2,7 @@
 
 namespace Ctlg.Filesystem.Service
 {
-    public class FilesystemService : IFilesystemService
+    public class FilesystemService : FilesystemServiceBase, IFilesystemService
     {
         public IFilesystemDirectory GetDirectory(string path)
         {

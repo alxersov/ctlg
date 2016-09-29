@@ -6,6 +6,7 @@ using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
+using File = Ctlg.Data.Model.File;
 
 namespace Ctlg.Service
 {
@@ -45,7 +46,7 @@ namespace Ctlg.Service
             var root = ParseDirectory(di, searchPattern);
             root.Name = di.Directory.FullPath;
 
-            CalculateHashes(root, hashFunction, hashAlgorithm.HashAlgorithmId);
+            ProcessTree(root, hashFunction, hashAlgorithm.HashAlgorithmId);
 
             DataService.AddDirectory(root);
 
@@ -100,35 +101,68 @@ namespace Ctlg.Service
             return directory;
         }
 
-        private void CalculateHashes(File directory, IHashFunction hashFunction, int hashAlgorithmId)
+        private void ProcessTree(File directory, IHashFunction hashFunction, int hashAlgorithmId)
         {
             foreach (var file in directory.Contents)
             {
                 if (file.IsDirectory)
                 {
-                    CalculateHashes(file, hashFunction, hashAlgorithmId);
+                    ProcessTree(file, hashFunction, hashAlgorithmId);
                 }
                 else
                 {
-                    try
-                    {
-                        using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-                        {
-                            var hash = hashFunction.CalculateHash(stream);
+                    CalculateHashes(file, hashFunction, hashAlgorithmId);
 
-                            DomainEvents.Raise(new HashCalculated(file.FullPath, hash));
-
-                            file.Hashes.Add(new Hash(hashAlgorithmId, hash));
-                        }
-                    }
-                    catch (Exception e)
+                    if (FilesystemService.IsArchiveExtension(file.FullPath))
                     {
-                        DomainEvents.Raise(new ExceptionEvent(e));
+                        ProcessArchive(file);
                     }
                 }
             }
         }
 
+        private void CalculateHashes(File file, IHashFunction hashFunction, int hashAlgorithmId)
+        {
+            try
+            {
+                using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
+                {
+                    var hash = hashFunction.CalculateHash(stream);
+
+                    DomainEvents.Raise(new HashCalculated(file.FullPath, hash));
+
+                    file.Hashes.Add(new Hash(hashAlgorithmId, hash));
+                }
+            }
+            catch (Exception e)
+            {
+                DomainEvents.Raise(new ExceptionEvent(e));
+            }
+        }
+
+        private void ProcessArchive(File file)
+        {
+            try
+            {
+                using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
+                {
+                    var archive = FilesystemService.OpenArchive(stream);
+
+                    DomainEvents.Raise(new ArchiveFound(file.FullPath));
+
+                    foreach (var entry in archive.EnumerateEntries())
+                    {
+                        file.Contents.Add(entry);
+
+                        DomainEvents.Raise(new ArchiveEntryFound(entry.Name));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                DomainEvents.Raise(new ExceptionEvent(e));
+            }
+        }
 
         public void Execute(ICommand command)
         {

@@ -3,7 +3,7 @@ using Pri.LongPath;
 
 namespace Ctlg.Filesystem.Service
 {
-    public class FilesystemServiceLongPath : IFilesystemService
+    public class FilesystemServiceLongPath : FilesystemServiceBase, IFilesystemService
     {
         public IFilesystemDirectory GetDirectory(string path)
         {
