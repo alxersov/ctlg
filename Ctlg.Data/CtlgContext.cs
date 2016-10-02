@@ -5,7 +5,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using Ctlg.Core;
 
-namespace Ctlg.Data.Service
+namespace Ctlg.Data
 {
     public class CtlgContext : DbContext, ICtlgContext
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Ctlg.Core;
 
-namespace Ctlg.Data.Service
+namespace Ctlg.Data
 {
     public interface IDataService
     {

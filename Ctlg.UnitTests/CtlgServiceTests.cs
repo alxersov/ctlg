@@ -4,7 +4,7 @@ using System.Linq;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
-using Ctlg.Data.Service;
+using Ctlg.Data;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service;
 using Ctlg.Service.Commands;

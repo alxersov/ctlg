@@ -1,5 +1,5 @@
 ﻿using System;
-using Ctlg.Data.Service;
+using Ctlg.Data;
 using Ctlg.Db.Migrations;
 using NUnit.Framework;
 

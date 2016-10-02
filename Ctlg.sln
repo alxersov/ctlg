@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg", "Ctlg\Ctlg.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Db.Migrations", "Ctlg.Db.Migrations\Ctlg.Db.Migrations.csproj", "{B33B78F0-7A5F-46BF-8AF5-CB607F762678}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Data.Service", "Ctlg.Data.Service\Ctlg.Data.Service.csproj", "{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Data", "Ctlg.Data\Ctlg.Data.csproj", "{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Filesystem.Service", "Ctlg.Filesystem.Service\Ctlg.Filesystem.Service.csproj", "{0B083C89-379C-4FFE-8271-93F7E94C231A}"
 EndProject

@@ -4,7 +4,7 @@ using System.Linq;
 using Ctlg.Core;
 using Ctlg.Db.Migrations;
 
-namespace Ctlg.Data.Service
+namespace Ctlg.Data
 {
     public class DataService : IDataService
     {

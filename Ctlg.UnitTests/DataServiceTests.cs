@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Ctlg.Data.Service;
+using Ctlg.Data;
 using Ctlg.Db.Migrations;
 using Moq;
 using NUnit.Framework;
