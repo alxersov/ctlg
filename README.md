@@ -17,7 +17,7 @@ A tool to catalog files and folders.
     ctlg find -h <hash>
     ctlg list
 
-### Available commands:
+### Available commands
 
  - add - Scan directory and add files to the catalog.
  - find - Find file in the catalog.
@@ -28,7 +28,9 @@ A tool to catalog files and folders.
  - .NET console application. 
  - Entity Framework with SQLite DB, database migrations in SQL.
  - Pri.LongPath is used to support long paths.
- - Autofac is used to inject dpendencies. 
+ - Autofac is used to inject dpendencies.
+ - SharpCompress is used to read archive files.
+ - Crc32.NET is used to calculate CRC32 checksums.
  - NUnit and Moq for testing.
  - Command and Event patterns.
  
