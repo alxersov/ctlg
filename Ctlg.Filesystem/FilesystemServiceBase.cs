@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Filesystem
 {

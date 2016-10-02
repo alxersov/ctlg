@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Autofac;
 using Ctlg.CommandLineOptions;
+using Ctlg.Core.Interfaces;
 using Ctlg.Data;
 using Ctlg.Db.Migrations;
 using Ctlg.Filesystem;

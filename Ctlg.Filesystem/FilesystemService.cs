@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Filesystem
 {

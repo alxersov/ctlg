@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
-using Ctlg.Data;
-using Ctlg.Filesystem;
+using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using File = Ctlg.Core.File;

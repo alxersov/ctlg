@@ -44,6 +44,11 @@
     <Compile Include="Hash.cs" />
     <Compile Include="HashAlgorithm.cs" />
     <Compile Include="HashAlgorithmId.cs" />
+    <Compile Include="Interfaces\IArchive.cs" />
+    <Compile Include="Interfaces\IDataService.cs" />
+    <Compile Include="Interfaces\IFilesystemDirectory.cs" />
+    <Compile Include="Interfaces\IFilesystemService.cs" />
+    <Compile Include="Interfaces\IHashFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -66,7 +66,6 @@
     <Compile Include="DataService.cs" />
     <Compile Include="CtlgContext.cs" />
     <Compile Include="ICtlgContext.cs" />
-    <Compile Include="IDataService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

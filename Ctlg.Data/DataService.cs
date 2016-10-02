@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 using Ctlg.Db.Migrations;
 
 namespace Ctlg.Data

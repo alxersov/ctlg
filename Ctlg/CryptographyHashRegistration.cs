@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using Autofac;
+using Ctlg.Core.Interfaces;
 using Ctlg.Filesystem;
 
 namespace Ctlg

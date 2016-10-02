@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
+using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Filesystem
 {

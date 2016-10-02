@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Ctlg.Filesystem
+namespace Ctlg.Core.Interfaces
 {
     public interface IHashFunction
     {

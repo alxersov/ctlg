@@ -3,6 +3,7 @@ using System.IO;
 using Ctlg.Core;
 using SharpCompress.Archive;
 using File = Ctlg.Core.File;
+using IArchive = Ctlg.Core.Interfaces.IArchive;
 
 namespace Ctlg.Filesystem
 {

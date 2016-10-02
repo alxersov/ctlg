@@ -54,10 +54,6 @@
     <Compile Include="FilesystemService.cs" />
     <Compile Include="FilesystemServiceBase.cs" />
     <Compile Include="FilesystemServiceLongPath.cs" />
-    <Compile Include="IArchive.cs" />
-    <Compile Include="IFilesystemDirectory.cs" />
-    <Compile Include="IFilesystemService.cs" />
-    <Compile Include="IHashFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpCompressArchive.cs" />
   </ItemGroup>

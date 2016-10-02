@@ -71,18 +71,6 @@
       <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
       <Name>Ctlg.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Data\Ctlg.Data.csproj">
-      <Project>{af3d28fa-dbb2-4ffe-8d59-b3173e4e3c7b}</Project>
-      <Name>Ctlg.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Db.Migrations\Ctlg.Db.Migrations.csproj">
-      <Project>{b33b78f0-7a5f-46bf-8af5-cb607f762678}</Project>
-      <Name>Ctlg.Db.Migrations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Filesystem\Ctlg.Filesystem.csproj">
-      <Project>{0b083c89-379c-4ffe-8271-93f7e94c231a}</Project>
-      <Name>Ctlg.Filesystem</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ctlg.Core.Interfaces;
 using Pri.LongPath;
 using File = Ctlg.Core.File;
 
