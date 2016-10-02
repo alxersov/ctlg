@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service;
@@ -11,7 +11,7 @@ using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Moq;
 using NUnit.Framework;
-using File = Ctlg.Data.Model.File;
+using File = Ctlg.Core.File;
 
 namespace Ctlg.UnitTests
 {

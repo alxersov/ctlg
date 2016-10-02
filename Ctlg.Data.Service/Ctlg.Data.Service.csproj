@@ -74,9 +74,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
+    <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
       <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
-      <Name>Ctlg.Data.Model</Name>
+      <Name>Ctlg.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ctlg.Db.Migrations\Ctlg.Db.Migrations.csproj">
       <Project>{b33b78f0-7a5f-46bf-8af5-cb607f762678}</Project>

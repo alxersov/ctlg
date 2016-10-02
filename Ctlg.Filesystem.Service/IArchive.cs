@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 
 namespace Ctlg.Filesystem.Service
 {

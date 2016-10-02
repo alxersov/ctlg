@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using File = Ctlg.Data.Model.File;
+using File = Ctlg.Core.File;
 
 
 namespace Ctlg.Filesystem.Service

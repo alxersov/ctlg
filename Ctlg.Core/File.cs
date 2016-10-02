@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Ctlg.Data.Model
+namespace Ctlg.Core
 {
     public class File
     {

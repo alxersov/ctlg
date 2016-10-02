@@ -3,7 +3,7 @@ using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Data.SQLite;
 using System.Diagnostics;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 
 namespace Ctlg.Data.Service
 {

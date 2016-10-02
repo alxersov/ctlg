@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SQLite;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 
 namespace Ctlg.Data.Service
 {

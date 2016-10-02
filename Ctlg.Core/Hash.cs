@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Ctlg.Data.Model
+namespace Ctlg.Core
 {
     public class Hash: IEquatable<Hash>
     {

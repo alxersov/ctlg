@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 using Ctlg.Db.Migrations;
 
 namespace Ctlg.Data.Service

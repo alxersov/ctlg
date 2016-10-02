@@ -62,13 +62,13 @@
     <Compile Include="SharpCompressArchive.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
-      <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
-      <Name>Ctlg.Data.Model</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
+      <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
+      <Name>Ctlg.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

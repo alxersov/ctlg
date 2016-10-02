@@ -93,9 +93,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
+    <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
       <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
-      <Name>Ctlg.Data.Model</Name>
+      <Name>Ctlg.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ctlg.Data.Service\Ctlg.Data.Service.csproj">
       <Project>{af3d28fa-dbb2-4ffe-8d59-b3173e4e3c7b}</Project>

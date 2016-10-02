@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac.Features.Indexed;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 using Ctlg.Data.Service;
 using Ctlg.Filesystem.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
-using File = Ctlg.Data.Model.File;
+using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {

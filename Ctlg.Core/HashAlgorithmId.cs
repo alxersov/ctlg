@@ -1,4 +1,4 @@
-﻿namespace Ctlg.Data.Model
+﻿namespace Ctlg.Core
 {
     public enum HashAlgorithmId
     {
