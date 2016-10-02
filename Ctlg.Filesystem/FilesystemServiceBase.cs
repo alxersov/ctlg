@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public class FilesystemServiceBase
     {

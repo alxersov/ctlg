@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Ctlg.Core;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public interface IArchive : IDisposable
     {

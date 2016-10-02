@@ -7,8 +7,8 @@
     <ProjectGuid>{0B083C89-379C-4FFE-8271-93F7E94C231A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ctlg.Filesystem.Service</RootNamespace>
-    <AssemblyName>Ctlg.Filesystem.Service</AssemblyName>
+    <RootNamespace>Ctlg.Filesystem</RootNamespace>
+    <AssemblyName>Ctlg.Filesystem</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

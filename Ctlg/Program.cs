@@ -5,7 +5,7 @@ using Autofac;
 using Ctlg.CommandLineOptions;
 using Ctlg.Data;
 using Ctlg.Db.Migrations;
-using Ctlg.Filesystem.Service;
+using Ctlg.Filesystem;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Utils;

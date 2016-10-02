@@ -4,7 +4,7 @@ using Ctlg.Core;
 using SharpCompress.Archive;
 using File = Ctlg.Core.File;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public class SharpCompressArchive : IArchive
     {

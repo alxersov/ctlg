@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public class FilesystemService : FilesystemServiceBase, IFilesystemService
     {

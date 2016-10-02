@@ -131,9 +131,9 @@
       <Project>{b33b78f0-7a5f-46bf-8af5-cb607f762678}</Project>
       <Name>Ctlg.Db.Migrations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Filesystem.Service\Ctlg.Filesystem.Service.csproj">
+    <ProjectReference Include="..\Ctlg.Filesystem\Ctlg.Filesystem.csproj">
       <Project>{0b083c89-379c-4ffe-8271-93f7e94c231a}</Project>
-      <Name>Ctlg.Filesystem.Service</Name>
+      <Name>Ctlg.Filesystem</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ctlg.Service\Ctlg.Service.csproj">
       <Project>{4f7d6469-b78e-4e41-942f-207c4f17d480}</Project>
