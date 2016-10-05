@@ -68,7 +68,7 @@ namespace Ctlg.Data
 
         public IEnumerable<File> GetFiles()
         {
-            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).Include(f => f.Hashes).AsNoTracking();
+            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).AsNoTracking();
             foreach (var dir in rootDirs)
             {
                 LoadContents(dir);
@@ -94,7 +94,7 @@ namespace Ctlg.Data
 
         private void LoadContents(File file)
         {
-            file.Contents = _ctlgContext.Files.Where(f => f.ParentFileId == file.FileId).Include(f => f.Hashes).AsNoTracking().ToList();
+            file.Contents = _ctlgContext.Files.Where(f => f.ParentFileId == file.FileId).AsNoTracking().ToList();
 
             foreach (var child in file.Contents)
             {

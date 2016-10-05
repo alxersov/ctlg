@@ -57,21 +57,8 @@ namespace Ctlg.EventHandlers
 
         public void Handle(TreeItemEnumerated args)
         {
-            var padding = "".PadLeft(args.NestingLevel * 4 + 1);
-            var hashes = string.Join(" ", args.File.Hashes.Select(h => FormatBytes.ToHexString(h.Value)));
-
-            if (string.IsNullOrEmpty(hashes))
-            {
-                hashes = "".PadLeft(40);
-            }
-
-            using (new ConsoleTextAttributesScope())
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(hashes);
-            }
-
-            Console.WriteLine("{0} {1}", padding, args.File.Name);
+            var padding = "".PadLeft(args.NestingLevel * 2);
+            Console.WriteLine("{0}{1}: {2}", padding, args.File.FileId, args.File.Name);
         }
 
         public void Handle(AddCommandFinished args)
@@ -84,7 +71,7 @@ namespace Ctlg.EventHandlers
         public void Handle(FileFoundInDb args)
         {
             var f = args.File;
-            Console.WriteLine("{0} {1}", f.BuildFullPath(), f.RecordUpdatedDateTime);
+            Console.WriteLine("{0}: {1} {2}", f.FileId, f.BuildFullPath(), f.RecordUpdatedDateTime);
         }
 
         private int _filesFound = 0;
