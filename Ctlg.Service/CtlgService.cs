@@ -69,6 +69,20 @@ namespace Ctlg.Service
             }
         }
 
+        public void Show(int catalgoEntryId)
+        {
+            var entry = DataService.GetCatalogEntry(catalgoEntryId);
+
+            if (entry == null)
+            {
+                DomainEvents.Raise(new CatalogEntryNotFound(catalgoEntryId));
+            }
+            else
+            {
+                DomainEvents.Raise(new CatalogEntryFound(entry));
+            }
+        }
+
         private void OutputFiles(IEnumerable<File> files, int level = 0)
         {
             foreach (var file in files)

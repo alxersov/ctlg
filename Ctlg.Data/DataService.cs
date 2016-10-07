@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Ctlg.Core;
@@ -32,6 +33,21 @@ namespace Ctlg.Data
 
             LoadExistingHashes(directory, dict);
             _ctlgContext.Files.Add(directory);
+        }
+
+        public File GetCatalogEntry(int catalogEntryId)
+        {
+            var entry = _ctlgContext.Files.Where(f => f.FileId == catalogEntryId)
+                    .Include(f => f.Contents)
+                    .Include(f => f.Hashes)
+                    .Include(f => f.Hashes.Select(h => h.HashAlgorithm))
+                    .FirstOrDefault();
+            if (entry != null)
+            {
+                LoadParentFile(entry);
+            }
+
+            return entry;
         }
 
         private void LoadExistingHashes(File file, Dictionary<Hash, Hash> dict)

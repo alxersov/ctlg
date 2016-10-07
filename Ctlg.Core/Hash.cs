@@ -32,6 +32,7 @@ namespace Ctlg.Core
 
         public int HashId { get; protected set; }
         public int HashAlgorithmId { get; protected set; }
+        public HashAlgorithm HashAlgorithm { get; protected set; }
         public byte[] Value { get; protected set; }
 
         public override int GetHashCode()

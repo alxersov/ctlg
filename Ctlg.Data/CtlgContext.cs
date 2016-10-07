@@ -47,6 +47,9 @@ namespace Ctlg.Data
                 .Property(h => h.Value)
                 .IsRequired();
 
+            modelBuilder.Entity<Hash>()
+                .HasRequired(h => h.HashAlgorithm).WithMany().HasForeignKey(h => h.HashAlgorithmId);
+
             modelBuilder.Entity<HashAlgorithm>()
                 .Property(h => h.Name)
                 .IsRequired();

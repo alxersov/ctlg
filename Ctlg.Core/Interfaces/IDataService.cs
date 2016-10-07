@@ -6,6 +6,7 @@ namespace Ctlg.Core.Interfaces
     {
         void ApplyDbMigrations();
         void AddDirectory(File directory);
+        File GetCatalogEntry(int catalogEntryId);
         IEnumerable<File> GetFiles();
         IEnumerable<File> GetFiles(byte[] hash);
         HashAlgorithm GetHashAlgorithm(string name);

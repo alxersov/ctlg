@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="CommandLineOptions\Add.cs" />
     <Compile Include="CommandLineOptions\Find.cs" />
+    <Compile Include="CommandLineOptions\Show.cs" />
     <Compile Include="ConsoleTextAttributesScope.cs" />
     <Compile Include="CryptographyHashRegistration.cs" />
     <Compile Include="EventHandlers\ErrorOutput.cs" />

@@ -76,11 +76,15 @@ namespace Ctlg
                     case "list":
                         command = new ListCommand();
                         break;
+                    case "show":
+                        var show = (Show) options;
+                        command = new ShowCommand(show.CatalogEntryIds.Select(int.Parse).ToList());
+                        break;
                 }
             }
             catch (Exception)
             {
-                Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", command);
+                Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", commandName);
             }
 
             return command;

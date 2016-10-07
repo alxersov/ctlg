@@ -14,6 +14,9 @@ namespace Ctlg.CommandLineOptions
         [VerbOption("list", HelpText = "List all files in the catalog.")]
         public object List { get; set; } = new object();
 
+        [VerbOption("show", HelpText = "Show catalog entry.")]
+        public Show Show { get; set; } = new Show();
+
         [HelpVerbOption]
         public string GetUsage(string verb)
         {
@@ -36,6 +39,9 @@ namespace Ctlg.CommandLineOptions
                     break;
                 case "list":
                     usage = "ctlg list";
+                    break;
+                case "show":
+                    usage = "ctlg show <catalog entry IDs>";
                     break;
             }
 

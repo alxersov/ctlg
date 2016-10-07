@@ -14,12 +14,14 @@ A tool to catalog files and folders.
     ctlg <command> [<args>]
 
     ctlg add -s <mask> -f <hash function> <directory>
+    ctlg show <catalog entry IDs>
     ctlg find -h <hash>
     ctlg list
 
 ### Available commands
 
  - add - Scan directory and add files to the catalog.
+ - show - Show detailed information about catalog enty.
  - find - Find file in the catalog.
  - list - List all files in the catalog.
 

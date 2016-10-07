@@ -1,4 +1,5 @@
-﻿using Ctlg.Service.Commands;
+﻿using System;
+using Ctlg.Service.Commands;
 
 namespace Ctlg.Service
 {
@@ -10,5 +11,6 @@ namespace Ctlg.Service
         void AddDirectory(string path, string searchPattern, string hashFunctionName);
         void ListFiles();
         void FindFiles(byte[] hash);
+        void Show(int catalgoEntryId);
     }
 }

@@ -48,11 +48,14 @@
     <Compile Include="Commands\FindCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ListCommand.cs" />
+    <Compile Include="Commands\ShowCommand.cs" />
     <Compile Include="CtlgService.cs" />
     <Compile Include="DomainEvents.cs" />
     <Compile Include="Events\AddCommandFinished.cs" />
     <Compile Include="Events\ArchiveEntryFound.cs" />
     <Compile Include="Events\ArchiveFound.cs" />
+    <Compile Include="Events\CatalogEntryFound.cs" />
+    <Compile Include="Events\CatalogEntryNotFound.cs" />
     <Compile Include="Events\DirectoryFound.cs" />
     <Compile Include="Events\ExceptionEvent.cs" />
     <Compile Include="Events\FileFound.cs" />
