@@ -1,6 +1,7 @@
 ﻿using System.IO;
+using Ctlg.Core.Interfaces;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public class FilesystemService : FilesystemServiceBase, IFilesystemService
     {

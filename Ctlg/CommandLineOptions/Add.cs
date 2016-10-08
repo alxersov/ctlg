@@ -8,7 +8,7 @@ namespace Ctlg.CommandLineOptions
         [ValueList(typeof(List<string>), MaximumElements = 1)]
         public IList<string> Path { get; set; }
 
-        [Option('s', "search", HelpText = "Search pattern.")]
+        [Option('s', "search", HelpText = "Search pattern. Can contain wildcards * and ?.")]
         public string SearchPattern { get; set; }
 
         [Option('f', "function", HelpText = "Hash function.")]

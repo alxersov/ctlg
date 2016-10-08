@@ -1,4 +1,4 @@
-﻿using Ctlg.Data.Model;
+﻿using Ctlg.Core;
 using NUnit.Framework;
 
 namespace Ctlg.UnitTests

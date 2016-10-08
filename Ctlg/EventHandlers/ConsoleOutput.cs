@@ -14,7 +14,9 @@ namespace Ctlg.EventHandlers
         IHandle<HashCalculated>,
         IHandle<TreeItemEnumerated>,
         IHandle<AddCommandFinished>,
-        IHandle<FileFoundInDb>
+        IHandle<FileFoundInDb>,
+        IHandle<CatalogEntryNotFound>,
+        IHandle<CatalogEntryFound>
     {
         public void Handle(DirectoryFound args)
         {
@@ -57,21 +59,8 @@ namespace Ctlg.EventHandlers
 
         public void Handle(TreeItemEnumerated args)
         {
-            var padding = "".PadLeft(args.NestingLevel * 4 + 1);
-            var hashes = string.Join(" ", args.File.Hashes.Select(h => FormatBytes.ToHexString(h.Value)));
-
-            if (string.IsNullOrEmpty(hashes))
-            {
-                hashes = "".PadLeft(40);
-            }
-
-            using (new ConsoleTextAttributesScope())
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(hashes);
-            }
-
-            Console.WriteLine("{0} {1}", padding, args.File.Name);
+            var padding = "".PadLeft(args.NestingLevel * 2);
+            Console.WriteLine("{0}{1}: {2}", padding, args.File.FileId, args.File.Name);
         }
 
         public void Handle(AddCommandFinished args)
@@ -84,7 +73,50 @@ namespace Ctlg.EventHandlers
         public void Handle(FileFoundInDb args)
         {
             var f = args.File;
-            Console.WriteLine("{0} {1}", f.BuildFullPath(), f.RecordUpdatedDateTime);
+            Console.WriteLine("{0}: {1} {2}", f.FileId, f.BuildFullPath(), f.RecordUpdatedDateTime);
+        }
+
+        public void Handle(CatalogEntryNotFound args)
+        {
+            Console.WriteLine("Entry with ID {0} not found.", args.Id);
+        }
+
+        public void Handle(CatalogEntryFound args)
+        {
+            var e = args.Entry;
+            Console.WriteLine("ID: {0}", e.FileId);
+            Console.WriteLine("Name: {0}", e.Name);
+            Console.WriteLine("Path: {0}", e.BuildFullPath());
+            if (e.Size.HasValue) { Console.WriteLine("Size: {0} bytes", e.Size); }
+            if (e.FileCreatedDateTime.HasValue) { Console.WriteLine("Created: {0}", e.FileCreatedDateTime); }
+            if (e.FileModifiedDateTime.HasValue) { Console.WriteLine("Modified: {0}", e.FileModifiedDateTime); }
+            Console.WriteLine("Entry updated: {0}", e.RecordUpdatedDateTime);
+            if (e.IsDirectory) { Console.WriteLine("Is directory"); }
+
+            foreach (var hash in e.Hashes)
+            {
+                Console.WriteLine("{0}: {1}", hash.HashAlgorithm.Name, FormatBytes.ToHexString(hash.Value));
+            }
+
+            if (e.ParentFile != null)
+            {
+                Console.WriteLine("Parent:");
+
+                Console.WriteLine(" ^ {0}: {1}", e.ParentFile.FileId, e.ParentFile.BuildFullPath());
+            }
+
+            if (e.Contents.Any())
+            {
+                Console.WriteLine("Contents:");
+
+                foreach (var content in e.Contents)
+                {
+                    Console.WriteLine(" > {0}: {1}", content.FileId, content.Name);
+                }
+            }
+
+
+            Console.WriteLine();
         }
 
         private int _filesFound = 0;

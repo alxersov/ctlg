@@ -3,9 +3,9 @@ using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Data.SQLite;
 using System.Diagnostics;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 
-namespace Ctlg.Data.Service
+namespace Ctlg.Data
 {
     public class CtlgContext : DbContext, ICtlgContext
     {
@@ -46,6 +46,9 @@ namespace Ctlg.Data.Service
             modelBuilder.Entity<Hash>()
                 .Property(h => h.Value)
                 .IsRequired();
+
+            modelBuilder.Entity<Hash>()
+                .HasRequired(h => h.HashAlgorithm).WithMany().HasForeignKey(h => h.HashAlgorithmId);
 
             modelBuilder.Entity<HashAlgorithm>()
                 .Property(h => h.Name)

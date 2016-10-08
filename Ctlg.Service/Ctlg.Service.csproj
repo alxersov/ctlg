@@ -48,11 +48,14 @@
     <Compile Include="Commands\FindCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ListCommand.cs" />
+    <Compile Include="Commands\ShowCommand.cs" />
     <Compile Include="CtlgService.cs" />
     <Compile Include="DomainEvents.cs" />
     <Compile Include="Events\AddCommandFinished.cs" />
     <Compile Include="Events\ArchiveEntryFound.cs" />
     <Compile Include="Events\ArchiveFound.cs" />
+    <Compile Include="Events\CatalogEntryFound.cs" />
+    <Compile Include="Events\CatalogEntryNotFound.cs" />
     <Compile Include="Events\DirectoryFound.cs" />
     <Compile Include="Events\ExceptionEvent.cs" />
     <Compile Include="Events\FileFound.cs" />
@@ -67,21 +70,9 @@
     <Compile Include="Utils\TypeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
+    <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
       <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
-      <Name>Ctlg.Data.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Data.Service\Ctlg.Data.Service.csproj">
-      <Project>{af3d28fa-dbb2-4ffe-8d59-b3173e4e3c7b}</Project>
-      <Name>Ctlg.Data.Service</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Db.Migrations\Ctlg.Db.Migrations.csproj">
-      <Project>{b33b78f0-7a5f-46bf-8af5-cb607f762678}</Project>
-      <Name>Ctlg.Db.Migrations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Filesystem.Service\Ctlg.Filesystem.Service.csproj">
-      <Project>{0b083c89-379c-4ffe-8271-93f7e94c231a}</Project>
-      <Name>Ctlg.Filesystem.Service</Name>
+      <Name>Ctlg.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

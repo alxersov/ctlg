@@ -3,15 +3,16 @@ using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
-using Ctlg.Data.Model;
-using Ctlg.Data.Service;
-using Ctlg.Filesystem.Service;
+using Ctlg.Core;
+using Ctlg.Core.Interfaces;
+using Ctlg.Data;
+using Ctlg.Filesystem;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Moq;
 using NUnit.Framework;
-using File = Ctlg.Data.Model.File;
+using File = Ctlg.Core.File;
 
 namespace Ctlg.UnitTests
 {
@@ -188,11 +189,11 @@ namespace Ctlg.UnitTests
             using (var mock = AutoMock.GetLoose())
             {
                 mock.Mock<IDataService>()
-                    .Setup(d => d.GetFiles(It.IsAny<byte[]>()))
+                    .Setup(d => d.GetFiles(It.IsAny<Hash>(), It.IsAny<long?>(), It.IsAny<string>()))
                     .Returns(new List<File> {file});
 
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.FindFiles(new byte[0]);
+                ctlg.FindFiles(new Hash(1, new byte[0]), null, "*");
 
                 Assert.That(events.Count, Is.EqualTo(1));
                 Assert.That(events[0].File.BuildFullPath(), Does.Contain(@"A\B\1.txt"));

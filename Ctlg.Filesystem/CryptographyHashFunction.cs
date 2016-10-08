@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
+using Ctlg.Core.Interfaces;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     /// <summary>
     /// Adapter for <see cref="System.Security.Cryptography.HashAlgorithm"/>. Allows to use any HashAlgorithm as IHashFunction.

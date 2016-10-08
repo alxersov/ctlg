@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using Ctlg.Data.Model;
 
-namespace Ctlg.Data.Service
+namespace Ctlg.Core.Interfaces
 {
     public interface IDataService
     {
         void ApplyDbMigrations();
         void AddDirectory(File directory);
+        File GetCatalogEntry(int catalogEntryId);
         IEnumerable<File> GetFiles();
-        IEnumerable<File> GetFiles(byte[] hash);
+        IEnumerable<File> GetFiles(Hash hash, long? size, string namePattern);
         HashAlgorithm GetHashAlgorithm(string name);
 
         void SaveChanges();

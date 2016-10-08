@@ -7,8 +7,8 @@
     <ProjectGuid>{0B083C89-379C-4FFE-8271-93F7E94C231A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ctlg.Filesystem.Service</RootNamespace>
-    <AssemblyName>Ctlg.Filesystem.Service</AssemblyName>
+    <RootNamespace>Ctlg.Filesystem</RootNamespace>
+    <AssemblyName>Ctlg.Filesystem</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -54,21 +54,17 @@
     <Compile Include="FilesystemService.cs" />
     <Compile Include="FilesystemServiceBase.cs" />
     <Compile Include="FilesystemServiceLongPath.cs" />
-    <Compile Include="IArchive.cs" />
-    <Compile Include="IFilesystemDirectory.cs" />
-    <Compile Include="IFilesystemService.cs" />
-    <Compile Include="IHashFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpCompressArchive.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
-      <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
-      <Name>Ctlg.Data.Model</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
+      <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
+      <Name>Ctlg.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,9 +3,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using Autofac;
 using Ctlg.CommandLineOptions;
-using Ctlg.Data.Service;
+using Ctlg.Core.Interfaces;
+using Ctlg.Data;
 using Ctlg.Db.Migrations;
-using Ctlg.Filesystem.Service;
+using Ctlg.Filesystem;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Utils;
@@ -70,16 +71,41 @@ namespace Ctlg
                         break;
                     case "find":
                         var find = (Find) options;
-                        command = new FindCommand {Hash = find.Hash};
+
+                        if (find.Checksum != null && find.HashFunctionName == null)
+                        {
+                            Console.Error.WriteLine("Checksum value parameter requires Hash function to be provided.");
+                            throw new InvalidOperationException();
+                        }
+
+                        if (find.Checksum == null &&
+                            find.Size == null &&
+                            find.NamePattern == null)
+                        {
+                            Console.Error.WriteLine("No parameters provided.");
+                            throw new InvalidOperationException();
+                        }
+
+                        command = new FindCommand
+                        {
+                            Hash = find.Checksum,
+                            HashFunctionName = find.HashFunctionName,
+                            NamePattern = find.NamePattern,
+                            Size = find.Size
+                        };
                         break;
                     case "list":
                         command = new ListCommand();
+                        break;
+                    case "show":
+                        var show = (Show) options;
+                        command = new ShowCommand(show.CatalogEntryIds.Select(int.Parse).ToList());
                         break;
                 }
             }
             catch (Exception)
             {
-                Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", command);
+                Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", commandName);
             }
 
             return command;

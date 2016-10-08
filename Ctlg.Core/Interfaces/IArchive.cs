@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ctlg.Data.Model;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Core.Interfaces
 {
     public interface IArchive : IDisposable
     {

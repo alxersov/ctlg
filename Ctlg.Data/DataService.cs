@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Ctlg.Data.Model;
+using System.Text.RegularExpressions;
+using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 using Ctlg.Db.Migrations;
 
-namespace Ctlg.Data.Service
+namespace Ctlg.Data
 {
     public class DataService : IDataService
     {
@@ -31,6 +34,21 @@ namespace Ctlg.Data.Service
 
             LoadExistingHashes(directory, dict);
             _ctlgContext.Files.Add(directory);
+        }
+
+        public File GetCatalogEntry(int catalogEntryId)
+        {
+            var entry = _ctlgContext.Files.Where(f => f.FileId == catalogEntryId)
+                    .Include(f => f.Contents)
+                    .Include(f => f.Hashes)
+                    .Include(f => f.Hashes.Select(h => h.HashAlgorithm))
+                    .FirstOrDefault();
+            if (entry != null)
+            {
+                LoadParentFile(entry);
+            }
+
+            return entry;
         }
 
         private void LoadExistingHashes(File file, Dictionary<Hash, Hash> dict)
@@ -67,7 +85,7 @@ namespace Ctlg.Data.Service
 
         public IEnumerable<File> GetFiles()
         {
-            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).Include(f => f.Hashes).AsNoTracking();
+            var rootDirs = _ctlgContext.Files.Where(f => f.ParentFile == null).AsNoTracking();
             foreach (var dir in rootDirs)
             {
                 LoadContents(dir);
@@ -75,25 +93,57 @@ namespace Ctlg.Data.Service
             }
         }
 
-        public IEnumerable<File> GetFiles(byte[] hash)
+        public IEnumerable<File> GetFiles(Hash hash, long? size, string namePattern)
         {
-            var foundFiles = _ctlgContext.Files.Where(f => f.Hashes.Any(h => h.Value == hash));
+            IQueryable<File> query = _ctlgContext.Files;
 
-            foreach (var file in foundFiles)
+            if (size != null)
             {
-                LoadParentFile(file);
-                yield return file;
+                query = query.Where(f => f.Size == size);
+            }
+
+            if (hash != null)
+            {
+                query = query.Where(f => f.Hashes.Any(h => h.HashAlgorithmId == hash.HashAlgorithmId && h.Value == hash.Value));
+            }
+
+            Regex regex = null;
+            if (namePattern != null)
+            {
+                if (namePattern.Contains("*") || namePattern.Contains("?"))
+                {
+                    var regexPattern =
+                        "^" +
+                        Regex.Escape(namePattern)
+                            .Replace(@"\*", ".*")
+                            .Replace(@"\?", ".?") +
+                        "$";
+                    regex = new Regex(regexPattern);
+                }
+                else
+                {
+                    query = query.Where(f => f.Name == namePattern);
+                }
+            }
+
+            foreach (var file in query)
+            {
+                if (regex == null || regex.IsMatch(file.Name))
+                {
+                    LoadParentFile(file);
+                    yield return file;
+                }
             }
         }
 
         public HashAlgorithm GetHashAlgorithm(string name)
         {
-            return _ctlgContext.HashAlgorithm.First(a => a.Name == name);
+            return _ctlgContext.HashAlgorithm.FirstOrDefault(a => a.Name == name);
         }
 
         private void LoadContents(File file)
         {
-            file.Contents = _ctlgContext.Files.Where(f => f.ParentFileId == file.FileId).Include(f => f.Hashes).AsNoTracking().ToList();
+            file.Contents = _ctlgContext.Files.Where(f => f.ParentFileId == file.FileId).AsNoTracking().ToList();
 
             foreach (var child in file.Contents)
             {

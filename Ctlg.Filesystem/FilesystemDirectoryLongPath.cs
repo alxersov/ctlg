@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using File = Ctlg.Data.Model.File;
+using Ctlg.Core.Interfaces;
+using Pri.LongPath;
+using File = Ctlg.Core.File;
 
-
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
-    public class FilesystemDirectory : IFilesystemDirectory
+    public class FilesystemDirectoryLongPath: IFilesystemDirectory
     {
         public File Directory { get; set; }
 
-        public FilesystemDirectory(string path)
+        public FilesystemDirectoryLongPath(string path)
         {
             Initialize(new DirectoryInfo(path));
         }
 
-        private FilesystemDirectory(DirectoryInfo directoryInfo)
+        private FilesystemDirectoryLongPath(DirectoryInfo directoryInfo)
         {
             Initialize(directoryInfo);
         }
@@ -33,12 +33,12 @@ namespace Ctlg.Filesystem.Service
                 RecordUpdatedDateTime = DateTime.UtcNow
             };
         }
-        
+
         public IEnumerable<IFilesystemDirectory> EnumerateDirectories()
         {
             foreach (var dir in _directoryInfo.GetDirectories())
             {
-                yield return new FilesystemDirectory(dir);
+                yield return new FilesystemDirectoryLongPath(dir);
             }
         }
 

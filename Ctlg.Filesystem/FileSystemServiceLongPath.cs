@@ -1,7 +1,8 @@
-﻿using Stream = System.IO.Stream;
+﻿using Ctlg.Core.Interfaces;
 using Pri.LongPath;
+using Stream = System.IO.Stream;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public class FilesystemServiceLongPath : FilesystemServiceBase, IFilesystemService
     {

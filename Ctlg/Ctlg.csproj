@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="CommandLineOptions\Add.cs" />
     <Compile Include="CommandLineOptions\Find.cs" />
+    <Compile Include="CommandLineOptions\Show.cs" />
     <Compile Include="ConsoleTextAttributesScope.cs" />
     <Compile Include="CryptographyHashRegistration.cs" />
     <Compile Include="EventHandlers\ErrorOutput.cs" />
@@ -93,21 +94,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ctlg.Data.Model\Ctlg.Data.Model.csproj">
+    <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
       <Project>{d52fdbd7-1ba7-4687-94d5-47b98fabfc24}</Project>
-      <Name>Ctlg.Data.Model</Name>
+      <Name>Ctlg.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Data.Service\Ctlg.Data.Service.csproj">
+    <ProjectReference Include="..\Ctlg.Data\Ctlg.Data.csproj">
       <Project>{af3d28fa-dbb2-4ffe-8d59-b3173e4e3c7b}</Project>
-      <Name>Ctlg.Data.Service</Name>
+      <Name>Ctlg.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ctlg.Db.Migrations\Ctlg.Db.Migrations.csproj">
       <Project>{b33b78f0-7a5f-46bf-8af5-cb607f762678}</Project>
       <Name>Ctlg.Db.Migrations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ctlg.Filesystem.Service\Ctlg.Filesystem.Service.csproj">
+    <ProjectReference Include="..\Ctlg.Filesystem\Ctlg.Filesystem.csproj">
       <Project>{0b083c89-379c-4ffe-8271-93f7e94c231a}</Project>
-      <Name>Ctlg.Filesystem.Service</Name>
+      <Name>Ctlg.Filesystem</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ctlg.Service\Ctlg.Service.csproj">
       <Project>{4f7d6469-b78e-4e41-942f-207c4f17d480}</Project>

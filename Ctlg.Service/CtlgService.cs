@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac.Features.Indexed;
-using Ctlg.Data.Model;
-using Ctlg.Data.Service;
-using Ctlg.Filesystem.Service;
+using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
-using File = Ctlg.Data.Model.File;
+using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {
@@ -35,7 +34,7 @@ namespace Ctlg.Service
                 throw new Exception($"Unsupported hash function {hashFunctionName}");
             }
 
-            var hashAlgorithm = DataService.GetHashAlgorithm(hashFunctionName);
+            var hashAlgorithm = GetHashAlgorithm(hashFunctionName);
 
             if (string.IsNullOrEmpty(searchPattern))
             {
@@ -60,14 +59,40 @@ namespace Ctlg.Service
             OutputFiles(DataService.GetFiles());
         }
 
-        public void FindFiles(byte[] hash)
+        public void FindFiles(Hash hash, long? size, string namePattern)
         {
-            var files = DataService.GetFiles(hash);
+            var files = DataService.GetFiles(hash, size, namePattern);
 
             foreach (var f in files)
             {
                 DomainEvents.Raise(new FileFoundInDb(f));
             }
+        }
+
+        public void Show(int catalgoEntryId)
+        {
+            var entry = DataService.GetCatalogEntry(catalgoEntryId);
+
+            if (entry == null)
+            {
+                DomainEvents.Raise(new CatalogEntryNotFound(catalgoEntryId));
+            }
+            else
+            {
+                DomainEvents.Raise(new CatalogEntryFound(entry));
+            }
+        }
+
+        public HashAlgorithm GetHashAlgorithm(string hashFunctionName)
+        {
+            var algorithm = DataService.GetHashAlgorithm(hashFunctionName);
+
+            if (algorithm == null)
+            {
+                throw new InvalidOperationException($"Unknown hash function {hashFunctionName}");
+            }
+
+            return algorithm;
         }
 
         private void OutputFiles(IEnumerable<File> files, int level = 0)

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Ctlg.Data.Model;
+using Ctlg.Core;
 using SharpCompress.Archive;
-using File = Ctlg.Data.Model.File;
+using File = Ctlg.Core.File;
+using IArchive = Ctlg.Core.Interfaces.IArchive;
 
-namespace Ctlg.Filesystem.Service
+namespace Ctlg.Filesystem
 {
     public class SharpCompressArchive : IArchive
     {

@@ -1,4 +1,4 @@
-﻿using Ctlg.Data.Model;
+﻿using Ctlg.Core;
 
 namespace Ctlg.Service.Events
 {

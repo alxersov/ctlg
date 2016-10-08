@@ -7,8 +7,8 @@
     <ProjectGuid>{D52FDBD7-1BA7-4687-94D5-47B98FABFC24}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ctlg.Data.Model</RootNamespace>
-    <AssemblyName>Ctlg.Data.Model</AssemblyName>
+    <RootNamespace>Ctlg.Core</RootNamespace>
+    <AssemblyName>Ctlg.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,6 +44,11 @@
     <Compile Include="Hash.cs" />
     <Compile Include="HashAlgorithm.cs" />
     <Compile Include="HashAlgorithmId.cs" />
+    <Compile Include="Interfaces\IArchive.cs" />
+    <Compile Include="Interfaces\IDataService.cs" />
+    <Compile Include="Interfaces\IFilesystemDirectory.cs" />
+    <Compile Include="Interfaces\IFilesystemService.cs" />
+    <Compile Include="Interfaces\IHashFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
