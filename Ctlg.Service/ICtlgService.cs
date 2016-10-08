@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Ctlg.Core;
 using Ctlg.Service.Commands;
 
 namespace Ctlg.Service
@@ -10,7 +10,9 @@ namespace Ctlg.Service
 
         void AddDirectory(string path, string searchPattern, string hashFunctionName);
         void ListFiles();
-        void FindFiles(byte[] hash);
+        void FindFiles(Hash hash, long? size, string namePattern);
         void Show(int catalgoEntryId);
+
+        HashAlgorithm GetHashAlgorithm(string hashAlgorithmName);
     }
 }

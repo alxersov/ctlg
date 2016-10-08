@@ -71,7 +71,28 @@ namespace Ctlg
                         break;
                     case "find":
                         var find = (Find) options;
-                        command = new FindCommand {Hash = find.Hash};
+
+                        if (find.Checksum != null && find.HashFunctionName == null)
+                        {
+                            Console.Error.WriteLine("Checksum value parameter requires Hash function to be provided.");
+                            throw new InvalidOperationException();
+                        }
+
+                        if (find.Checksum == null &&
+                            find.Size == null &&
+                            find.NamePattern == null)
+                        {
+                            Console.Error.WriteLine("No parameters provided.");
+                            throw new InvalidOperationException();
+                        }
+
+                        command = new FindCommand
+                        {
+                            Hash = find.Checksum,
+                            HashFunctionName = find.HashFunctionName,
+                            NamePattern = find.NamePattern,
+                            Size = find.Size
+                        };
                         break;
                     case "list":
                         command = new ListCommand();

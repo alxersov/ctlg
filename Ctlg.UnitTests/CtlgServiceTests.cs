@@ -189,11 +189,11 @@ namespace Ctlg.UnitTests
             using (var mock = AutoMock.GetLoose())
             {
                 mock.Mock<IDataService>()
-                    .Setup(d => d.GetFiles(It.IsAny<byte[]>()))
+                    .Setup(d => d.GetFiles(It.IsAny<Hash>(), It.IsAny<long?>(), It.IsAny<string>()))
                     .Returns(new List<File> {file});
 
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.FindFiles(new byte[0]);
+                ctlg.FindFiles(new Hash(1, new byte[0]), null, "*");
 
                 Assert.That(events.Count, Is.EqualTo(1));
                 Assert.That(events[0].File.BuildFullPath(), Does.Contain(@"A\B\1.txt"));

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Db.Migrations;
@@ -92,20 +93,52 @@ namespace Ctlg.Data
             }
         }
 
-        public IEnumerable<File> GetFiles(byte[] hash)
+        public IEnumerable<File> GetFiles(Hash hash, long? size, string namePattern)
         {
-            var foundFiles = _ctlgContext.Files.Where(f => f.Hashes.Any(h => h.Value == hash));
+            IQueryable<File> query = _ctlgContext.Files;
 
-            foreach (var file in foundFiles)
+            if (size != null)
             {
-                LoadParentFile(file);
-                yield return file;
+                query = query.Where(f => f.Size == size);
+            }
+
+            if (hash != null)
+            {
+                query = query.Where(f => f.Hashes.Any(h => h.HashAlgorithmId == hash.HashAlgorithmId && h.Value == hash.Value));
+            }
+
+            Regex regex = null;
+            if (namePattern != null)
+            {
+                if (namePattern.Contains("*") || namePattern.Contains("?"))
+                {
+                    var regexPattern =
+                        "^" +
+                        Regex.Escape(namePattern)
+                            .Replace(@"\*", ".*")
+                            .Replace(@"\?", ".?") +
+                        "$";
+                    regex = new Regex(regexPattern);
+                }
+                else
+                {
+                    query = query.Where(f => f.Name == namePattern);
+                }
+            }
+
+            foreach (var file in query)
+            {
+                if (regex == null || regex.IsMatch(file.Name))
+                {
+                    LoadParentFile(file);
+                    yield return file;
+                }
             }
         }
 
         public HashAlgorithm GetHashAlgorithm(string name)
         {
-            return _ctlgContext.HashAlgorithm.First(a => a.Name == name);
+            return _ctlgContext.HashAlgorithm.FirstOrDefault(a => a.Name == name);
         }
 
         private void LoadContents(File file)

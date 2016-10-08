@@ -8,7 +8,7 @@ namespace Ctlg.Core.Interfaces
         void AddDirectory(File directory);
         File GetCatalogEntry(int catalogEntryId);
         IEnumerable<File> GetFiles();
-        IEnumerable<File> GetFiles(byte[] hash);
+        IEnumerable<File> GetFiles(Hash hash, long? size, string namePattern);
         HashAlgorithm GetHashAlgorithm(string name);
 
         void SaveChanges();

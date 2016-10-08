@@ -34,7 +34,7 @@ namespace Ctlg.Service
                 throw new Exception($"Unsupported hash function {hashFunctionName}");
             }
 
-            var hashAlgorithm = DataService.GetHashAlgorithm(hashFunctionName);
+            var hashAlgorithm = GetHashAlgorithm(hashFunctionName);
 
             if (string.IsNullOrEmpty(searchPattern))
             {
@@ -59,9 +59,9 @@ namespace Ctlg.Service
             OutputFiles(DataService.GetFiles());
         }
 
-        public void FindFiles(byte[] hash)
+        public void FindFiles(Hash hash, long? size, string namePattern)
         {
-            var files = DataService.GetFiles(hash);
+            var files = DataService.GetFiles(hash, size, namePattern);
 
             foreach (var f in files)
             {
@@ -81,6 +81,18 @@ namespace Ctlg.Service
             {
                 DomainEvents.Raise(new CatalogEntryFound(entry));
             }
+        }
+
+        public HashAlgorithm GetHashAlgorithm(string hashFunctionName)
+        {
+            var algorithm = DataService.GetHashAlgorithm(hashFunctionName);
+
+            if (algorithm == null)
+            {
+                throw new InvalidOperationException($"Unknown hash function {hashFunctionName}");
+            }
+
+            return algorithm;
         }
 
         private void OutputFiles(IEnumerable<File> files, int level = 0)
