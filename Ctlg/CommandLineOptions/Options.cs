@@ -38,10 +38,10 @@ namespace Ctlg.CommandLineOptions
                     usage = "ctlg find [<options>]\n\nAvailable options:";
                     break;
                 case "list":
-                    usage = "ctlg list";
+                    usage = "ctlg list\n";
                     break;
                 case "show":
-                    usage = "ctlg show <catalog entry IDs>";
+                    usage = "ctlg show <catalog entry IDs>\n";
                     break;
             }
 

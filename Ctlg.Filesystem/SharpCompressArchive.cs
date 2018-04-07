@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Ctlg.Core;
-using SharpCompress.Archive;
+using SharpCompress.Readers;
 using File = Ctlg.Core.File;
 using IArchive = Ctlg.Core.Interfaces.IArchive;
 
@@ -11,13 +11,14 @@ namespace Ctlg.Filesystem
     {
         public SharpCompressArchive(Stream stream)
         {
-            _archive = ArchiveFactory.Open(stream);
+            _archive = ReaderFactory.Open(stream);
         }
 
         public IEnumerable<File> EnumerateEntries()
         {
-            foreach (var entry in _archive.Entries)
+            while (_archive.MoveToNextEntry())
             {
+                var entry = _archive.Entry;
                 if (!entry.IsDirectory)
                 {
                     var file = new File(entry.Key)
@@ -43,6 +44,6 @@ namespace Ctlg.Filesystem
             }
         }
 
-        private SharpCompress.Archive.IArchive _archive;
+        private IReader _archive;
     }
 }
