@@ -294,14 +294,20 @@ namespace Ctlg.UnitTests
 
                 var hashFunctionMock = new Mock<IHashFunction>();
                 hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
-                    .Returns(new byte[] {1, 2, 3, 4});
+                                .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
 
                 var index = new Index<string, IHashFunction>();
                 index.Add("XHASH", hashFunctionMock.Object);
                 mock.Provide<IIndex<string, IHashFunction>>(index);
 
+
+                var addCommand = mock.Create<AddCommand>();
+
+                addCommand.Path = "somepath";
+                addCommand.HashFunctionName = "XHASH";
+
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("somepath", null, "XHASH");
+                addCommand.Execute(ctlg);
 
                 return addedDirectory;
             }

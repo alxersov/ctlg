@@ -8,11 +8,12 @@ namespace Ctlg.Service
         void Execute(ICommand command);
         void ApplyDbMigrations();
 
-        void AddDirectory(string path, string searchPattern, string hashFunctionName);
         void ListFiles();
         void FindFiles(Hash hash, long? size, string namePattern);
         void Show(int catalgoEntryId);
 
         HashAlgorithm GetHashAlgorithm(string hashAlgorithmName);
+
+        string GetBackupFilePath(string hash);
     }
 }
