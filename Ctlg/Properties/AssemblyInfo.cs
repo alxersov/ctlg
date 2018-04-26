@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ctlg")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("aersh")]
+[assembly: AssemblyCompany("alxersov")]
 [assembly: AssemblyProduct("ctlg")]
-[assembly: AssemblyCopyright("Copyright (c) 2016 aersh")]
+[assembly: AssemblyCopyright("Copyright (c) 2018 Alexei Ersov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

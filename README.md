@@ -8,6 +8,7 @@ A tool to catalog files and folders.
  - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32. 
  - Can work with long paths. 
  - Catalogs files inside archives. Supports common archive types: Zip, 7Zip, Rar.
+ - Create file backups.
 
 ## Usage
 
@@ -17,6 +18,8 @@ A tool to catalog files and folders.
     ctlg show <catalog entry IDs>
     ctlg find -f <hash function> -c <checksum> -s <size> -n <name pattern>
     ctlg list
+    ctlg backup -n <Backup name> <directory>
+    ctlg restore -n <Backup name> <directory>
 
 ### Available commands
 
@@ -24,6 +27,8 @@ A tool to catalog files and folders.
  - show - Show detailed information about catalog enty.
  - find - Find file in the catalog. It is possible to search files by name, size, and checksum value.
  - list - List all files in the catalog.
+ - backup - Backup files from specified directory.
+ - restore - Restore files from backup to specified directory.
 
 ## Implementation details
 
@@ -35,4 +40,11 @@ A tool to catalog files and folders.
  - Crc32.NET is used to calculate CRC32 checksums.
  - NUnit and Moq for testing.
  - Command and Event patterns.
- 
+
+## Runnig on Mono
+
+ - Download System.Data.SQLite full source [`sqlite-netFx-source`](https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki).
+ - Run `Setup/compile-interop-assembly-release.sh`.
+ - Copy `bin/2013/Release/bin/libSQLite.Interop.dylib` to Ctlg applicatio directory.
+
+ [More info](https://stackoverflow.com/a/43173220/5642735).
