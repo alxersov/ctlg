@@ -11,6 +11,7 @@ namespace Ctlg.Service.Commands
     public class BackupCommand: TreeProcessingCommand, ICommand
     {
         public string Name { get; set; }
+
         private IHashFunction HashFunction;
         private int RootPathPrefixLength;
         private StreamWriter FileListWriter;
@@ -69,7 +70,8 @@ namespace Ctlg.Service.Commands
                 }
                 else
                 {
-                    var backupFileDir = System.IO.Path.GetDirectoryName(backupFile);
+                    var backupFileDir = FilesystemService.GetDirectoryName(backupFile);
+                    FilesystemService.CreateDirectory(backupFileDir);
                     FilesystemService.Copy(file.FullPath, backupFile);
                 }
 

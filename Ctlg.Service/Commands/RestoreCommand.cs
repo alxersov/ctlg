@@ -11,6 +11,7 @@ namespace Ctlg.Service.Commands
     {
         public string Name { get; set; }
         public string Path { get; set; }
+
         private IFilesystemService FileSystemService { get; }
         private ICtlgService CtlgService { get; }
         private static Regex BackupLineRegex = new Regex(@"^(?<hash>[a-h0-9]{64})\s(?<date>[0-9:.TZ-]{19,28})\s(?<size>[0-9]{1,10})\s(?<name>\S.*)$", RegexOptions.IgnoreCase);
@@ -66,8 +67,8 @@ namespace Ctlg.Service.Commands
                 throw new Exception($"Could not restore {name}. Backup file {backupFilePath} not found.");
             }
 
-            var destinationFile = System.IO.Path.Combine(Path, name);
-            var destinationDir = System.IO.Path.GetDirectoryName(destinationFile);
+            var destinationFile = FileSystemService.CombinePath(Path, name);
+            var destinationDir = FileSystemService.GetDirectoryName(destinationFile);
             FileSystemService.CreateDirectory(destinationDir);
             FileSystemService.Copy(backupFilePath, destinationFile);
 

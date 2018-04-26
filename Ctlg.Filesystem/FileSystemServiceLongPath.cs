@@ -42,6 +42,11 @@ namespace Ctlg.Filesystem
             return new FilesystemDirectoryLongPath(path);
         }
 
+        public string GetDirectoryName(string path)
+        {
+            return Path.GetDirectoryName(path);
+        }
+
         public long GetFileSize(string path)
         {
             var fi = new FileInfo(path);

@@ -27,6 +27,21 @@ namespace Ctlg.Service.Commands
             return root;
         }
 
+        public void ProcessTree(File directory)
+        {
+            foreach (var file in directory.Contents)
+            {
+                if (file.IsDirectory)
+                {
+                    ProcessTree(file);
+                }
+                else
+                {
+                    ProcessFile(file);
+                }
+            }
+        }
+
         protected abstract void ProcessFile(File file);
 
         private File ParseDirectory(IFilesystemDirectory fsDirectory, string searchPattern)
@@ -50,20 +65,6 @@ namespace Ctlg.Service.Commands
             return directory;
         }
 
-        public void ProcessTree(File directory)
-        {
-            foreach (var file in directory.Contents)
-            {
-                if (file.IsDirectory)
-                {
-                    ProcessTree(file);
-                }
-                else
-                {
-                    ProcessFile(file);
-                }
-            }
-        }
 
         protected IFilesystemService FilesystemService { get; }
     }
