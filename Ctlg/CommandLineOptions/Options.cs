@@ -17,6 +17,12 @@ namespace Ctlg.CommandLineOptions
         [VerbOption("show", HelpText = "Show catalog entry.")]
         public Show Show { get; set; } = new Show();
 
+        [VerbOption("backup", HelpText = "Backup directory.")]
+        public Backup Backup { get; set; } = new Backup();
+
+        [VerbOption("restore", HelpText = "Restore directory from backup.")]
+        public Restore Restore { get; set; } = new Restore();
+
         [HelpVerbOption]
         public string GetUsage(string verb)
         {
@@ -42,6 +48,12 @@ namespace Ctlg.CommandLineOptions
                     break;
                 case "show":
                     usage = "ctlg show <catalog entry IDs>\n";
+                    break;
+                case "backup":
+                    usage = "ctlg backup [<options>] <directory>\n\nAvailable options:";
+                    break;
+                case "restore":
+                    usage = "ctlg restore [<options>] <directory>\n\nAvailable options:";
                     break;
             }
 

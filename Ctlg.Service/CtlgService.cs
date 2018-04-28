@@ -23,37 +23,6 @@ namespace Ctlg.Service
             DataService.ApplyDbMigrations();
         }
 
-        public void AddDirectory(string path, string searchPattern, string hashFunctionName)
-        {
-            hashFunctionName = hashFunctionName ?? "SHA-1";
-            hashFunctionName = hashFunctionName.ToUpperInvariant();
-
-            IHashFunction hashFunction;
-            if (!HashFunctions.TryGetValue(hashFunctionName, out hashFunction))
-            {
-                throw new Exception($"Unsupported hash function {hashFunctionName}");
-            }
-
-            var hashAlgorithm = GetHashAlgorithm(hashFunctionName);
-
-            if (string.IsNullOrEmpty(searchPattern))
-            {
-                searchPattern = "*";
-            }
-
-            var di = FilesystemService.GetDirectory(path);
-            var root = ParseDirectory(di, searchPattern);
-            root.Name = di.Directory.FullPath;
-
-            ProcessTree(root, hashFunction, hashAlgorithm.HashAlgorithmId);
-
-            DataService.AddDirectory(root);
-
-            DataService.SaveChanges();
-
-            DomainEvents.Raise(new AddCommandFinished());
-        }
-
         public void ListFiles()
         {
             OutputFiles(DataService.GetFiles());
@@ -105,90 +74,6 @@ namespace Ctlg.Service
             }
         }
 
-        private File ParseDirectory(IFilesystemDirectory fsDirectory, string searchPattern)
-        {
-            var directory = fsDirectory.Directory;
-
-            DomainEvents.Raise(new DirectoryFound(directory.FullPath));
-
-            foreach (var file in fsDirectory.EnumerateFiles(searchPattern))
-            {
-                DomainEvents.Raise(new FileFound(file.FullPath));
-
-                directory.Contents.Add(file);
-            }
-
-            foreach (var dir in fsDirectory.EnumerateDirectories())
-            {
-                directory.Contents.Add(ParseDirectory(dir, searchPattern));
-            }
-
-            return directory;
-        }
-
-        private void ProcessTree(File directory, IHashFunction hashFunction, int hashAlgorithmId)
-        {
-            foreach (var file in directory.Contents)
-            {
-                if (file.IsDirectory)
-                {
-                    ProcessTree(file, hashFunction, hashAlgorithmId);
-                }
-                else
-                {
-                    CalculateHashes(file, hashFunction, hashAlgorithmId);
-
-                    if (FilesystemService.IsArchiveExtension(file.FullPath))
-                    {
-                        ProcessArchive(file);
-                    }
-                }
-            }
-        }
-
-        private void CalculateHashes(File file, IHashFunction hashFunction, int hashAlgorithmId)
-        {
-            try
-            {
-                using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-                {
-                    var hash = hashFunction.CalculateHash(stream);
-
-                    DomainEvents.Raise(new HashCalculated(file.FullPath, hash));
-
-                    file.Hashes.Add(new Hash(hashAlgorithmId, hash));
-                }
-            }
-            catch (Exception e)
-            {
-                DomainEvents.Raise(new ExceptionEvent(e));
-            }
-        }
-
-        private void ProcessArchive(File file)
-        {
-            try
-            {
-                using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-                {
-                    var archive = FilesystemService.OpenArchive(stream);
-
-                    DomainEvents.Raise(new ArchiveFound(file.FullPath));
-
-                    foreach (var entry in archive.EnumerateEntries())
-                    {
-                        file.Contents.Add(entry);
-
-                        DomainEvents.Raise(new ArchiveEntryFound(entry.Name));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                DomainEvents.Raise(new ExceptionEvent(e));
-            }
-        }
-
         public void Execute(ICommand command)
         {
             try
@@ -199,6 +84,12 @@ namespace Ctlg.Service
             {
                 DomainEvents.Raise(new ExceptionEvent(e));
             }
+        }
+
+        public string GetBackupFilePath(string hash)
+        {
+            var backupFileDir = FilesystemService.CombinePath(".", "files", hash.Substring(0, 2));
+            return FilesystemService.CombinePath(backupFileDir, hash);
         }
 
         private IDataService DataService { get; }

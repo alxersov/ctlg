@@ -16,15 +16,8 @@ using File = Ctlg.Core.File;
 
 namespace Ctlg.UnitTests
 {
-    [TestFixture]
-    public class CtlgServiceTests
+    public class CtlgServiceTests: BaseTestFixture
     {
-        [TearDown]
-        public void ClearEventHandlers()
-        {
-            DomainEvents.ClearCallbacks();
-        }
-
         [Test]
         public void AddDirectory_WhenEmptyDirectory_SavesItWihtFullPathAsName()
         {
@@ -66,7 +59,7 @@ namespace Ctlg.UnitTests
         [Test]
         public void AddDirectory_WhenDirectoryWithFiles_Raises2FileFoundEvents()
         {
-            var events = GatherEvents<FileFound>();
+            var events = SetupEvents<FileFound>();
 
             var fakeDir = CreateFakeDirWithTwoFiles();
             
@@ -77,17 +70,10 @@ namespace Ctlg.UnitTests
             Assert.That(events[1].FullPath, Does.Contain("foo.bar"));
         }
 
-        private static IList<T> GatherEvents<T>() where T : IDomainEvent
-        {
-            var events = new List<T>();
-            DomainEvents.Register<T>(events.Add);
-            return events;
-        }
-
         [Test]
         public void AddDirectory_WhenDirectoryWithFiles_RaisesHashCalculatedEvent()
         {
-            var events = GatherEvents<HashCalculated>();
+            var events = SetupEvents<HashCalculated>();
 
             var fakeDir = CreateFakeDirWithOneFile();
 
@@ -129,7 +115,7 @@ namespace Ctlg.UnitTests
         [Test]
         public void AddDirectory_WhenEmptyDirectory_RaisesDirectoryFoundEvent()
         {
-            var events = GatherEvents<DirectoryFound>();
+            var events = SetupEvents<DirectoryFound>();
 
             var fakeDir = CreateFakeEmptyDir();
             AddDirectory(fakeDir);
@@ -141,7 +127,7 @@ namespace Ctlg.UnitTests
         [Test]
         public void List_WhenDirectoryWithSubdirInDb_RaisesTreeItemEnumerated()
         {
-            var events = GatherEvents<TreeItemEnumerated>();
+            var events = SetupEvents<TreeItemEnumerated>();
 
             var files = new List<File>
             {
@@ -171,7 +157,7 @@ namespace Ctlg.UnitTests
         [Test]
         public void Find_FileFound_RaisesFileFoundInDbEvent()
         {
-            var events = GatherEvents<FileFoundInDb>();
+            var events = SetupEvents<FileFoundInDb>();
 
             var file = new File
             {
@@ -294,14 +280,20 @@ namespace Ctlg.UnitTests
 
                 var hashFunctionMock = new Mock<IHashFunction>();
                 hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
-                    .Returns(new byte[] {1, 2, 3, 4});
+                                .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
 
                 var index = new Index<string, IHashFunction>();
                 index.Add("XHASH", hashFunctionMock.Object);
                 mock.Provide<IIndex<string, IHashFunction>>(index);
 
+
+                var addCommand = mock.Create<AddCommand>();
+
+                addCommand.Path = "somepath";
+                addCommand.HashFunctionName = "XHASH";
+
                 var ctlg = mock.Create<CtlgService>();
-                ctlg.AddDirectory("somepath", null, "XHASH");
+                addCommand.Execute(ctlg);
 
                 return addedDirectory;
             }

@@ -16,7 +16,8 @@ namespace Ctlg.EventHandlers
         IHandle<AddCommandFinished>,
         IHandle<FileFoundInDb>,
         IHandle<CatalogEntryNotFound>,
-        IHandle<CatalogEntryFound>
+        IHandle<CatalogEntryFound>,
+        IHandle<BackupEntryProcessed>
     {
         public void Handle(DirectoryFound args)
         {
@@ -117,6 +118,11 @@ namespace Ctlg.EventHandlers
 
 
             Console.WriteLine();
+        }
+
+        public void Handle(BackupEntryProcessed args)
+        {
+            Console.WriteLine(args.BackupEntry);
         }
 
         private int _filesFound = 0;

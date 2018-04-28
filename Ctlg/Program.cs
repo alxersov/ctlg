@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Autofac;
 using Ctlg.CommandLineOptions;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Data;
 using Ctlg.Db.Migrations;
@@ -19,19 +20,6 @@ namespace Ctlg
     {
         static int Main(string[] args)
         {
-            var options = new Options();
-            ICommand command = null;
-            CommandLine.Parser.Default.ParseArguments(args, options,
-                (verb, subOptions) =>
-                {
-                    command = CreateCommand(verb, subOptions);
-                });
-            
-            if (command == null)
-            {
-                return 1;
-            }
-
             var container = BuildIocContainer();
             using (var scope = container.BeginLifetimeScope())
             {
@@ -39,13 +27,33 @@ namespace Ctlg
 
                 var svc = scope.Resolve<ICtlgService>();
                 svc.ApplyDbMigrations();
-                svc.Execute(command);
+
+                ICommand command = CreateCommand(args, scope);
+
+                if (command == null)
+                {
+                    return 1;
+                }
+
+                command.Execute(svc);
             }
 
             return 0;
         }
 
-        private static ICommand CreateCommand(string commandName, object options)
+        private static ICommand CreateCommand(string[] args, ILifetimeScope scope)
+        {
+            ICommand command = null;
+            var options = new Options();
+            CommandLine.Parser.Default.ParseArguments(args, options,
+                (verb, subOptions) =>
+                {
+                    command = CreateCommand(verb, subOptions, scope);
+                });
+            return command;
+        }
+
+        private static ICommand CreateCommand(string commandName, object options, ILifetimeScope scope)
         {
             if (commandName == null || options == null)
             {
@@ -62,12 +70,13 @@ namespace Ctlg
                 {
                     case "add":
                         var add = (Add) options;
-                        command = new AddCommand
-                        {
-                            Path = add.Path.First(),
-                            SearchPattern = add.SearchPattern,
-                            HashFunctionName = add.HashFunctionName
-                        };
+                        var addCommand = scope.Resolve<AddCommand>();
+
+                        addCommand.Path = add.Path.First();
+                        addCommand.SearchPattern = add.SearchPattern;
+                        addCommand.HashFunctionName = add.HashFunctionName;
+
+                        command = addCommand;
                         break;
                     case "find":
                         var find = (Find) options;
@@ -101,11 +110,28 @@ namespace Ctlg
                         var show = (Show) options;
                         command = new ShowCommand(show.CatalogEntryIds.Select(int.Parse).ToList());
                         break;
+                    case "backup":
+                        var backup = (Backup)options;
+                        var backupCommand = scope.Resolve<BackupCommand>();
+
+                        backupCommand.Path = backup.Path;
+                        backupCommand.Name = backup.Name;
+                        command = backupCommand;
+                        break;
+                    case "restore":
+                        var restore = (Restore)options;
+                        var restoreCommand = scope.Resolve<RestoreCommand>();
+
+                        restoreCommand.Path = restore.Path;
+                        restoreCommand.Name = restore.Name;
+                        command = restoreCommand;
+                        break;
                 }
             }
             catch (Exception)
             {
                 Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", commandName);
+                throw;
             }
 
             return command;
@@ -117,14 +143,22 @@ namespace Ctlg
 
             builder.RegisterType<DataService>().As<IDataService>();
             builder.RegisterType<MigrationService>().As<IMigrationService>();
-            builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
 
-            builder.RegisterCryptographyHashFunction<MD5Cng>("MD5");
-            builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1");
-            builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256");
-            builder.RegisterCryptographyHashFunction<SHA384Cng>("SHA-384");
-            builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512");
-            builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32");
+            if (IsMonoRuntime())
+            {
+                builder.RegisterType<FilesystemService>().As<IFilesystemService>();
+            }
+            else
+            {
+                builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
+            }
+
+            builder.RegisterCryptographyHashFunction<MD5Cng>("MD5", HashAlgorithmId.MD5);
+            builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1", HashAlgorithmId.SHA1);
+            builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256", HashAlgorithmId.SHA256);
+            builder.RegisterCryptographyHashFunction<SHA384Cng>("SHA-384", HashAlgorithmId.SHA384);
+            builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512", HashAlgorithmId.SHA512);
+            builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32", HashAlgorithmId.CRC32);
 
             builder.RegisterType<CtlgContext>().As<ICtlgContext>();
             builder.RegisterType<CtlgService>().As<ICtlgService>();
@@ -135,7 +169,17 @@ namespace Ctlg
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterAssemblyTypes(typeof(AddCommand).Assembly)
+                .Where(t => t.IsAssignableTo<ICommand>())
+                .AsSelf()
+                .InstancePerLifetimeScope();
+
             return builder.Build();
+        }
+
+        private static bool IsMonoRuntime()
+        {
+            return Type.GetType("Mono.Runtime") != null;
         }
     }
 }
