@@ -25,21 +25,24 @@ namespace Ctlg.EventHandlers
             using (new ConsoleTextAttributesScope())
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(args.FullPath);
+                if (!string.IsNullOrEmpty(args.Path))
+                {
+                    Console.WriteLine(args.Path);
+                }
             }
         }
 
         public void Handle(FileFound args)
         {
             ++_filesFound;
-            Console.WriteLine(args.FullPath);
+            Console.WriteLine(args.Path);
         }
 
         public void Handle(ArchiveFound args)
         {
             ++_archivesFound;
             Console.Write("Archive: ");
-            Console.WriteLine(args.FullPath);
+            Console.WriteLine(args.Path);
         }
 
         public void Handle(ArchiveEntryFound args)
@@ -55,7 +58,7 @@ namespace Ctlg.EventHandlers
         {
             Console.WriteLine("{0} {1}",
                 FormatBytes.ToHexString(args.Hash),
-                args.FullPath);
+                args.Path);
         }
 
         public void Handle(TreeItemEnumerated args)

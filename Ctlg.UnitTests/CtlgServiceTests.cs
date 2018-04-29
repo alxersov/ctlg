@@ -66,8 +66,8 @@ namespace Ctlg.UnitTests
             AddDirectory(fakeDir);
 
             Assert.That(events.Count, Is.EqualTo(2));
-            Assert.That(events[0].FullPath, Does.Contain("1.txt"));
-            Assert.That(events[1].FullPath, Does.Contain("foo.bar"));
+            Assert.That(events[0].Path, Does.Contain("1.txt"));
+            Assert.That(events[1].Path, Does.Contain("foo.bar"));
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace Ctlg.UnitTests
             AddDirectory(fakeDir);
 
             Assert.That(events.Count, Is.EqualTo(1));
-            Assert.That(events[0].FullPath, Is.EqualTo(@"c:\some\full\path"));
+            Assert.That(events[0].Path, Is.EqualTo(string.Empty));
         }
 
         [Test]
@@ -252,8 +252,8 @@ namespace Ctlg.UnitTests
             var fakeDir = CreateFakeEmptyDir();
             fakeDir.Setup(d => d.EnumerateFiles(It.IsAny<string>())).Returns(new List<File>
             {
-                new File("1.txt") {FullPath = @"c:\some\full\path\1.txt"},
-                new File("foo.bar") {FullPath = @"c:\some\full\path\foo.bar"}
+                new File("1.txt") {FullPath = @"c:\some\full\path\1.txt", RelativePath="1.txt"},
+                new File("foo.bar") {FullPath = @"c:\some\full\path\foo.bar", RelativePath="foo.bar"}
             });
             return fakeDir;
         }

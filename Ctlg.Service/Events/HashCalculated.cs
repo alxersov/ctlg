@@ -2,13 +2,13 @@
 {
     public class HashCalculated: IDomainEvent
     {
-        public HashCalculated(string fullPath, byte[] hash)
+        public HashCalculated(string path, byte[] hash)
         {
-            FullPath = fullPath;
+            Path = path;
             Hash = hash;
         }
 
-        public string FullPath { get; }
+        public string Path { get; }
         public byte[] Hash { get; }
     }
 }

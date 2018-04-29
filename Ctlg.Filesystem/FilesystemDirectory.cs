@@ -37,21 +37,34 @@ namespace Ctlg.Filesystem
         
         public IEnumerable<IFilesystemDirectory> EnumerateDirectories()
         {
-            foreach (var dir in _directoryInfo.GetDirectories())
+            foreach (var directoryInfo in _directoryInfo.GetDirectories())
             {
-                yield return new FilesystemDirectory(dir);
+                var dir = new FilesystemDirectory(directoryInfo);
+                dir.Directory.RelativePath = CombineRelativePath(directoryInfo.Name);
+
+                yield return dir;
             }
         }
 
         public IEnumerable<File> EnumerateFiles(string searchPattern)
         {
-            foreach (var file in _directoryInfo.GetFiles(searchPattern))
+            foreach (var fileInfo in _directoryInfo.GetFiles(searchPattern))
             {
-                yield return CreateFilesystemEntry(file);
+                var file = CreateFilesystemEntry(fileInfo);
+                file.RelativePath = CombineRelativePath(fileInfo.Name);
+
+                yield return file;
             }
         }
 
         private DirectoryInfo _directoryInfo;
+
+        private string CombineRelativePath(string name)
+        {
+            return Directory.IsRoot ?
+                name :
+                Path.Combine(Directory.RelativePath, name);
+        }
 
         protected static File CreateFilesystemEntry(FileInfo fileInfo)
         {
