@@ -75,7 +75,7 @@ namespace Ctlg.Service.Commands
                 var fileListEntry = $"{hash} {date} {file.Size} {path}";
                 FileListWriter.WriteLine(fileListEntry);
 
-                DomainEvents.Raise(new BackupEntryProcessed(fileListEntry));
+                DomainEvents.Raise(new BackupEntryCreated(fileListEntry));
             }
             catch (Exception e)
             {

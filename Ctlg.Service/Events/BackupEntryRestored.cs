@@ -1,9 +1,9 @@
 ﻿using System;
 namespace Ctlg.Service.Events
 {
-    public class BackupEntryProcessed: IDomainEvent
+    public class BackupEntryRestored: IDomainEvent
     {
-        public BackupEntryProcessed(string backupEntry)
+        public BackupEntryRestored(string backupEntry)
         {
             BackupEntry = backupEntry;
         }
