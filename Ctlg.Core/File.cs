@@ -9,14 +9,16 @@ namespace Ctlg.Core
         {
             Contents = new List<File>();
             Hashes = new List<Hash>();
+            RelativePath = string.Empty;
         }
 
         public File(string name, bool isDirectory = false)
         {
             Contents = new List<File>();
             Hashes = new List<Hash>();
-
+            RelativePath = string.Empty;
             Name = name;
+
             IsDirectory = isDirectory;
             RecordUpdatedDateTime = DateTime.UtcNow;
         }
@@ -25,6 +27,7 @@ namespace Ctlg.Core
         public int? ParentFileId { get; set; }
         public File ParentFile { get; set; }
         public bool IsDirectory { get; set; }
+        public bool IsRoot { get { return string.IsNullOrEmpty(RelativePath); }}
         public string Name { get; set; }
         public long? Size { get; set; }
         public DateTime? FileCreatedDateTime { get; set; }
@@ -34,8 +37,10 @@ namespace Ctlg.Core
         public IList<File> Contents { get; set; }
         public IList<Hash> Hashes { get; set; }
 
+        public string RelativePath { get; set; }
         public string FullPath { get; set; }
 
+        // TODO: move to services
         public string BuildFullPath()
         {
             if (FullPath == null)
@@ -51,6 +56,7 @@ namespace Ctlg.Core
                 }
                 else
                 {
+                    // TODO: use CombinePath method
                     FullPath = string.Format("{0}\\{1}", ParentFile.BuildFullPath(), Name);
                 }
             }

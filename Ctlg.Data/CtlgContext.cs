@@ -41,6 +41,7 @@ namespace Ctlg.Data
                     m.MapRightKey("HashId");
                 });
 
+            modelBuilder.Entity<File>().Ignore(f => f.RelativePath);
             modelBuilder.Entity<File>().Ignore(f => f.FullPath);
 
             modelBuilder.Entity<Hash>()

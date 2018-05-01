@@ -2,11 +2,11 @@
 {
     public class DirectoryFound: IDomainEvent
     {
-        public DirectoryFound(string fullPath)
+        public DirectoryFound(string path)
         {
-            FullPath = fullPath;
+            Path = path;
         }
 
-        public string FullPath { get; }
+        public string Path { get; }
     }
 }

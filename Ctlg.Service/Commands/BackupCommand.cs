@@ -13,7 +13,6 @@ namespace Ctlg.Service.Commands
         public string Name { get; set; }
 
         private IHashFunction HashFunction;
-        private int RootPathPrefixLength;
         private StreamWriter FileListWriter;
 
         private IIndex<string, IHashFunction> HashFunctions { get; }
@@ -40,8 +39,6 @@ namespace Ctlg.Service.Commands
 
             var root = ReadTree();
 
-            RootPathPrefixLength = root.FullPath.Length + 1;
-
             using(var fileList = FilesystemService.CreateNewFileForWrite(Name))
             {
                 using (FileListWriter = new StreamWriter(fileList))
@@ -57,7 +54,7 @@ namespace Ctlg.Service.Commands
             {
                 var hash = CalculateHash(file.FullPath);
                 var date = file.FileModifiedDateTime?.ToString("o");
-                var path = file.FullPath.Substring(RootPathPrefixLength);
+                var path = file.RelativePath;
 
                 var backupFile = CtlgService.GetBackupFilePath(hash);
 
@@ -78,7 +75,7 @@ namespace Ctlg.Service.Commands
                 var fileListEntry = $"{hash} {date} {file.Size} {path}";
                 FileListWriter.WriteLine(fileListEntry);
 
-                DomainEvents.Raise(new BackupEntryProcessed(fileListEntry));
+                DomainEvents.Raise(new BackupEntryCreated(fileListEntry));
             }
             catch (Exception e)
             {

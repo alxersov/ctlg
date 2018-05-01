@@ -48,11 +48,11 @@ namespace Ctlg.Service.Commands
         {
             var directory = fsDirectory.Directory;
 
-            DomainEvents.Raise(new DirectoryFound(directory.FullPath));
+            DomainEvents.Raise(new DirectoryFound(directory.RelativePath));
 
             foreach (var file in fsDirectory.EnumerateFiles(searchPattern))
             {
-                DomainEvents.Raise(new FileFound(file.FullPath));
+                DomainEvents.Raise(new FileFound(file.RelativePath));
 
                 directory.Contents.Add(file);
             }

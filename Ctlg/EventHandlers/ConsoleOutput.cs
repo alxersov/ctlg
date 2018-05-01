@@ -17,7 +17,8 @@ namespace Ctlg.EventHandlers
         IHandle<FileFoundInDb>,
         IHandle<CatalogEntryNotFound>,
         IHandle<CatalogEntryFound>,
-        IHandle<BackupEntryProcessed>
+        IHandle<BackupEntryCreated>,
+        IHandle<BackupEntryRestored>
     {
         public void Handle(DirectoryFound args)
         {
@@ -25,21 +26,24 @@ namespace Ctlg.EventHandlers
             using (new ConsoleTextAttributesScope())
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(args.FullPath);
+                if (!string.IsNullOrEmpty(args.Path))
+                {
+                    Console.WriteLine(args.Path);
+                }
             }
         }
 
         public void Handle(FileFound args)
         {
             ++_filesFound;
-            Console.WriteLine(args.FullPath);
+            Console.WriteLine(args.Path);
         }
 
         public void Handle(ArchiveFound args)
         {
             ++_archivesFound;
             Console.Write("Archive: ");
-            Console.WriteLine(args.FullPath);
+            Console.WriteLine(args.Path);
         }
 
         public void Handle(ArchiveEntryFound args)
@@ -55,7 +59,7 @@ namespace Ctlg.EventHandlers
         {
             Console.WriteLine("{0} {1}",
                 FormatBytes.ToHexString(args.Hash),
-                args.FullPath);
+                args.Path);
         }
 
         public void Handle(TreeItemEnumerated args)
@@ -120,12 +124,22 @@ namespace Ctlg.EventHandlers
             Console.WriteLine();
         }
 
-        public void Handle(BackupEntryProcessed args)
+        public void Handle(BackupEntryCreated args)
         {
-            Console.WriteLine(args.BackupEntry);
+            ++_filesProcessed;
+
+            Console.WriteLine($"{_filesProcessed}/{_filesFound} {args.BackupEntry}");
+        }
+
+        public void Handle(BackupEntryRestored args)
+        {
+            ++_filesProcessed;
+
+            Console.WriteLine($"{_filesProcessed} {args.BackupEntry}");
         }
 
         private int _filesFound = 0;
+        private int _filesProcessed = 0;
         private int _directoriesFound = 0;
         private int _archivesFound = 0;
     }

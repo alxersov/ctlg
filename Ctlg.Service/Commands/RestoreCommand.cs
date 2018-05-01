@@ -72,7 +72,7 @@ namespace Ctlg.Service.Commands
             FileSystemService.CreateDirectory(destinationDir);
             FileSystemService.Copy(backupFilePath, destinationFile);
 
-            DomainEvents.Raise(new BackupEntryProcessed(name));
+            DomainEvents.Raise(new BackupEntryRestored(name));
         }
     }
 }

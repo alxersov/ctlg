@@ -49,7 +49,7 @@ namespace Ctlg.Service.Commands
                 {
                     var hash = HashFunction.CalculateHash(stream);
 
-                    DomainEvents.Raise(new HashCalculated(file.FullPath, hash.Value));
+                    DomainEvents.Raise(new HashCalculated(file.RelativePath, hash.Value));
 
                     file.Hashes.Add(hash);
                 }

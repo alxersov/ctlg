@@ -27,6 +27,7 @@ namespace Ctlg.UnitTests
 
             var file = new Core.File("1.txt");
             file.FullPath = @"C:\foo\1.txt";
+            file.RelativePath = file.Name;
             file.Size = 11;
             file.FileModifiedDateTime = new DateTime(2018, 4, 22, 18, 5, 12, 0, DateTimeKind.Utc);
             fsDirectory.Setup(d => d.EnumerateFiles(It.IsAny<string>()))

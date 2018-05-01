@@ -2,11 +2,11 @@
 {
     public class FileFound: IDomainEvent
     {
-        public FileFound(string fullPath)
+        public FileFound(string path)
         {
-            FullPath = fullPath;
+            Path = path;
         }
 
-        public string FullPath { get; }
+        public string Path { get; }
     }
 }

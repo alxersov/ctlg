@@ -2,11 +2,11 @@
 {
     public class ArchiveFound : IDomainEvent
     {
-        public ArchiveFound(string fullPath)
+        public ArchiveFound(string path)
         {
-            FullPath = fullPath;
+            Path = path;
         }
 
-        public string FullPath { get; }
+        public string Path { get; }
     }
 }

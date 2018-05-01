@@ -55,7 +55,7 @@ namespace Ctlg.UnitTests
 
                 mock.SetupFileExists(BackupFileName, true);
 
-                var events = SetupEvents<BackupEntryProcessed>();
+                var events = SetupEvents<BackupEntryRestored>();
 
                 Execute(mock);
 
