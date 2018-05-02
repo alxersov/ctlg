@@ -39,7 +39,16 @@ namespace Ctlg.Service.Commands
 
             var root = ReadTree();
 
-            using(var fileList = FilesystemService.CreateNewFileForWrite(Name))
+
+            var backupDirectory = CtlgService.SnapshotsDirectory;
+            FilesystemService.CreateDirectory(backupDirectory);
+
+            var snapshotName = CtlgService.GenerateSnapshotFileName();
+            var snapshotPath = FilesystemService.CombinePath(backupDirectory, snapshotName);
+
+            DomainEvents.Raise(new BackupCommandStarted(snapshotPath, CtlgService.FileStorageDirectory));
+
+            using(var fileList = FilesystemService.CreateNewFileForWrite(snapshotPath))
             {
                 using (FileListWriter = new StreamWriter(fileList))
                 {

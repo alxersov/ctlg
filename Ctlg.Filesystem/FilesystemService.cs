@@ -56,5 +56,10 @@ namespace Ctlg.Filesystem
         {
             return File.OpenRead(path);
         }
+
+        public string GetCurrentDirectory()
+        {
+            return Directory.GetCurrentDirectory();
+        }
     }
 }

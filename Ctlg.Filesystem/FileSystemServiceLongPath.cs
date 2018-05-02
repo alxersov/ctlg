@@ -37,6 +37,11 @@ namespace Ctlg.Filesystem
             return File.Exists(path);
         }
 
+        public string GetCurrentDirectory()
+        {
+            return Directory.GetCurrentDirectory();
+        }
+
         public IFilesystemDirectory GetDirectory(string path)
         {
             return new FilesystemDirectoryLongPath(path);

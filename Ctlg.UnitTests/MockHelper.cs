@@ -73,12 +73,13 @@ namespace Ctlg.UnitTests
                 .Returns(stream);
         }
 
-        public static MemoryStream SetupCreateNewFileForWrite(this AutoMock mock, string fileName)
+        public static MemoryStream SetupCreateNewFileForWrite(this AutoMock mock)
         {
             var fileSystemServiceMock = mock.Mock<IFilesystemService>();
             var stream = new MemoryStream();
-            fileSystemServiceMock.Setup(s => s.CreateNewFileForWrite(It.Is<string>(p => p == fileName)))
-                                 .Returns(stream);
+            fileSystemServiceMock
+                .Setup(s => s.CreateNewFileForWrite(It.IsAny<string>()))
+                .Returns(stream);
             return stream;
         }
 

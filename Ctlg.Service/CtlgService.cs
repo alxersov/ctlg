@@ -16,7 +16,15 @@ namespace Ctlg.Service
             DataService = dataService;
             FilesystemService = filesystemService;
             HashFunctions = hashFunction;
+
+            CurrentDirectory = FilesystemService.GetCurrentDirectory();
+            SnapshotsDirectory = FilesystemService.CombinePath(CurrentDirectory, "snapshots");
+            FileStorageDirectory = FilesystemService.CombinePath(CurrentDirectory, "file_storage");
         }
+
+        public string CurrentDirectory { get; private set; }
+        public string SnapshotsDirectory { get; private set; }
+        public string FileStorageDirectory {get; private set; }
 
         public void ApplyDbMigrations()
         {
@@ -88,8 +96,13 @@ namespace Ctlg.Service
 
         public string GetBackupFilePath(string hash)
         {
-            var backupFileDir = FilesystemService.CombinePath(".", "files", hash.Substring(0, 2));
+            var backupFileDir = FilesystemService.CombinePath(FileStorageDirectory, hash.Substring(0, 2));
             return FilesystemService.CombinePath(backupFileDir, hash);
+        }
+
+        public string GenerateSnapshotFileName()
+        {
+            return DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
         }
 
         private IDataService DataService { get; }

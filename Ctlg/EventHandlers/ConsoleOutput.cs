@@ -18,7 +18,8 @@ namespace Ctlg.EventHandlers
         IHandle<CatalogEntryNotFound>,
         IHandle<CatalogEntryFound>,
         IHandle<BackupEntryCreated>,
-        IHandle<BackupEntryRestored>
+        IHandle<BackupEntryRestored>,
+        IHandle<BackupCommandStarted>
     {
         public void Handle(DirectoryFound args)
         {
@@ -136,6 +137,12 @@ namespace Ctlg.EventHandlers
             ++_filesProcessed;
 
             Console.WriteLine($"{_filesProcessed} {args.BackupEntry}");
+        }
+
+        public void Handle(BackupCommandStarted args)
+        {
+            Console.WriteLine($"Snapshot: {args.SnapshotFile}");
+            Console.WriteLine($"Storage: {args.FileStorage}");
         }
 
         private int _filesFound = 0;
