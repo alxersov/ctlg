@@ -35,6 +35,11 @@ namespace Ctlg.Filesystem
             return File.Exists(path);
         }
 
+        public bool DirectoryExists(string path)
+        {
+            return Directory.Exists(path);
+        }
+
         public string GetDirectoryName(string path)
         {
             return Path.GetDirectoryName(path);

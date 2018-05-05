@@ -15,7 +15,11 @@ namespace Ctlg.Service
         HashAlgorithm GetHashAlgorithm(string hashAlgorithmName);
 
         string GetBackupFilePath(string hash);
+        string GetBackupSnapshotDirectory(string snapshotName);
+        string GetLastSnapshotFile(string snapshotName);
         string GenerateSnapshotFileName();
+        void SortTree(File directory);
+        File GetInnerFile(File container, string name);
 
         string CurrentDirectory { get; }
         string SnapshotsDirectory { get; }

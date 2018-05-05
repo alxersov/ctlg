@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -105,8 +106,50 @@ namespace Ctlg.Service
             return DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
         }
 
+        public string GetBackupSnapshotDirectory(string snapshotName)
+        {
+            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName);
+        }
+
+        public string GetLastSnapshotFile(string snapshotName)
+        {
+            var dir = GetBackupSnapshotDirectory(snapshotName);
+
+            if (!FilesystemService.DirectoryExists(dir))
+            {
+                return null;
+            }
+
+            var dirInfo = FilesystemService.GetDirectory(dir);
+            var files = dirInfo.EnumerateFiles("????-??-??_??-??-??");
+
+            return files.Max(f => f.Name);
+        }
+
+        public void SortTree(File directory)
+        {
+            directory.Contents.Sort(FileNameComparer);
+
+            foreach (var f in directory.Contents)
+            {
+                SortTree(f);
+            }
+        }
+
+        public File GetInnerFile(File container, string name)
+        {
+            var index = container.Contents.BinarySearch(new File(name), FileNameComparer);
+            if (index < 0)
+            {
+                return null;
+            }
+
+            return container.Contents[index];
+        }
+
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
         private IIndex<string, IHashFunction> HashFunctions { get; }
+        private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

@@ -129,7 +129,10 @@ namespace Ctlg.EventHandlers
         {
             ++_filesProcessed;
 
-            Console.WriteLine($"{_filesProcessed}/{_filesFound} {args.BackupEntry}");
+            var h = args.HashCalculated ? 'H' : ' ';
+            var n = args.NewFileAddedToStorage ? 'N' : ' ';
+
+            Console.WriteLine($"{_filesProcessed}/{_filesFound} {h}{n} {args.BackupEntry}");
         }
 
         public void Handle(BackupEntryRestored args)
