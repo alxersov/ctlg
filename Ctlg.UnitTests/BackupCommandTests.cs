@@ -19,7 +19,7 @@ namespace Ctlg.UnitTests
             {
                 mock.SetupHashFunction("SHA-256", new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(Hash)));
                 mock.SetupGetDirectory(SourcePath);
-                var stream = mock.SetupCreateNewFileForWrite(BackupName);
+                var stream = mock.SetupCreateNewFileForWrite();
 
                 Execute(mock);
 
@@ -37,7 +37,7 @@ namespace Ctlg.UnitTests
             {
                 mock.SetupHashFunction("SHA-256", new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(Hash)));
                 mock.SetupGetDirectory(SourcePath);
-                mock.SetupCreateNewFileForWrite(BackupName);
+                mock.SetupCreateNewFileForWrite();
                 mock.SetupGetBackupFilePath(Hash, BackupFileName);
                 mock.SetupGetDirectoryName(BackupFileName, BackupDirectory);
                 mock.SetupFileExists(BackupFileName, false);

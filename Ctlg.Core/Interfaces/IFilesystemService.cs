@@ -8,7 +8,9 @@ namespace Ctlg.Core.Interfaces
         Stream OpenFileForRead(string path);
         Stream CreateNewFileForWrite(string path);
         void CreateDirectory(string path);
+        string GetCurrentDirectory();
         bool FileExists(string path);
+        bool DirectoryExists(string path);
         long GetFileSize(string path);
         void Copy(string from, string to);
         string CombinePath(string path1, string path2);

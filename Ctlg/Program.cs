@@ -116,6 +116,7 @@ namespace Ctlg
 
                         backupCommand.Path = backup.Path;
                         backupCommand.Name = backup.Name;
+                        backupCommand.IsFastMode = backup.Fast;
                         command = backupCommand;
                         break;
                     case "restore":

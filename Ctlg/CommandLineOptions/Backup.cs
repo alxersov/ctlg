@@ -10,5 +10,8 @@ namespace Ctlg.CommandLineOptions
 
         [Option('n', "name", HelpText = "Backup name.")]
         public string Name { get; set; }
+
+        [Option('f', "fast", HelpText = "Fast mode.", DefaultValue = false)]
+        public bool Fast { get; set; }
     }
 }

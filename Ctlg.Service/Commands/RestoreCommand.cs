@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
 
@@ -14,8 +14,6 @@ namespace Ctlg.Service.Commands
 
         private IFilesystemService FileSystemService { get; }
         private ICtlgService CtlgService { get; }
-        private static Regex BackupLineRegex = new Regex(@"^(?<hash>[a-h0-9]{64})\s(?<date>[0-9:.TZ-]{19,28})\s(?<size>[0-9]{1,10})\s(?<name>\S.*)$", RegexOptions.IgnoreCase);
-
 
         public RestoreCommand(IFilesystemService fileSystemService, ICtlgService ctlgService)
         {
@@ -49,30 +47,20 @@ namespace Ctlg.Service.Commands
 
         private void ProcessBackupLine(string line)
         {
-            var match = BackupLineRegex.Match(line);
+            var record = new SnapshotRecord(line);
 
-            if (!match.Success)
-            {
-                throw new Exception($"Unexpected list line {line}.");
-            }
-
-            var hash = match.Groups["hash"].Value;
-            var size = long.Parse(match.Groups["size"].Value);
-            var date = DateTime.Parse(match.Groups["date"].Value);
-            var name = match.Groups["name"].Value;
-
-            var backupFilePath = CtlgService.GetBackupFilePath(hash);
+            var backupFilePath = CtlgService.GetBackupFilePath(record.Hash);
             if (!FileSystemService.FileExists(backupFilePath))
             {
-                throw new Exception($"Could not restore {name}. Backup file {backupFilePath} not found.");
+                throw new Exception($"Could not restore {record.Name}. Backup file {backupFilePath} not found.");
             }
 
-            var destinationFile = FileSystemService.CombinePath(Path, name);
+            var destinationFile = FileSystemService.CombinePath(Path, record.Name);
             var destinationDir = FileSystemService.GetDirectoryName(destinationFile);
             FileSystemService.CreateDirectory(destinationDir);
             FileSystemService.Copy(backupFilePath, destinationFile);
 
-            DomainEvents.Raise(new BackupEntryRestored(name));
+            DomainEvents.Raise(new BackupEntryRestored(record.Name));
         }
     }
 }

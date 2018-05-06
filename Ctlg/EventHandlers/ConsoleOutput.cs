@@ -18,7 +18,8 @@ namespace Ctlg.EventHandlers
         IHandle<CatalogEntryNotFound>,
         IHandle<CatalogEntryFound>,
         IHandle<BackupEntryCreated>,
-        IHandle<BackupEntryRestored>
+        IHandle<BackupEntryRestored>,
+        IHandle<BackupCommandStarted>
     {
         public void Handle(DirectoryFound args)
         {
@@ -128,7 +129,10 @@ namespace Ctlg.EventHandlers
         {
             ++_filesProcessed;
 
-            Console.WriteLine($"{_filesProcessed}/{_filesFound} {args.BackupEntry}");
+            var h = args.HashCalculated ? 'H' : ' ';
+            var n = args.NewFileAddedToStorage ? 'N' : ' ';
+
+            Console.WriteLine($"{_filesProcessed}/{_filesFound} {h}{n} {args.BackupEntry}");
         }
 
         public void Handle(BackupEntryRestored args)
@@ -136,6 +140,12 @@ namespace Ctlg.EventHandlers
             ++_filesProcessed;
 
             Console.WriteLine($"{_filesProcessed} {args.BackupEntry}");
+        }
+
+        public void Handle(BackupCommandStarted args)
+        {
+            Console.WriteLine($"Snapshot: {args.SnapshotFile}");
+            Console.WriteLine($"Storage: {args.FileStorage}");
         }
 
         private int _filesFound = 0;

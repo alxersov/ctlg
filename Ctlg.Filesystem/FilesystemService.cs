@@ -35,6 +35,11 @@ namespace Ctlg.Filesystem
             return File.Exists(path);
         }
 
+        public bool DirectoryExists(string path)
+        {
+            return Directory.Exists(path);
+        }
+
         public string GetDirectoryName(string path)
         {
             return Path.GetDirectoryName(path);
@@ -55,6 +60,11 @@ namespace Ctlg.Filesystem
         public Stream OpenFileForRead(string path)
         {
             return File.OpenRead(path);
+        }
+
+        public string GetCurrentDirectory()
+        {
+            return Directory.GetCurrentDirectory();
         }
     }
 }
