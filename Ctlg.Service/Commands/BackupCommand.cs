@@ -13,6 +13,7 @@ namespace Ctlg.Service.Commands
     public class BackupCommand: TreeProcessingCommand, ICommand
     {
         public string Name { get; set; }
+        public bool IsFastMode { get; set; }
 
         private IHashFunction HashFunction;
         private StreamWriter FileListWriter;
@@ -41,7 +42,10 @@ namespace Ctlg.Service.Commands
 
             var root = ReadTree();
 
-            FindFilesInPreviousSnapshot(root);
+            if (IsFastMode)
+            {
+                FindFilesInPreviousSnapshot(root);
+            }
 
             var backupDirectory = CtlgService.GetBackupSnapshotDirectory(Name);
             FilesystemService.CreateDirectory(backupDirectory);
