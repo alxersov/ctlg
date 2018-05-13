@@ -154,7 +154,7 @@ namespace Ctlg.Service.Commands
                     newFileAddedToStorage = true;
                 }
 
-                var fileListEntry = $"{hash} {date} {file.Size} {path}";
+                var fileListEntry = new SnapshotRecord(hash, file.FileModifiedDateTime ?? DateTime.MinValue, file.Size ?? 0, path);
                 FileListWriter.WriteLine(fileListEntry);
 
                 DomainEvents.Raise(new BackupEntryCreated(fileListEntry, hashCalculated, newFileAddedToStorage));

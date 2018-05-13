@@ -107,6 +107,7 @@
     <Compile Include="BackupTestFixture.cs" />
     <Compile Include="MockHelper.cs" />
     <Compile Include="BackupCommandTests.cs" />
+    <Compile Include="FileSizeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
