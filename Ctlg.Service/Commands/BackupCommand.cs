@@ -90,7 +90,7 @@ namespace Ctlg.Service.Commands
                         }
                         catch (Exception ex)
                         {
-                            DomainEvents.Raise(new ExceptionEvent(ex));
+                            DomainEvents.Raise(new ErrorEvent(ex));
                         }
 
                         line = reader.ReadLine();
@@ -161,7 +161,7 @@ namespace Ctlg.Service.Commands
             }
             catch (Exception e)
             {
-                DomainEvents.Raise(new ExceptionEvent(e));
+                DomainEvents.Raise(new ErrorEvent(e));
             }
         }
 

@@ -3,9 +3,10 @@ using CommandLine;
 
 namespace Ctlg.CommandLineOptions
 {
+    [Verb("restore", HelpText = "Restore directory from backup.")]
     class Restore
     {
-        [ValueOption(0)]
+        [Value(0)]
         public string Path { get; set; }
 
         [Option('n', "name", HelpText = "Backup name.")]

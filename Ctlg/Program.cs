@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using Autofac;
+using CommandLine;
 using Ctlg.CommandLineOptions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -10,14 +11,19 @@ using Ctlg.Db.Migrations;
 using Ctlg.Filesystem;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
+using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 using Force.Crc32;
 
 
 namespace Ctlg
 {
-    class Program
+    class Program: IProgram, IHandle<ErrorEvent>
     {
+        private ICtlgService CtlgService { get; set; }
+        private ILifetimeScope Scope { get; set; }
+        private int ExitCode { get; set; }
+
         static int Main(string[] args)
         {
             var container = BuildIocContainer();
@@ -25,117 +31,109 @@ namespace Ctlg
             {
                 DomainEvents.Container = scope;
 
-                var svc = scope.Resolve<ICtlgService>();
-                svc.ApplyDbMigrations();
-
-                ICommand command = CreateCommand(args, scope);
-
-                if (command == null)
-                {
-                    return 1;
-                }
-
-                command.Execute(svc);
+                var program = scope.Resolve<IProgram>();
+                return program.Run(scope, args);
             }
-
-            return 0;
         }
 
-        private static ICommand CreateCommand(string[] args, ILifetimeScope scope)
+        public Program(ICtlgService ctlgService)
         {
-            ICommand command = null;
-            var options = new Options();
-            CommandLine.Parser.Default.ParseArguments(args, options,
-                (verb, subOptions) =>
-                {
-                    command = CreateCommand(verb, subOptions, scope);
-                });
-            return command;
+            CtlgService = ctlgService;
         }
 
-        private static ICommand CreateCommand(string commandName, object options, ILifetimeScope scope)
+        public int Run(ILifetimeScope scope, string[] args)
         {
-            if (commandName == null || options == null)
+            ExitCode = 0;
+
+            Scope = scope;
+
+            CtlgService.ApplyDbMigrations();
+
+
+            Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show>(args)
+            .WithParsed<Add>(opts => RunAdd(opts))
+            .WithParsed<Backup>(opts => RunBackupCommand(opts))
+            .WithParsed<Find>(opts => RunFindCommand(opts))
+            .WithParsed<List>(opts => RunListCommand(opts))
+            .WithParsed<Restore>(opts => RunRestoreCommand(opts))
+            .WithParsed<Show>(opts => RunShowCommand(opts))
+            .WithNotParsed(errors => { ExitCode = 1; });
+
+            return ExitCode;
+        }
+
+        private void RunAdd(Add options)
+        {
+            var command = Scope.Resolve<AddCommand>();
+
+            command.Path = options.Path.First();
+            command.SearchPattern = options.SearchPattern;
+            command.HashFunctionName = options.HashFunctionName;
+
+            command.Execute(CtlgService);
+        }
+
+        private void RunBackupCommand(Backup options)
+        {
+            var command = Scope.Resolve<BackupCommand>();
+            
+            command.Path = options.Path;
+            command.Name = options.Name;
+            command.IsFastMode = options.Fast;
+
+            command.Execute(CtlgService);
+        }
+
+        private void RunFindCommand(Find options)
+        {
+            if (options.Checksum != null && options.HashFunctionName == null)
             {
-                return null;
+                DomainEvents.Raise(new ErrorEvent("Checksum value parameter requires Hash function to be provided."));
+                return;
             }
 
-            commandName = commandName.ToLowerInvariant();
-
-            ICommand command = null;
-
-            try
+            if (options.Checksum == null &&
+                options.Size == null &&
+                options.NamePattern == null)
             {
-                switch (commandName)
-                {
-                    case "add":
-                        var add = (Add) options;
-                        var addCommand = scope.Resolve<AddCommand>();
-
-                        addCommand.Path = add.Path.First();
-                        addCommand.SearchPattern = add.SearchPattern;
-                        addCommand.HashFunctionName = add.HashFunctionName;
-
-                        command = addCommand;
-                        break;
-                    case "find":
-                        var find = (Find) options;
-
-                        if (find.Checksum != null && find.HashFunctionName == null)
-                        {
-                            Console.Error.WriteLine("Checksum value parameter requires Hash function to be provided.");
-                            throw new InvalidOperationException();
-                        }
-
-                        if (find.Checksum == null &&
-                            find.Size == null &&
-                            find.NamePattern == null)
-                        {
-                            Console.Error.WriteLine("No parameters provided.");
-                            throw new InvalidOperationException();
-                        }
-
-                        command = new FindCommand
-                        {
-                            Hash = find.Checksum,
-                            HashFunctionName = find.HashFunctionName,
-                            NamePattern = find.NamePattern,
-                            Size = find.Size
-                        };
-                        break;
-                    case "list":
-                        command = new ListCommand();
-                        break;
-                    case "show":
-                        var show = (Show) options;
-                        command = new ShowCommand(show.CatalogEntryIds.Select(int.Parse).ToList());
-                        break;
-                    case "backup":
-                        var backup = (Backup)options;
-                        var backupCommand = scope.Resolve<BackupCommand>();
-
-                        backupCommand.Path = backup.Path;
-                        backupCommand.Name = backup.Name;
-                        backupCommand.IsFastMode = backup.Fast;
-                        command = backupCommand;
-                        break;
-                    case "restore":
-                        var restore = (Restore)options;
-                        var restoreCommand = scope.Resolve<RestoreCommand>();
-
-                        restoreCommand.Path = restore.Path;
-                        restoreCommand.Name = restore.Name;
-                        command = restoreCommand;
-                        break;
-                }
-            }
-            catch (Exception)
-            {
-                Console.Error.WriteLine("Bad arguments supplied for {0} command. To get help on {0} comand please run ctlg {0} --help.", commandName);
-                throw;
+                DomainEvents.Raise(new ErrorEvent("No parameters provided."));
+                return;
             }
 
-            return command;
+            var command = Scope.Resolve<FindCommand>();
+
+            command.Hash = options.Checksum;
+            command.HashFunctionName = options.HashFunctionName;
+            command.NamePattern = options.NamePattern;
+            command.Size = options.Size;
+
+            command.Execute(CtlgService);
+        }
+
+        private void RunListCommand(List options)
+        {
+            var command = Scope.Resolve<ListCommand>();
+
+            command.Execute(CtlgService);
+        }
+
+        private void RunRestoreCommand(Restore options)
+        {
+            var command = Scope.Resolve<RestoreCommand>();
+
+            command.Path = options.Path;
+            command.Name = options.Name;
+            
+            command.Execute(CtlgService);		
+        }
+
+        private void RunShowCommand(Show options)
+        {
+            var ids = options.CatalogEntryIds.Select(int.Parse).ToList();
+
+            var command = Scope.Resolve<ShowCommand>(new NamedParameter("catalogEntryIds", ids));
+
+            command.Execute(CtlgService);
         }
 
         private static IContainer BuildIocContainer()
@@ -181,6 +179,11 @@ namespace Ctlg
         private static bool IsMonoRuntime()
         {
             return Type.GetType("Mono.Runtime") != null;
+        }
+
+        public void Handle(ErrorEvent args)
+        {
+            ExitCode = 2;
         }
     }
 }

@@ -3,9 +3,10 @@ using CommandLine;
 
 namespace Ctlg.CommandLineOptions
 {
+    [Verb("add", HelpText="Add directory to the catalog.")]
     class Add
     {
-        [ValueList(typeof(List<string>), MaximumElements = 1)]
+        [Value(0, MetaName = "Path")]
         public IList<string> Path { get; set; }
 
         [Option('s', "search", HelpText = "Search pattern. Can contain wildcards * and ?.")]

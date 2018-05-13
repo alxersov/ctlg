@@ -15,7 +15,7 @@ namespace Ctlg.UnitTests
             {
                 mock.SetupOpenFileForRead(BackupName, "Bad line");
 
-                var events = SetupEvents<ExceptionEvent>();
+                var events = SetupEvents<ErrorEvent>();
 
                 Execute(mock);
 
@@ -35,7 +35,7 @@ namespace Ctlg.UnitTests
 
                 mock.SetupFileExists(BackupFileName, false);
 
-                var events = SetupEvents<ExceptionEvent>();
+                var events = SetupEvents<ErrorEvent>();
 
                 Execute(mock);
 

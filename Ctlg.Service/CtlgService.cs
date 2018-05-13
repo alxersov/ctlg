@@ -91,7 +91,7 @@ namespace Ctlg.Service
             }
             catch (Exception e)
             {
-                DomainEvents.Raise(new ExceptionEvent(e));
+                DomainEvents.Raise(new ErrorEvent(e));
             }
         }
 

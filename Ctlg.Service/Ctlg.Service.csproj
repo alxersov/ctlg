@@ -60,7 +60,7 @@
     <Compile Include="Events\CatalogEntryFound.cs" />
     <Compile Include="Events\CatalogEntryNotFound.cs" />
     <Compile Include="Events\DirectoryFound.cs" />
-    <Compile Include="Events\ExceptionEvent.cs" />
+    <Compile Include="Events\ErrorEvent.cs" />
     <Compile Include="Events\FileFound.cs" />
     <Compile Include="Events\FileFoundInDb.cs" />
     <Compile Include="Events\HashCalculated.cs" />

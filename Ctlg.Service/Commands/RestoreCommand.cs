@@ -36,7 +36,7 @@ namespace Ctlg.Service.Commands
                         }
                         catch (Exception ex)
                         {
-                            DomainEvents.Raise(new ExceptionEvent(ex));
+                            DomainEvents.Raise(new ErrorEvent(ex));
                         }
 
                         line = reader.ReadLine();

@@ -2,6 +2,7 @@
 
 namespace Ctlg.CommandLineOptions
 {
+    [Verb("find", HelpText = "Find file in the catalog.")]
     class Find
     {
         [Option('f', "function", HelpText = "Hash function.")]
