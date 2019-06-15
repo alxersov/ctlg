@@ -133,7 +133,10 @@ namespace Ctlg.EventHandlers
             var h = args.HashCalculated ? 'H' : ' ';
             var n = args.NewFileAddedToStorage ? 'N' : ' ';
 
-            Console.WriteLine($"{_filesProcessed}/{_filesFound} {h}{n} {FormatSnapshotRecord(args.BackupEntry)}");
+            var maxCounterLength = _filesFound.ToString().Length;
+            var counter = _filesProcessed.ToString().PadLeft(maxCounterLength);
+
+            Console.WriteLine($"{counter}/{_filesFound} {h}{n} {FormatSnapshotRecord(args.BackupEntry)}");
         }
 
         public void Handle(BackupEntryRestored args)

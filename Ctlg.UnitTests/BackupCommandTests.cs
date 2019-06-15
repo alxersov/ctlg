@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -13,49 +12,71 @@ namespace Ctlg.UnitTests
     public class BackupCommandTests: BackupTestFixture
     {
         [Test]
-        public void Execute_CreatesFileListEntry()
+        public void Execute_AddsFilesToSnapshot()
         {
             using (var mock = AutoMock.GetLoose())
             {
-                mock.SetupHashFunction("SHA-256", new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(Hash)));
-                mock.SetupGetDirectory(SourcePath);
-                var stream = mock.SetupCreateNewFileForWrite();
+                SetupTreeProvider(mock);
+                var writerMock = SetupSnapshotWriter(mock);
 
-                Execute(mock);
+                var command = mock.Create<BackupCommand>();
+                command.Path = "test-path";
+                command.SnapshotName = "test-name";
 
-                var reader = new StreamReader(new MemoryStream(stream.ToArray()));
-                string fileListLine = reader.ReadToEnd().Trim();
+                command.Execute(null);
 
-                Assert.That(fileListLine, Is.EqualTo(FileListLine));
+                writerMock.VerifyAll();
             }
         }
 
         [Test]
-        public void Execute_WhenFileWasNotProcessedBefore_CopiesItToStorageFolder()
+        public void Execute_WhenFastMode_ReadsLatesSnapshot()
         {
             using (var mock = AutoMock.GetLoose())
             {
-                mock.SetupHashFunction("SHA-256", new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(Hash)));
-                mock.SetupGetDirectory(SourcePath);
-                mock.SetupCreateNewFileForWrite();
-                mock.SetupGetBackupFilePath(Hash, BackupFileName);
-                mock.SetupGetDirectoryName(BackupFileName, BackupDirectory);
-                mock.SetupFileExists(BackupFileName, false);
+                SetupTreeProvider(mock);
+                SetupSnapshotWriter(mock);
 
-                Execute(mock);
+                var snapshotReaderMock = mock.Mock<ISnapshotReader>();
+                snapshotReaderMock.Setup(r => r.ReadHashesFromLatestSnapshot(It.Is<string>(s => s == "test-name"),
+                        It.Is<File>(f => f == Tree)));
 
-                mock.Mock<IFilesystemService>().Verify(s => s.CreateDirectory(BackupDirectory), Times.Once);
-                mock.Mock<IFilesystemService>().Verify(s => s.Copy(SourceFilePath, BackupFileName), Times.Once);
+                var command = mock.Create<BackupCommand>();
+                command.Path = "test-path";
+                command.SnapshotName = "test-name";
+                command.IsFastMode = true;
+
+                command.Execute(null);
+
+                snapshotReaderMock.VerifyAll();
             }
         }
 
-        private void Execute(AutoMock mock)
+        [SetUp]
+        public void Init()
         {
-            var command = mock.Create<BackupCommand>();
-            command.Name = BackupName;
-            command.Path = SourcePath;
+            Tree = new File("test-path", true) { Contents = { new File("test-1.txt") } };
+        }
 
-            command.Execute(null);
+        private File Tree;
+
+        private static Mock<ISnapshotWriter> SetupSnapshotWriter(AutoMock mock)
+        {
+            var writerMock = new Mock<ISnapshotWriter>();
+            writerMock.Setup(w => w.AddFile(It.Is<File>(file => file.Name == "test-1.txt")));
+
+            mock.Mock<ISnapshotWriterProvider>()
+                .Setup(p => p.CreateSnapshotWriter(It.Is<string>(name => name == "test-name")))
+                .Returns(writerMock.Object);
+
+            return writerMock;
+        }
+
+        private void SetupTreeProvider(AutoMock mock)
+        {
+            mock.Mock<ITreeProvider>()
+                .Setup(d => d.ReadTree(It.Is<string>(s => s == "test-path")))
+                .Returns(Tree);
         }
     }
 }

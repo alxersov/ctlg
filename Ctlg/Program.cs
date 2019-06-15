@@ -76,9 +76,8 @@ namespace Ctlg
         private void RunBackupCommand(Backup options)
         {
             var command = Scope.Resolve<BackupCommand>();
-            
             command.Path = options.Path;
-            command.Name = options.Name;
+            command.SnapshotName = options.Name;
             command.IsFastMode = options.Fast;
 
             command.Execute(CtlgService);
@@ -124,7 +123,7 @@ namespace Ctlg
             command.Path = options.Path;
             command.Name = options.Name;
             
-            command.Execute(CtlgService);		
+            command.Execute(CtlgService);
         }
 
         private void RunShowCommand(Show options)
@@ -172,6 +171,11 @@ namespace Ctlg
                 .Where(t => t.IsAssignableTo<ICommand>())
                 .AsSelf()
                 .InstancePerLifetimeScope();
+
+            builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>();
+            builder.RegisterType<SnapshotWriterProvider>().As<ISnapshotWriterProvider>();
+            builder.RegisterType<SnapshotReader>().As<ISnapshotReader>();
+
 
             return builder.Build();
         }
