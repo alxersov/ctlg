@@ -35,6 +35,6 @@ namespace Ctlg.Service.Commands
 
         private ITreeProvider TreeProvider { get; set; }
         private ISnapshotWriterProvider SnapshotWriterProvider { get; set; }
-        public ISnapshotReader SnapshotReader { get; }
+        private ISnapshotReader SnapshotReader { get; set; }
     }
 }
