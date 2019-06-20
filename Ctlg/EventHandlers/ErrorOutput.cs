@@ -4,14 +4,17 @@ using Ctlg.Service.Events;
 
 namespace Ctlg.EventHandlers
 {
-    public class ErrorOutput: IHandle<ExceptionEvent>
+    public class ErrorOutput: IHandle<ErrorEvent>
     {
-        public void Handle(ExceptionEvent args)
+        public void Handle(ErrorEvent args)
         {
             using (new ConsoleTextAttributesScope())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine(args.Exception.Message);
+
+                var message = args.Message ?? args.Exception?.Message;
+
+                Console.Error.WriteLine(message);
             }
         }
     }

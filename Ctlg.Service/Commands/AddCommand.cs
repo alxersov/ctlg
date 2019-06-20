@@ -56,7 +56,7 @@ namespace Ctlg.Service.Commands
             }
             catch (Exception e)
             {
-                DomainEvents.Raise(new ExceptionEvent(e));
+                DomainEvents.Raise(new ErrorEvent(e));
             }
         }
 
@@ -80,7 +80,7 @@ namespace Ctlg.Service.Commands
             }
             catch (Exception e)
             {
-                DomainEvents.Raise(new ExceptionEvent(e));
+                DomainEvents.Raise(new ErrorEvent(e));
             }
         }
 

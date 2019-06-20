@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Ctlg.Core;
 using Ctlg.Service;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
@@ -132,7 +133,10 @@ namespace Ctlg.EventHandlers
             var h = args.HashCalculated ? 'H' : ' ';
             var n = args.NewFileAddedToStorage ? 'N' : ' ';
 
-            Console.WriteLine($"{_filesProcessed}/{_filesFound} {h}{n} {args.BackupEntry}");
+            var maxCounterLength = _filesFound.ToString().Length;
+            var counter = _filesProcessed.ToString().PadLeft(maxCounterLength);
+
+            Console.WriteLine($"{counter}/{_filesFound} {h}{n} {FormatSnapshotRecord(args.BackupEntry)}");
         }
 
         public void Handle(BackupEntryRestored args)
@@ -146,6 +150,11 @@ namespace Ctlg.EventHandlers
         {
             Console.WriteLine($"Snapshot: {args.SnapshotFile}");
             Console.WriteLine($"Storage: {args.FileStorage}");
+        }
+
+        public string FormatSnapshotRecord(SnapshotRecord record)
+        {
+            return $"{record.Hash.Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
         }
 
         private int _filesFound = 0;
