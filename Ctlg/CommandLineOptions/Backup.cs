@@ -9,6 +9,9 @@ namespace Ctlg.CommandLineOptions
         [Value(0)]
         public string Path { get; set; }
 
+        [Option('s', "search", HelpText = "Search pattern. Can contain wildcards * and ?.")]
+        public string SearchPattern { get; set; }
+
         [Option('n', "name", HelpText = "Backup name.")]
         public string Name { get; set; }
 

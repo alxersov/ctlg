@@ -57,3 +57,14 @@ teardown() {
   echo -n "world" > "$CTLG_FILESDIR/world.txt"
   diff -r "$CTLG_FILESDIR" "${CTLG_RESTOREDIR}"
 }
+
+@test "backup filters files by search pattern" {
+  echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
+  echo -n "test" > "$CTLG_FILESDIR/hi.bin"
+
+  $CTLG_EXECUTABLE backup -n Test1 -s *.txt ${CTLG_FILESDIR}
+
+  snapshot="snapshots/Test1/$(ls snapshots/Test1 | tail -1)"
+  file_list=$(cat "$snapshot" | awk '{ print $4 }')
+  [ "$file_list" == "hi.txt" ]
+}

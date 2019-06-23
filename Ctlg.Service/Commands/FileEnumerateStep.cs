@@ -12,9 +12,11 @@ namespace Ctlg.Service.Commands
             FilesystemService = filesystemService;
         }
 
-        public File ReadTree(string path)
+        public File ReadTree(string path, string searchPattern = null)
         {
-            var searchPattern = "*";
+            if (string.IsNullOrEmpty(searchPattern)) {
+                searchPattern = "*";
+            }
 
             var di = FilesystemService.GetDirectory(path);
             var root = ParseDirectory(di, searchPattern);

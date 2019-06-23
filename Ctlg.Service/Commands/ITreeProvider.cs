@@ -5,6 +5,6 @@ namespace Ctlg.Service.Commands
 {
     public interface ITreeProvider
     {
-        File ReadTree(string path);
+        File ReadTree(string path, string searchPattern = null);
     }
 }
