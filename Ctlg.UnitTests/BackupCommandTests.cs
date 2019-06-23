@@ -75,7 +75,7 @@ namespace Ctlg.UnitTests
         private void SetupTreeProvider(AutoMock mock)
         {
             mock.Mock<ITreeProvider>()
-                .Setup(d => d.ReadTree(It.Is<string>(s => s == "test-path")))
+                .Setup(d => d.ReadTree(It.Is<string>(s => s == "test-path"), It.Is<string>(s => s == null)))
                 .Returns(Tree);
         }
     }

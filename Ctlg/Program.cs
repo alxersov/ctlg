@@ -77,6 +77,7 @@ namespace Ctlg
         {
             var command = Scope.Resolve<BackupCommand>();
             command.Path = options.Path;
+            command.SearchPattern = options.SearchPattern;
             command.SnapshotName = options.Name;
             command.IsFastMode = options.Fast;
 

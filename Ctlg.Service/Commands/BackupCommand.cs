@@ -7,6 +7,7 @@ namespace Ctlg.Service.Commands
     {
         public string SnapshotName { get; set; }
         public string Path { get; set; }
+        public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
         public BackupCommand(ITreeProvider treeProvider, ISnapshotWriterProvider snapshotWriterProvider, ISnapshotReader snapshotReader)
@@ -18,7 +19,7 @@ namespace Ctlg.Service.Commands
 
         public void Execute(ICtlgService ctlgService)
         {
-            var root = TreeProvider.ReadTree(Path);
+            var root = TreeProvider.ReadTree(Path, SearchPattern);
 
             if (IsFastMode)
             {
