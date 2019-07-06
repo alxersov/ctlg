@@ -6,17 +6,25 @@ using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
 {
-    public class AddCommand : TreeProcessingCommand, ICommand
+    public class AddCommand : ICommand
     {
         public string HashFunctionName { get; set; }
+        public string Path { get; set; }
+        public string SearchPattern { get; set; }
 
         private IHashFunction HashFunction;
+
+        private ITreeProvider TreeProvider { get; }
         private IIndex<string, IHashFunction> HashFunctions { get; }
         private IDataService DataService { get; }
+        private IFilesystemService FilesystemService { get; }
 
-        public AddCommand(IIndex<string, IHashFunction> hashFunctions, IDataService dataService, IFilesystemService filesystemService): base(filesystemService)
+        public AddCommand(ITreeProvider treeProvider, IIndex<string, IHashFunction> hashFunctions,
+            IDataService dataService, IFilesystemService filesystemService)
         {
             DataService = dataService;
+            FilesystemService = filesystemService;
+            TreeProvider = treeProvider;
             HashFunctions = hashFunctions;
         }
 
@@ -30,9 +38,10 @@ namespace Ctlg.Service.Commands
                 throw new Exception($"Unsupported hash function {hashFunctionName}");
             }
 
-            var root = ReadTree();
+            var root = TreeProvider.ReadTree(Path, SearchPattern);
+            var treeWalker = new TreeWalker(root);
+            treeWalker.Walk(ProcessFile);
 
-            ProcessTree(root);
 
             DataService.AddDirectory(root);
 
@@ -84,7 +93,7 @@ namespace Ctlg.Service.Commands
             }
         }
 
-        protected override void ProcessFile(File file)
+        protected void ProcessFile(File file)
         {
             CalculateHashes(file);
 

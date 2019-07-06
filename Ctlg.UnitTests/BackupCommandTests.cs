@@ -65,7 +65,7 @@ namespace Ctlg.UnitTests
             var writerMock = new Mock<ISnapshotWriter>();
             writerMock.Setup(w => w.AddFile(It.Is<File>(file => file.Name == "test-1.txt")));
 
-            mock.Mock<ISnapshotWriterProvider>()
+            mock.Mock<ISnapshotService>()
                 .Setup(p => p.CreateSnapshotWriter(It.Is<string>(name => name == "test-name")))
                 .Returns(writerMock.Object);
 

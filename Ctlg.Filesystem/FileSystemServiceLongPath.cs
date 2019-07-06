@@ -2,6 +2,7 @@
 using Pri.LongPath;
 using Stream = System.IO.Stream;
 using FileMode = System.IO.FileMode;
+using System.Collections.Generic;
 
 namespace Ctlg.Filesystem
 {
@@ -67,6 +68,12 @@ namespace Ctlg.Filesystem
         public Stream OpenFileForRead(string path)
         {
             return File.OpenRead(path);
+        }
+
+        public IEnumerable<Core.File> EnumerateFiles(string path, string searchMask = null)
+        {
+            var dir = GetDirectory(path);
+            return dir.EnumerateFiles(searchMask ?? "*");
         }
     }
 }

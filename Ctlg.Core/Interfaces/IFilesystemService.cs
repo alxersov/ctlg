@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Ctlg.Core.Interfaces
 {
     public interface IFilesystemService
     {
         IFilesystemDirectory GetDirectory(string path);
+        IEnumerable<File> EnumerateFiles(string path, string searchMask = null);
         Stream OpenFileForRead(string path);
         Stream CreateNewFileForWrite(string path);
         void CreateDirectory(string path);

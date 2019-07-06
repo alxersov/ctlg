@@ -1,7 +1,7 @@
 ﻿using System;
 using Ctlg.Core;
 
-namespace Ctlg.Service.Commands
+namespace Ctlg.Core.Interfaces
 {
     public interface ISnapshotWriter: IDisposable
     {

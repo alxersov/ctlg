@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
@@ -92,6 +93,16 @@ namespace Ctlg.UnitTests
             var index = new Index<string, IHashFunction>();
             index.Add(hashFunctionName, hashFunctionMock.Object);
             mock.Provide<IIndex<string, IHashFunction>>(index);
+        }
+
+        public static void SetupFindSnapshotFile(this AutoMock mock, string backupName, string snapshotPath)
+        {
+            mock.Mock<ISnapshotService>().Setup(s => s.FindSnapshotFile(It.Is<string>(name => name == backupName), It.Is<string>(date => date == null))).Returns(snapshotPath);
+        }
+
+        public static void SetupReadSnapshotFile(this AutoMock mock, string path, IEnumerable<SnapshotRecord> snapshotRecords)
+        {
+            mock.Mock<ISnapshotService>().Setup(s => s.ReadSnapshotFile(It.Is<string>(p => p == path))).Returns(snapshotRecords);
         }
     }
 }

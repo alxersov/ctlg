@@ -274,9 +274,13 @@ namespace Ctlg.UnitTests
                         Name = "XHASH"
                     });
 
-                mock.Mock<IFilesystemService>()
+                var fs = mock.Mock<IFilesystemService>();
+                fs
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
+
+                var treeProvider = new FileEnumerateStep(fs.Object);
+                mock.Provide<ITreeProvider>(treeProvider);
 
                 var hashFunctionMock = new Mock<IHashFunction>();
                 hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))

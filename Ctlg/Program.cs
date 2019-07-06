@@ -123,6 +123,7 @@ namespace Ctlg
 
             command.Path = options.Path;
             command.Name = options.Name;
+            command.Date = options.Date;
             
             command.Execute(CtlgService);
         }
@@ -151,7 +152,7 @@ namespace Ctlg
             {
                 builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
             }
-
+            builder.RegisterType<SnapshotService>().As<ISnapshotService>();
             builder.RegisterCryptographyHashFunction<MD5Cng>("MD5", HashAlgorithmId.MD5);
             builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1", HashAlgorithmId.SHA1);
             builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256", HashAlgorithmId.SHA256);
@@ -174,7 +175,6 @@ namespace Ctlg
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>();
-            builder.RegisterType<SnapshotWriterProvider>().As<ISnapshotWriterProvider>();
             builder.RegisterType<SnapshotReader>().As<ISnapshotReader>();
 
 

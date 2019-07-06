@@ -7,7 +7,7 @@ using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 using File = Ctlg.Core.File;
 
-namespace Ctlg.Service.Commands
+namespace Ctlg.Service
 {
     public class SnapshotWriter: ISnapshotWriter
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Service.Commands
 {
@@ -10,10 +11,10 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider, ISnapshotWriterProvider snapshotWriterProvider, ISnapshotReader snapshotReader)
+        public BackupCommand(ITreeProvider treeProvider, ISnapshotService snapshotService, ISnapshotReader snapshotReader)
         {
             TreeProvider = treeProvider;
-            SnapshotWriterProvider = snapshotWriterProvider;
+            SnapshotService = snapshotService;
             SnapshotReader = snapshotReader;
         }
 
@@ -28,14 +29,14 @@ namespace Ctlg.Service.Commands
 
             var treeWalker = new TreeWalker(root);
 
-            using (var snapshot = SnapshotWriterProvider.CreateSnapshotWriter(SnapshotName))
+            using (var snapshot = SnapshotService.CreateSnapshotWriter(SnapshotName))
             {
                 treeWalker.Walk(snapshot.AddFile);
             }
         }
 
         private ITreeProvider TreeProvider { get; set; }
-        private ISnapshotWriterProvider SnapshotWriterProvider { get; set; }
+        private ISnapshotService SnapshotService { get; set; }
         private ISnapshotReader SnapshotReader { get; set; }
     }
 }

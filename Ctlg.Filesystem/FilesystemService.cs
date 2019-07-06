@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Filesystem
@@ -65,6 +66,12 @@ namespace Ctlg.Filesystem
         public string GetCurrentDirectory()
         {
             return Directory.GetCurrentDirectory();
+        }
+
+        public IEnumerable<Core.File> EnumerateFiles(string path, string searchMask = null)
+        {
+            var dir = GetDirectory(path);
+            return dir.EnumerateFiles(searchMask ?? "*");
         }
     }
 }

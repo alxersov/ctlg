@@ -19,12 +19,10 @@ namespace Ctlg.Service
             HashFunctions = hashFunction;
 
             CurrentDirectory = FilesystemService.GetCurrentDirectory();
-            SnapshotsDirectory = FilesystemService.CombinePath(CurrentDirectory, "snapshots");
             FileStorageDirectory = FilesystemService.CombinePath(CurrentDirectory, "file_storage");
         }
 
         public string CurrentDirectory { get; private set; }
-        public string SnapshotsDirectory { get; private set; }
         public string FileStorageDirectory {get; private set; }
 
         public void ApplyDbMigrations()
@@ -99,31 +97,6 @@ namespace Ctlg.Service
         {
             var backupFileDir = FilesystemService.CombinePath(FileStorageDirectory, hash.Substring(0, 2));
             return FilesystemService.CombinePath(backupFileDir, hash);
-        }
-
-        public string GenerateSnapshotFileName()
-        {
-            return DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
-        }
-
-        public string GetBackupSnapshotDirectory(string snapshotName)
-        {
-            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName);
-        }
-
-        public string GetLastSnapshotFile(string snapshotName)
-        {
-            var dir = GetBackupSnapshotDirectory(snapshotName);
-
-            if (!FilesystemService.DirectoryExists(dir))
-            {
-                return null;
-            }
-
-            var dirInfo = FilesystemService.GetDirectory(dir);
-            var files = dirInfo.EnumerateFiles("????-??-??_??-??-??");
-
-            return files.Max(f => f.Name);
         }
 
         public void SortTree(File directory)
