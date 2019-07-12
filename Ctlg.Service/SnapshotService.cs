@@ -23,13 +23,6 @@ namespace Ctlg.Service
             SnapshotsDirectory = FilesystemService.CombinePath(currentDirectory, "snapshots");
         }
 
-        public string SnapshotsDirectory { get; private set; }
-
-        public string GetSnapshotDirectory(string snapshotName)
-        {
-            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName);
-        }
-
         public string GetLastSnapshotPath(string snapshotName)
         {
             var files = GetSnapshotFiles(snapshotName);
@@ -42,7 +35,7 @@ namespace Ctlg.Service
             return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName, fileName);
         }
 
-        public virtual IEnumerable<File> GetSnapshotFiles(string snapshotName)
+        public IEnumerable<File> GetSnapshotFiles(string snapshotName)
         {
             var snapshotsPath = GetSnapshotDirectory(snapshotName);
             if (!FilesystemService.DirectoryExists(snapshotsPath))
@@ -50,6 +43,36 @@ namespace Ctlg.Service
                 return Enumerable.Empty<File>();
             }
             return FilesystemService.EnumerateFiles(snapshotsPath, "????-??-??_??-??-??");
+        }
+
+        public IEnumerable<SnapshotRecord> ReadSnapshotFile(string path)
+        {
+            using (var stream = FilesystemService.OpenFileForRead(path))
+            {
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var line = reader.ReadLine();
+                    while (line != null)
+                    {
+                        SnapshotRecord snapshotRecord = null;
+                        try
+                        {
+                            snapshotRecord = new SnapshotRecord(line);
+                        }
+                        catch (Exception ex)
+                        {
+                            DomainEvents.Raise(new ErrorEvent(ex));
+                        }
+
+                        if (snapshotRecord != null)
+                        {
+                            yield return snapshotRecord;
+                        }
+
+                        line = reader.ReadLine();
+                    }
+                }
+            }
         }
 
         public string FindSnapshotFile(string snapshotName, string snapshotDate = null)
@@ -80,6 +103,13 @@ namespace Ctlg.Service
             return new SnapshotWriter(fileListWriter, FilesystemService, CtlgService, hashFunction);
         }
 
+        private string SnapshotsDirectory { get; set; }
+
+        private string GetSnapshotDirectory(string snapshotName)
+        {
+            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName);
+        }
+
         private string GenerateSnapshotFileName()
         {
             return FormatSnapshotName(DateTime.UtcNow);
@@ -101,36 +131,6 @@ namespace Ctlg.Service
                 var date = DateTime.Parse(snapshotDate);
                 var snapshotDateFormatted = FormatSnapshotName(date);
                 return snapshots.Last(s => string.Compare(s, snapshotDateFormatted) <= 0);
-            }
-        }
-
-        public IEnumerable<SnapshotRecord> ReadSnapshotFile(string path)
-        {
-            using (var stream = FilesystemService.OpenFileForRead(path))
-            {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    var line = reader.ReadLine();
-                    while (line != null)
-                    {
-                        SnapshotRecord snapshotRecord = null;
-                        try
-                        {
-                            snapshotRecord = new SnapshotRecord(line);
-                        }
-                        catch (Exception ex)
-                        {
-                            DomainEvents.Raise(new ErrorEvent(ex));
-                        }
-
-                        if (snapshotRecord != null)
-                        {
-                            yield return snapshotRecord;
-                        }
-
-                        line = reader.ReadLine();
-                    }
-                }
             }
         }
 

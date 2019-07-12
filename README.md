@@ -5,8 +5,8 @@ A tool to catalog files and folders.
 
 ## Features
  - Calculates checksums. You can search files in catalog by checksum.
- - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32. 
- - Can work with long paths. 
+ - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32.
+ - Can work with long paths.
  - Catalogs files inside archives. Supports common archive types: Zip, 7Zip, Rar.
  - Create file backups.
 
@@ -18,21 +18,50 @@ A tool to catalog files and folders.
     ctlg show <catalog entry IDs>
     ctlg find -f <hash function> -c <checksum> -s <size> -n <name pattern>
     ctlg list
-    ctlg backup -n <Backup name> <directory>
-    ctlg restore -n <Backup name> <directory>
+    ctlg backup -f -n <backup name> -s <search pattern> <directory>
+    ctlg restore -n <backup name> -d <date> <directory>
 
-### Available commands
+### Add
 
- - add - Scan directory and add files to the catalog.
- - show - Show detailed information about catalog enty.
- - find - Find file in the catalog. It is possible to search files by name, size, and checksum value.
- - list - List all files in the catalog.
- - backup - Backup files from specified directory.
- - restore - Restore files from backup to specified directory.
+Scan directory and add files to the catalog.
+
+Available options:
+
+`-s <mask>`
+
+`--search <mask>`
+
+Include only files specified by `<mask>`. Can contain wildcards * and ?. Default is `*`.
+
+`-f <hash function>`
+
+`--function <hash function>`
+
+Apply `<hash function>` to files when adding them to the catalog. Default is `SHA-1`.
+
+### show
+
+Show detailed information about catalog enty.
+
+### find
+
+Find file in the catalog. It is possible to search files by name, size, and checksum value.
+
+### list
+
+List all files in the catalog.
+
+### backup
+
+Backup files from specified directory.
+
+### restore
+
+Restore files from backup to specified directory.
 
 ## Implementation details
 
- - .NET console application. 
+ - .NET console application.
  - Entity Framework with SQLite DB, database migrations in SQL.
  - Pri.LongPath is used to support long paths.
  - Autofac is used to inject dpendencies.

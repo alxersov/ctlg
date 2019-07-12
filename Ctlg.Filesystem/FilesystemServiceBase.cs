@@ -1,24 +1,17 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Filesystem
 {
-    public class FilesystemServiceBase
+    public abstract class FilesystemServiceBase
     {
-        public bool IsArchiveExtension(string path)
+        public IEnumerable<Core.File> EnumerateFiles(string path, string searchMask = null)
         {
-            var ext = Path.GetExtension(path);
-
-            return ArchiveExtensions.Any(e => e.Equals(ext, StringComparison.OrdinalIgnoreCase));
+            var dir = GetDirectory(path);
+            return dir.EnumerateFiles(searchMask ?? "*");
         }
 
-        public IArchive OpenArchive(Stream stream)
-        {
-            return new SharpCompressArchive(stream);
-        }
-
-        private static readonly string[] ArchiveExtensions = { ".ZIP", ".7Z", ".RAR" };
+        public abstract IFilesystemDirectory GetDirectory(string path);
     }
 }

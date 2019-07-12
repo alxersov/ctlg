@@ -18,7 +18,5 @@ namespace Ctlg.Core.Interfaces
         string CombinePath(string path1, string path2);
         string CombinePath(string path1, string path2, string path3);
         string GetDirectoryName(string path);
-        bool IsArchiveExtension(string path);
-        IArchive OpenArchive(Stream stream);
     }
 }

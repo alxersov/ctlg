@@ -124,7 +124,7 @@ namespace Ctlg
             command.Path = options.Path;
             command.Name = options.Name;
             command.Date = options.Date;
-            
+
             command.Execute(CtlgService);
         }
 
@@ -152,6 +152,7 @@ namespace Ctlg
             {
                 builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
             }
+            builder.RegisterType<ArchiveService>().As<IArchiveService>();
             builder.RegisterType<SnapshotService>().As<ISnapshotService>();
             builder.RegisterCryptographyHashFunction<MD5Cng>("MD5", HashAlgorithmId.MD5);
             builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1", HashAlgorithmId.SHA1);

@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Ctlg.UnitTests
 {
-    public class SnapshotServiceTests : BaseTestFixture
+    public class SnapshotServiceTests : BackupTestFixture
     {
         [Test]
         public void FindSnapshotFile_WithoutDate_ReturnsLatest()
@@ -49,7 +49,7 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void ReadSnapshotFile_WhenBadFileList_RaisesExceptionEvent()
+        public void ReadSnapshotFile_WhenBadFile_RaisesExceptionEvent()
         {
             using (var mock = AutoMock.GetLoose())
             {
@@ -66,13 +66,63 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
+        public void ReadSnapshotFile_WhenCorrectFile_ReturnsSnapshotRecords()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.SetupOpenFileForRead("some-path", FileListLine);
+
+                var service = CreateService(mock);
+                var records = service.ReadSnapshotFile("some-path").ToList();
+
+                Assert.That(records.Count, Is.EqualTo(1));
+                Assert.That(records[0].ToString(), Is.EqualTo(FileListLine));
+            }
+        }
+
+        [Test]
         public void GetLastSnapshotPath_WhenSnapshotDoesNotExist_ReturnsNull()
         {
             using (var mock = AutoMock.GetLoose())
             {
                 var service = CreateService(mock);
-
                 Assert.That(service.GetLastSnapshotPath("DoesNotExist"), Is.Null);
+            }
+        }
+
+        [Test]
+        public void GetLastSnapshotPath_WhenSnapshotsExist_ReturnsLast()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var service = CreateService(mock);
+
+                Assert.That(service.GetLastSnapshotPath("Test"),
+                    Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-06-26_00-00-00"));
+            }
+        }
+
+        [Test]
+        public void CreateSnapshotWriter_CreatesWriter()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.SetupHashFunction("SHA-256", null);
+
+                var service = CreateService(mock);
+                var stream = mock.SetupCreateNewFileForWrite();
+
+                var writer = service.CreateSnapshotWriter("TestCreateSnapshotWriter");
+
+                Assert.That(writer, Is.Not.Null);
+                mock.Mock<IFilesystemService>()
+                    .Verify(f => f.CreateDirectory(
+                        @"X:\current-directory\snapshots\TestCreateSnapshotWriter"),
+                        Times.Once);
+                mock.Mock<IFilesystemService>()
+                    .Verify(f => f.CreateNewFileForWrite(
+                        @"X:\current-directory\snapshots\TestCreateSnapshotWriter\test"),
+                        Times.Once);
             }
         }
 
@@ -93,6 +143,18 @@ namespace Ctlg.UnitTests
                     It.Is<string>(path => path == "X:\\current-directory\\snapshots"),
                     It.Is<string>(path => path == "Test")))
                 .Returns("X:\\current-directory\\snapshots\\Test");
+
+            fs
+                .Setup(f => f.CombinePath(
+                    It.Is<string>(path => path == @"X:\current-directory\snapshots"),
+                    It.Is<string>(path => path == "TestCreateSnapshotWriter")))
+                .Returns(@"X:\current-directory\snapshots\TestCreateSnapshotWriter");
+
+            fs
+                .Setup(f => f.CombinePath(
+                    It.Is<string>(path => path == @"X:\current-directory\snapshots\TestCreateSnapshotWriter"),
+                    It.IsAny<string>()))
+                .Returns(@"X:\current-directory\snapshots\TestCreateSnapshotWriter\test");
 
             fs
                 .Setup(f => f.DirectoryExists(It.Is<string>(path => path == "X:\\current-directory\\snapshots\\Test")))

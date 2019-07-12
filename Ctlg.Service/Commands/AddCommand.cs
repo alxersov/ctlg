@@ -18,12 +18,14 @@ namespace Ctlg.Service.Commands
         private IIndex<string, IHashFunction> HashFunctions { get; }
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
+        private IArchiveService ArchiveService { get; }
 
         public AddCommand(ITreeProvider treeProvider, IIndex<string, IHashFunction> hashFunctions,
-            IDataService dataService, IFilesystemService filesystemService)
+            IDataService dataService, IFilesystemService filesystemService, IArchiveService archiveService)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
+            ArchiveService = archiveService;
             TreeProvider = treeProvider;
             HashFunctions = hashFunctions;
         }
@@ -75,7 +77,7 @@ namespace Ctlg.Service.Commands
             {
                 using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
                 {
-                    var archive = FilesystemService.OpenArchive(stream);
+                    var archive = ArchiveService.OpenArchive(stream);
 
                     DomainEvents.Raise(new ArchiveFound(file.FullPath));
 
@@ -97,7 +99,7 @@ namespace Ctlg.Service.Commands
         {
             CalculateHashes(file);
 
-            if (FilesystemService.IsArchiveExtension(file.FullPath))
+            if (ArchiveService.IsArchiveExtension(file.FullPath))
             {
                 ProcessArchive(file);
             }
