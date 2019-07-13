@@ -1,12 +1,8 @@
 ﻿using System;
-// using System.IO;
 using System.Linq;
-using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Filesystem;
-using Ctlg.Service;
-using Ctlg.Service.Utils;
 using Moq;
 using NUnit.Framework;
 

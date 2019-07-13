@@ -23,18 +23,6 @@ namespace Ctlg.Service
             SnapshotsDirectory = FilesystemService.CombinePath(currentDirectory, "snapshots");
         }
 
-        public string GetLastSnapshotPath(string snapshotName)
-        {
-            var files = GetSnapshotFiles(snapshotName);
-
-            var fileName = files.Max(f => f.Name);
-            if (fileName == null) {
-              return null;
-            }
-
-            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName, fileName);
-        }
-
         public IEnumerable<File> GetSnapshotFiles(string snapshotName)
         {
             var snapshotsPath = GetSnapshotDirectory(snapshotName);
@@ -75,9 +63,14 @@ namespace Ctlg.Service
             }
         }
 
-        public string FindSnapshotFile(string snapshotName, string snapshotDate = null)
+        public string FindSnapshotPath(string snapshotName, string snapshotDate = null)
         {
-            var allSnapshots = GetSnapshotFiles(snapshotName).Select(d => d.Name).OrderBy(s => s);
+            var allSnapshots = GetSnapshotFiles(snapshotName).Select(d => d.Name).OrderBy(s => s).ToList();
+
+            if (allSnapshots.Count == 0)
+            {
+                return null;
+            }
 
             var fileName = SelectSnapshotByDate(allSnapshots, snapshotDate);
 
@@ -120,7 +113,7 @@ namespace Ctlg.Service
             return date.ToString("yyyy-MM-dd_HH-mm-ss");
         }
 
-        private string SelectSnapshotByDate(IOrderedEnumerable<string> snapshots, string snapshotDate)
+        private string SelectSnapshotByDate(IEnumerable<string> snapshots, string snapshotDate)
         {
             if (string.IsNullOrEmpty(snapshotDate))
             {

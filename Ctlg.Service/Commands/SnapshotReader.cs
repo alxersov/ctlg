@@ -20,7 +20,7 @@ namespace Ctlg.Service.Commands
 
         public void ReadHashesFromLatestSnapshot(string snapshotName, File destinationTree)
         {
-            var snapshotPath = SnapshotService.GetLastSnapshotPath(snapshotName);
+            var snapshotPath = SnapshotService.FindSnapshotPath(snapshotName);
             if (snapshotPath == null)
             {
                 return;

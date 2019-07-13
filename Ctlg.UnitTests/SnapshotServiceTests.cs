@@ -19,7 +19,7 @@ namespace Ctlg.UnitTests
             {
                 var service = CreateService(mock);
 
-                var snapshotPath = service.FindSnapshotFile("Test");
+                var snapshotPath = service.FindSnapshotPath("Test");
                 Assert.That(snapshotPath, Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-06-26_00-00-00"));
             }
         }
@@ -31,7 +31,7 @@ namespace Ctlg.UnitTests
             {
                 var service = CreateService(mock);
 
-                var snapshotPath = service.FindSnapshotFile("Test", "2019-01-01T00:00:00");
+                var snapshotPath = service.FindSnapshotPath("Test", "2019-01-01T00:00:00");
                 Assert.That(snapshotPath, Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-01-01_00-00-00"));
             }
         }
@@ -43,8 +43,20 @@ namespace Ctlg.UnitTests
             {
                 var service = CreateService(mock);
 
-                var snapshotPath = service.FindSnapshotFile("Test", "2019-01-01T05:00:30");
+                var snapshotPath = service.FindSnapshotPath("Test", "2019-01-01T05:00:30");
                 Assert.That(snapshotPath, Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-01-01_02-30-00"));
+            }
+        }
+
+        [Test]
+        public void FindSnapshotFile_WhenSnapshotDoesNotExist_ReturnsNull()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var service = CreateService(mock);
+
+                var snapshotPath = service.FindSnapshotPath("DoesNotExist");
+                Assert.That(snapshotPath, Is.Null);
             }
         }
 
@@ -77,28 +89,6 @@ namespace Ctlg.UnitTests
 
                 Assert.That(records.Count, Is.EqualTo(1));
                 Assert.That(records[0].ToString(), Is.EqualTo(FileListLine));
-            }
-        }
-
-        [Test]
-        public void GetLastSnapshotPath_WhenSnapshotDoesNotExist_ReturnsNull()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                var service = CreateService(mock);
-                Assert.That(service.GetLastSnapshotPath("DoesNotExist"), Is.Null);
-            }
-        }
-
-        [Test]
-        public void GetLastSnapshotPath_WhenSnapshotsExist_ReturnsLast()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                var service = CreateService(mock);
-
-                Assert.That(service.GetLastSnapshotPath("Test"),
-                    Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-06-26_00-00-00"));
             }
         }
 

@@ -97,7 +97,7 @@ namespace Ctlg.UnitTests
 
         public static void SetupFindSnapshotFile(this AutoMock mock, string backupName, string snapshotPath)
         {
-            mock.Mock<ISnapshotService>().Setup(s => s.FindSnapshotFile(It.Is<string>(name => name == backupName), It.Is<string>(date => date == null))).Returns(snapshotPath);
+            mock.Mock<ISnapshotService>().Setup(s => s.FindSnapshotPath(It.Is<string>(name => name == backupName), It.Is<string>(date => date == null))).Returns(snapshotPath);
         }
 
         public static void SetupReadSnapshotFile(this AutoMock mock, string path, IEnumerable<SnapshotRecord> snapshotRecords)
