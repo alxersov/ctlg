@@ -11,5 +11,8 @@ namespace Ctlg.CommandLineOptions
 
         [Option('n', "name", HelpText = "Backup name.")]
         public string Name { get; set; }
+
+        [Option('d', "date", HelpText = "Backup date.")]
+        public string Date { get; set; }
     }
 }

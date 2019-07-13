@@ -23,7 +23,7 @@ namespace Ctlg.Service.Utils
             {
                 bytes[i / 2] = Convert.ToByte(hexString.Substring(i, 2), 16);
             }
-                
+
             return bytes;
         }
     }

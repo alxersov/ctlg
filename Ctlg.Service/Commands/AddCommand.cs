@@ -6,17 +6,27 @@ using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
 {
-    public class AddCommand : TreeProcessingCommand, ICommand
+    public class AddCommand : ICommand
     {
         public string HashFunctionName { get; set; }
+        public string Path { get; set; }
+        public string SearchPattern { get; set; }
 
         private IHashFunction HashFunction;
+
+        private ITreeProvider TreeProvider { get; }
         private IIndex<string, IHashFunction> HashFunctions { get; }
         private IDataService DataService { get; }
+        private IFilesystemService FilesystemService { get; }
+        private IArchiveService ArchiveService { get; }
 
-        public AddCommand(IIndex<string, IHashFunction> hashFunctions, IDataService dataService, IFilesystemService filesystemService): base(filesystemService)
+        public AddCommand(ITreeProvider treeProvider, IIndex<string, IHashFunction> hashFunctions,
+            IDataService dataService, IFilesystemService filesystemService, IArchiveService archiveService)
         {
             DataService = dataService;
+            FilesystemService = filesystemService;
+            ArchiveService = archiveService;
+            TreeProvider = treeProvider;
             HashFunctions = hashFunctions;
         }
 
@@ -30,9 +40,10 @@ namespace Ctlg.Service.Commands
                 throw new Exception($"Unsupported hash function {hashFunctionName}");
             }
 
-            var root = ReadTree();
+            var root = TreeProvider.ReadTree(Path, SearchPattern);
+            var treeWalker = new TreeWalker(root);
+            treeWalker.Walk(ProcessFile);
 
-            ProcessTree(root);
 
             DataService.AddDirectory(root);
 
@@ -66,7 +77,7 @@ namespace Ctlg.Service.Commands
             {
                 using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
                 {
-                    var archive = FilesystemService.OpenArchive(stream);
+                    var archive = ArchiveService.OpenArchive(stream);
 
                     DomainEvents.Raise(new ArchiveFound(file.FullPath));
 
@@ -84,11 +95,11 @@ namespace Ctlg.Service.Commands
             }
         }
 
-        protected override void ProcessFile(File file)
+        protected void ProcessFile(File file)
         {
             CalculateHashes(file);
 
-            if (FilesystemService.IsArchiveExtension(file.FullPath))
+            if (ArchiveService.IsArchiveExtension(file.FullPath))
             {
                 ProcessArchive(file);
             }

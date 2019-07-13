@@ -13,12 +13,11 @@ setup() {
   mkdir "${CTLG_RESTOREDIR}"
   cd "${CTLG_WORKDIR}"
 
-  echo "# Setup ${CTLG_TEMPDIR}" >&3
+  # echo "# Setup ${CTLG_TEMPDIR}" >&3
 }
 
 teardown() {
   rm -rf "${CTLG_TEMPDIR}"
-  :
 }
 
 @test "backup and restore one file" {
@@ -27,7 +26,18 @@ teardown() {
 
   [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]]
 
-  ${CTLG_EXECUTABLE} restore -n "snapshots/Test/$(ls snapshots/Test | tail -1)" "${CTLG_RESTOREDIR}"
+  ${CTLG_EXECUTABLE} restore -n "Test" "${CTLG_RESTOREDIR}"
+
+  diff -r "$CTLG_FILESDIR" "${CTLG_RESTOREDIR}"
+}
+
+@test "backup and restore one file with fast mode" {
+  echo -n "hello" > ${CTLG_FILESDIR}/hi.txt
+  output=$($CTLG_EXECUTABLE backup -f -n Test ${CTLG_FILESDIR})
+
+  [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]]
+
+  ${CTLG_EXECUTABLE} restore -n "Test" "${CTLG_RESTOREDIR}"
 
   diff -r "$CTLG_FILESDIR" "${CTLG_RESTOREDIR}"
 }
@@ -39,7 +49,7 @@ teardown() {
   echo -n "world" > "$CTLG_FILESDIR/foo/b r/w.txt"
 
   $CTLG_EXECUTABLE backup -n Test ${CTLG_FILESDIR}
-  ${CTLG_EXECUTABLE} restore -n "snapshots/Test/$(ls snapshots/Test | tail -1)" "${CTLG_RESTOREDIR}"
+  ${CTLG_EXECUTABLE} restore -n Test "${CTLG_RESTOREDIR}"
   diff -r "$CTLG_FILESDIR" "${CTLG_RESTOREDIR}"
 }
 
@@ -52,7 +62,7 @@ teardown() {
   echo -n "TEST" > "$CTLG_FILESDIR/hi.txt"
   $CTLG_EXECUTABLE backup -n Test1 ${CTLG_FILESDIR}
 
-  ${CTLG_EXECUTABLE} restore -n "snapshots/Test2/$(ls snapshots/Test2 | tail -1)" "${CTLG_RESTOREDIR}"
+  ${CTLG_EXECUTABLE} restore -n "Test2" "${CTLG_RESTOREDIR}"
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   echo -n "world" > "$CTLG_FILESDIR/world.txt"
   diff -r "$CTLG_FILESDIR" "${CTLG_RESTOREDIR}"
@@ -67,4 +77,30 @@ teardown() {
   snapshot="snapshots/Test1/$(ls snapshots/Test1 | tail -1)"
   file_list=$(cat "$snapshot" | awk '{ print $4 }')
   [ "$file_list" == "hi.txt" ]
+}
+
+@test "restore backup for differnt dates" {
+  echo -n "1" > "$CTLG_FILESDIR/hi.txt"
+  $CTLG_EXECUTABLE backup -n Test $CTLG_FILESDIR
+  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-02_03-04-05"
+
+  echo -n "2" > "$CTLG_FILESDIR/hi.txt"
+  $CTLG_EXECUTABLE backup -n Test $CTLG_FILESDIR
+  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-02_03-04-10"
+
+  echo -n "3" > "$CTLG_FILESDIR/hi.txt"
+  $CTLG_EXECUTABLE backup -n Test $CTLG_FILESDIR
+  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-02_03-04-15"
+
+  $CTLG_EXECUTABLE restore -n "Test" "$CTLG_RESTOREDIR"
+  grep -Fxq "3" "$CTLG_RESTOREDIR/hi.txt"
+  rm "$CTLG_RESTOREDIR/hi.txt"
+
+  $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-02T03:04:10" "$CTLG_RESTOREDIR"
+  grep -Fxq "2" "$CTLG_RESTOREDIR/hi.txt"
+  rm "$CTLG_RESTOREDIR/hi.txt"
+
+  $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-02T03:04:07" "$CTLG_RESTOREDIR"
+  grep -Fxq "1" "$CTLG_RESTOREDIR/hi.txt"
+  rm "$CTLG_RESTOREDIR/hi.txt"
 }

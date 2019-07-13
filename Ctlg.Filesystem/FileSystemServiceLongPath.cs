@@ -47,7 +47,7 @@ namespace Ctlg.Filesystem
             return Directory.GetCurrentDirectory();
         }
 
-        public IFilesystemDirectory GetDirectory(string path)
+        public override IFilesystemDirectory GetDirectory(string path)
         {
             return new FilesystemDirectoryLongPath(path);
         }

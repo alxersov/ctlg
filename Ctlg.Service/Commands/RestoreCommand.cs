@@ -10,45 +10,39 @@ namespace Ctlg.Service.Commands
     public class RestoreCommand: ICommand
     {
         public string Name { get; set; }
+        public string Date { get; set; }
         public string Path { get; set; }
 
         private IFilesystemService FileSystemService { get; }
         private ICtlgService CtlgService { get; }
+        private ISnapshotService SnapshotService { get; }
 
-        public RestoreCommand(IFilesystemService fileSystemService, ICtlgService ctlgService)
+        public RestoreCommand(IFilesystemService fileSystemService, ICtlgService ctlgService, ISnapshotService snapshotService)
         {
             CtlgService = ctlgService;
+            SnapshotService = snapshotService;
             FileSystemService = fileSystemService;
         }
 
         public void Execute(ICtlgService ctlgService)
         {
-            using (var stream = FileSystemService.OpenFileForRead(Name))
+            var snapshotPath = SnapshotService.FindSnapshotPath(Name, Date);
+            var snapshotRecords = SnapshotService.ReadSnapshotFile(snapshotPath);
+            foreach (var record in snapshotRecords)
             {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                try
                 {
-                    var line = reader.ReadLine();
-                    while (line != null)
-                    {
-                        try
-                        {
-                            ProcessBackupLine(line);
-                        }
-                        catch (Exception ex)
-                        {
-                            DomainEvents.Raise(new ErrorEvent(ex));
-                        }
-
-                        line = reader.ReadLine();
-                    }
+                    ProcessSnapshotRecord(record);
+                }
+                catch (Exception ex)
+                {
+                    DomainEvents.Raise(new ErrorEvent(ex));
                 }
             }
         }
 
-        private void ProcessBackupLine(string line)
+        private void ProcessSnapshotRecord(SnapshotRecord record)
         {
-            var record = new SnapshotRecord(line);
-
             var backupFilePath = CtlgService.GetBackupFilePath(record.Hash);
             if (!FileSystemService.FileExists(backupFilePath))
             {
