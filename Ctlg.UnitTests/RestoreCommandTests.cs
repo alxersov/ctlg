@@ -60,7 +60,7 @@ namespace Ctlg.UnitTests
             command.Name = BackupName;
             command.Path = @"C:\foo";
 
-            command.Execute(null);
+            command.Execute();
         }
     }
 }

@@ -49,39 +49,44 @@ namespace Ctlg
 
             CtlgService.ApplyDbMigrations();
 
-
             Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show>(args)
-            .WithParsed<Add>(opts => RunAdd(opts))
-            .WithParsed<Backup>(opts => RunBackupCommand(opts))
-            .WithParsed<Find>(opts => RunFindCommand(opts))
-            .WithParsed<List>(opts => RunListCommand(opts))
-            .WithParsed<Restore>(opts => RunRestoreCommand(opts))
-            .WithParsed<Show>(opts => RunShowCommand(opts))
-            .WithNotParsed(errors => { ExitCode = 1; });
+                .WithParsed<Add>(opts => RunAdd(opts))
+                .WithParsed<Backup>(opts => RunBackupCommand(opts))
+                .WithParsed<Find>(opts => RunFindCommand(opts))
+                .WithParsed<List>(opts => RunListCommand(opts))
+                .WithParsed<Restore>(opts => RunRestoreCommand(opts))
+                .WithParsed<Show>(opts => RunShowCommand(opts))
+                .WithNotParsed(errors => { ExitCode = 1; });
 
             return ExitCode;
         }
 
+        private void SetupAndExecute<T>(Action<T> setupActon) where T : ICommand
+        {
+            var command = Scope.Resolve<T>();
+
+            setupActon(command);
+
+            command.Execute();
+        }
+
         private void RunAdd(Add options)
         {
-            var command = Scope.Resolve<AddCommand>();
-
-            command.Path = options.Path.First();
-            command.SearchPattern = options.SearchPattern;
-            command.HashFunctionName = options.HashFunctionName;
-
-            command.Execute(CtlgService);
+            SetupAndExecute<AddCommand>(command => {
+                command.Path = options.Path.First();
+                command.SearchPattern = options.SearchPattern;
+                command.HashFunctionName = options.HashFunctionName;
+            });
         }
 
         private void RunBackupCommand(Backup options)
         {
-            var command = Scope.Resolve<BackupCommand>();
-            command.Path = options.Path;
-            command.SearchPattern = options.SearchPattern;
-            command.SnapshotName = options.Name;
-            command.IsFastMode = options.Fast;
-
-            command.Execute(CtlgService);
+            SetupAndExecute<BackupCommand>(command => {
+                command.Path = options.Path;
+                command.SearchPattern = options.SearchPattern;
+                command.SnapshotName = options.Name;
+                command.IsFastMode = options.Fast;
+            });
         }
 
         private void RunFindCommand(Find options)
@@ -100,41 +105,35 @@ namespace Ctlg
                 return;
             }
 
-            var command = Scope.Resolve<FindCommand>();
-
-            command.Hash = options.Checksum;
-            command.HashFunctionName = options.HashFunctionName;
-            command.NamePattern = options.NamePattern;
-            command.Size = options.Size;
-
-            command.Execute(CtlgService);
+            SetupAndExecute<FindCommand>(command => {
+                command.Hash = options.Checksum;
+                command.HashFunctionName = options.HashFunctionName;
+                command.NamePattern = options.NamePattern;
+                command.Size = options.Size;
+            });
         }
 
         private void RunListCommand(List options)
         {
-            var command = Scope.Resolve<ListCommand>();
-
-            command.Execute(CtlgService);
+            SetupAndExecute<ListCommand>(command => {});
         }
 
         private void RunRestoreCommand(Restore options)
         {
-            var command = Scope.Resolve<RestoreCommand>();
-
-            command.Path = options.Path;
-            command.Name = options.Name;
-            command.Date = options.Date;
-
-            command.Execute(CtlgService);
+            SetupAndExecute<RestoreCommand>(command => {
+                command.Path = options.Path;
+                command.Name = options.Name;
+                command.Date = options.Date;
+            });
         }
 
         private void RunShowCommand(Show options)
         {
             var ids = options.CatalogEntryIds.Select(int.Parse).ToList();
 
-            var command = Scope.Resolve<ShowCommand>(new NamedParameter("catalogEntryIds", ids));
-
-            command.Execute(CtlgService);
+            SetupAndExecute<ShowCommand>(command => {
+                command.CatalogEntryIds = ids;
+            });
         }
 
         private static IContainer BuildIocContainer()

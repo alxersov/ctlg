@@ -18,7 +18,7 @@ namespace Ctlg.Service.Commands
             SnapshotReader = snapshotReader;
         }
 
-        public void Execute(ICtlgService ctlgService)
+        public void Execute()
         {
             var root = TreeProvider.ReadTree(Path, SearchPattern);
 

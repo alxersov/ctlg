@@ -13,11 +13,10 @@ namespace Ctlg.Service
 {
     public class SnapshotService: ISnapshotService
     {
-        public SnapshotService(IFilesystemService filesystemService, ICtlgService ctlgService, IIndex<string, IHashFunction> hashFunctions)
+        public SnapshotService(IFilesystemService filesystemService, ICtlgService ctlgService)
         {
             FilesystemService = filesystemService;
             CtlgService = ctlgService;
-            HashFunctions = hashFunctions;
 
             var currentDirectory = FilesystemService.GetCurrentDirectory();
             SnapshotsDirectory = FilesystemService.CombinePath(currentDirectory, "snapshots");
@@ -79,11 +78,7 @@ namespace Ctlg.Service
 
         public ISnapshotWriter CreateSnapshotWriter(string name)
         {
-            var hashFunctionName = "SHA-256";
-            if (!HashFunctions.TryGetValue(hashFunctionName, out IHashFunction hashFunction))
-            {
-                throw new Exception($"Unsupported hash function {hashFunctionName}");
-            }
+            var hashFunction = CtlgService.GetHashFunction("SHA-256");
 
             var backupDirectory = GetSnapshotDirectory(name);
             FilesystemService.CreateDirectory(backupDirectory);

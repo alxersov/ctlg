@@ -15,35 +15,28 @@ namespace Ctlg.Service.Commands
         private IHashFunction HashFunction;
 
         private ITreeProvider TreeProvider { get; }
-        private IIndex<string, IHashFunction> HashFunctions { get; }
+        private ICtlgService CtlgService { get; }
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
         private IArchiveService ArchiveService { get; }
 
-        public AddCommand(ITreeProvider treeProvider, IIndex<string, IHashFunction> hashFunctions,
+        public AddCommand(ITreeProvider treeProvider, ICtlgService ctlgService,
             IDataService dataService, IFilesystemService filesystemService, IArchiveService archiveService)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
             ArchiveService = archiveService;
             TreeProvider = treeProvider;
-            HashFunctions = hashFunctions;
+            CtlgService = ctlgService;
         }
 
-        public void Execute(ICtlgService svc)
+        public void Execute()
         {
-            var hashFunctionName = HashFunctionName ?? "SHA-1";
-            hashFunctionName = hashFunctionName.ToUpperInvariant();
-
-            if (!HashFunctions.TryGetValue(hashFunctionName, out HashFunction))
-            {
-                throw new Exception($"Unsupported hash function {hashFunctionName}");
-            }
+            HashFunction = CtlgService.GetHashFunction(HashFunctionName ?? "SHA-256");
 
             var root = TreeProvider.ReadTree(Path, SearchPattern);
             var treeWalker = new TreeWalker(root);
             treeWalker.Walk(ProcessFile);
-
 
             DataService.AddDirectory(root);
 

@@ -24,7 +24,7 @@ namespace Ctlg.Service.Commands
             FileSystemService = fileSystemService;
         }
 
-        public void Execute(ICtlgService ctlgService)
+        public void Execute()
         {
             var snapshotPath = SnapshotService.FindSnapshotPath(Name, Date);
             var snapshotRecords = SnapshotService.ReadSnapshotFile(snapshotPath);

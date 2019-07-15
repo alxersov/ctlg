@@ -23,7 +23,7 @@ namespace Ctlg.UnitTests
                 command.Path = "test-path";
                 command.SnapshotName = "test-name";
 
-                command.Execute(null);
+                command.Execute();
 
                 writerMock.VerifyAll();
             }
@@ -46,7 +46,7 @@ namespace Ctlg.UnitTests
                 command.SnapshotName = "test-name";
                 command.IsFastMode = true;
 
-                command.Execute(null);
+                command.Execute();
 
                 snapshotReaderMock.VerifyAll();
             }

@@ -5,19 +5,20 @@ namespace Ctlg.Service.Commands
 {
     public class ShowCommand : ICommand
     {
-        public ShowCommand(IList<int> catalogEntryIds)
+        public ShowCommand(ICtlgService ctlgService)
         {
-            CatalogEntryIds = catalogEntryIds;
+            CtlgService = ctlgService;
         }
 
-        public void Execute(ICtlgService ctlgService)
+        public void Execute()
         {
             foreach (var id in CatalogEntryIds)
             {
-                ctlgService.Show(id);
+                CtlgService.Show(id);
             }
         }
 
-        public IList<int> CatalogEntryIds { get; }
+        public IList<int> CatalogEntryIds { get; set; }
+        private ICtlgService CtlgService { get; }
     }
 }

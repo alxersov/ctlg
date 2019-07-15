@@ -10,18 +10,25 @@ namespace Ctlg.Service.Commands
         public long? Size { get; set; }
         public string NamePattern { get; set; }
 
-        public void Execute(ICtlgService ctlgService)
+        public FindCommand(ICtlgService ctlgService)
+        {
+            CtlgService = ctlgService;
+        }
+
+        public void Execute()
         {
             Hash hash = null;
             if (HashFunctionName != null && Hash != null)
             {
-                var hashAlgorithm = ctlgService.GetHashAlgorithm(HashFunctionName.ToUpperInvariant());
+                var hashAlgorithm = CtlgService.GetHashAlgorithm(HashFunctionName.ToUpperInvariant());
                 var bytes = FormatBytes.ToByteArray(Hash);
 
                 hash = new Hash(hashAlgorithm.HashAlgorithmId, bytes);
             }
 
-            ctlgService.FindFiles(hash, Size, NamePattern);
+            CtlgService.FindFiles(hash, Size, NamePattern);
         }
+
+        private ICtlgService CtlgService { get; }
     }
 }

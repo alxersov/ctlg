@@ -62,7 +62,7 @@ namespace Ctlg.UnitTests
             var events = SetupEvents<FileFound>();
 
             var fakeDir = CreateFakeDirWithTwoFiles();
-            
+
             AddDirectory(fakeDir);
 
             Assert.That(events.Count, Is.EqualTo(2));
@@ -199,21 +199,6 @@ namespace Ctlg.UnitTests
             }
         }
 
-        [Test]
-        public void Execute_CallsCommandExecute()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                var ctlg = mock.Create<CtlgService>();
-
-                var command = new Mock<ICommand>();
-
-                ctlg.Execute(command.Object);
-
-                command.Verify(c => c.Execute(ctlg), Times.Once);
-            }
-        }
-
         private void ListFiles(IList<File> files)
         {
             using (var mock = AutoMock.GetLoose())
@@ -267,13 +252,6 @@ namespace Ctlg.UnitTests
                     .Setup(d => d.AddDirectory(It.IsAny<File>()))
                     .Callback<File>(f => addedDirectory = f);
 
-                mock.Mock<IDataService>()
-                    .Setup(d => d.GetHashAlgorithm(It.IsAny<string>())).Returns(new HashAlgorithm()
-                    {
-                        HashAlgorithmId = 1,
-                        Name = "XHASH"
-                    });
-
                 var fs = mock.Mock<IFilesystemService>();
                 fs
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
@@ -286,18 +264,16 @@ namespace Ctlg.UnitTests
                 hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
                                 .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
 
-                var index = new Index<string, IHashFunction>();
-                index.Add("XHASH", hashFunctionMock.Object);
-                mock.Provide<IIndex<string, IHashFunction>>(index);
-
+                mock.Mock<ICtlgService>()
+                    .Setup(s => s.GetHashFunction(It.Is<string>(name => name == "XHASH")))
+                    .Returns(hashFunctionMock.Object);
 
                 var addCommand = mock.Create<AddCommand>();
 
                 addCommand.Path = "somepath";
                 addCommand.HashFunctionName = "XHASH";
 
-                var ctlg = mock.Create<CtlgService>();
-                addCommand.Execute(ctlg);
+                addCommand.Execute();
 
                 return addedDirectory;
             }

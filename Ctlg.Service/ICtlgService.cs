@@ -1,11 +1,11 @@
 ﻿using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 
 namespace Ctlg.Service
 {
     public interface ICtlgService
     {
-        void Execute(ICommand command);
         void ApplyDbMigrations();
 
         void ListFiles();
@@ -13,6 +13,8 @@ namespace Ctlg.Service
         void Show(int catalgoEntryId);
 
         HashAlgorithm GetHashAlgorithm(string hashAlgorithmName);
+
+        IHashFunction GetHashFunction(string name);
 
         string GetBackupFilePath(string hash);
         void SortTree(File directory);

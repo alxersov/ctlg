@@ -71,6 +71,17 @@ namespace Ctlg.Service
             return algorithm;
         }
 
+        public IHashFunction GetHashFunction(string name)
+        {
+            var canonicName = name.ToUpperInvariant();
+            if (!HashFunctions.TryGetValue(name, out IHashFunction hashFunction))
+            {
+                throw new Exception($"Unsupported hash function {name}");
+            }
+
+            return hashFunction;
+        }
+
         private void OutputFiles(IEnumerable<File> files, int level = 0)
         {
             foreach (var file in files)
@@ -78,18 +89,6 @@ namespace Ctlg.Service
                 DomainEvents.Raise(new TreeItemEnumerated(file, level));
 
                 OutputFiles(file.Contents, level + 1);
-            }
-        }
-
-        public void Execute(ICommand command)
-        {
-            try
-            {
-                command.Execute(this);
-            }
-            catch (Exception e)
-            {
-                DomainEvents.Raise(new ErrorEvent(e));
             }
         }
 

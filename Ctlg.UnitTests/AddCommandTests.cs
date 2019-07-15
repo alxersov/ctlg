@@ -1,4 +1,7 @@
-﻿using Ctlg.Service;
+﻿using Autofac.Extras.Moq;
+using Ctlg.Core;
+using Ctlg.Core.Interfaces;
+using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
@@ -11,14 +14,27 @@ namespace Ctlg.UnitTests
         [Test]
         public void Execute_WhenCalled_CallsAddDirectory()
         {
-            //var addCommand = new AddCommand {Path = @"foo\bar"};
+            using (var mock = AutoMock.GetLoose())
+            {
+                var tree = new File("test-path", true) { Contents = { new File("test-1.txt") } };
 
-            //var serviceMock = new Mock<ICtlgService>(MockBehavior.Strict);
-            //serviceMock.Setup(s => s.AddDirectory(It.Is<string>(path => path == @"foo\bar"), It.IsAny<string>(), It.IsAny<string>()));
+                var hashFunctionMock = new Mock<IHashFunction>();
 
-            //addCommand.Execute(serviceMock.Object);
+                mock.Mock<ITreeProvider>()
+                    .Setup(d => d.ReadTree(It.Is<string>(s => s == "test-path"), It.Is<string>(s => s == null)))
+                    .Returns(tree);
 
-            //serviceMock.VerifyAll();
+                mock.Mock<ICtlgService>()
+                    .Setup(s => s.GetHashFunction(It.Is<string>(name => name == "SHA-256")))
+                    .Returns(hashFunctionMock.Object);
+
+                var command = mock.Create<AddCommand>();
+                command.Path = "test-path";
+
+                command.Execute();
+
+                mock.Mock<IDataService>().Verify(s => s.AddDirectory(tree), Times.Once);
+            }
         }
     }
 }

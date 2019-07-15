@@ -2,9 +2,16 @@
 {
     public class ListCommand: ICommand
     {
-        public void Execute(ICtlgService ctlgService)
+        public ListCommand(ICtlgService ctlgService)
         {
-            ctlgService.ListFiles();
+            CtlgService = ctlgService;
         }
+
+        public void Execute()
+        {
+            CtlgService.ListFiles();
+        }
+
+        private ICtlgService CtlgService { get; }
     }
 }

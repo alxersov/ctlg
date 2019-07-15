@@ -2,6 +2,6 @@
 {
     public interface ICommand
     {
-        void Execute(ICtlgService ctlgService);
+        void Execute();
     }
 }
