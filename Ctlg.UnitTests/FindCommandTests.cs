@@ -14,11 +14,6 @@ namespace Ctlg.UnitTests
         [Test]
         public void Execute_Always_CallsFindFiles()
         {
-            var command = new FindCommand
-            {
-                HashFunctionName = "test",
-                Hash = "01FF"
-            };
 
             var serviceMock = new Mock<ICtlgService>(MockBehavior.Strict);
 
@@ -31,7 +26,12 @@ namespace Ctlg.UnitTests
                 It.IsAny<long?>(),
                 It.IsAny<string>())).Callback<Hash, long?, string>((h, s, n) => hashParameter = h.Value);
 
-            command.Execute(serviceMock.Object);
+            var command = new FindCommand(serviceMock.Object)
+            {
+                HashFunctionName = "test",
+                Hash = "01FF"
+            };
+            command.Execute();
 
             serviceMock.VerifyAll();
             Assert.That(FormatBytes.ToHexString(hashParameter), Is.EqualTo("01ff").IgnoreCase);

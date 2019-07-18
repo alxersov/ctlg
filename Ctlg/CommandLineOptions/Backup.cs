@@ -16,6 +16,6 @@ namespace Ctlg.CommandLineOptions
         public string Name { get; set; }
 
         [Option('f', "fast", HelpText = "Fast mode.", Default = false)]
-        public bool Fast { get; set; }
+        public bool IsFastMode { get; set; }
     }
 }

@@ -21,9 +21,9 @@ namespace Ctlg.UnitTests
 
                 var command = mock.Create<BackupCommand>();
                 command.Path = "test-path";
-                command.SnapshotName = "test-name";
+                command.Name = "test-name";
 
-                command.Execute(null);
+                command.Execute();
 
                 writerMock.VerifyAll();
             }
@@ -43,10 +43,10 @@ namespace Ctlg.UnitTests
 
                 var command = mock.Create<BackupCommand>();
                 command.Path = "test-path";
-                command.SnapshotName = "test-name";
+                command.Name = "test-name";
                 command.IsFastMode = true;
 
-                command.Execute(null);
+                command.Execute();
 
                 snapshotReaderMock.VerifyAll();
             }

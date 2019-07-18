@@ -9,7 +9,7 @@ namespace Ctlg.CommandLineOptions
         public string HashFunctionName { get; set; }
 
         [Option('c', "checksum", HelpText = "Checksum value.")]
-        public string Checksum { get; set; }
+        public string Hash { get; set; }
 
         [Option('s', "size", HelpText = "File size in bytes.")]
         public long? Size { get; set; }

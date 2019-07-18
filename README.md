@@ -12,56 +12,111 @@ A tool to catalog files and folders.
 
 ## Usage
 
-    ctlg <command> [<args>]
-
-    ctlg add -s <mask> -f <hash function> <directory>
-    ctlg show <catalog entry IDs>
-    ctlg find -f <hash function> -c <checksum> -s <size> -n <name pattern>
-    ctlg list
-    ctlg backup -f -n <backup name> -s <search pattern> <directory>
-    ctlg restore -n <backup name> -d <date> <directory>
+    ctlg <command> [<options>]
 
 ### Add
+
+    ctlg add -s <mask> -f <hash function> <directory>
 
 Scan directory and add files to the catalog.
 
 Available options:
 
-`-s <mask>`
-
-`--search <mask>`
+    -s <mask>
+    --search <mask>
 
 Include only files specified by `<mask>`. Can contain wildcards * and ?. Default is `*`.
 
-`-f <hash function>`
+    -f <hash function>
+    --function <hash function>
 
-`--function <hash function>`
-
-Apply `<hash function>` to files when adding them to the catalog. Default is `SHA-1`.
+Apply `<hash function>` to files when adding them to the catalog. Default is `SHA-256`.
 
 ### show
+
+    ctlg show <catalog entry IDs>
 
 Show detailed information about catalog enty.
 
 ### find
 
+    ctlg find -f <hash function> -c <checksum> -s <size> -n <mask>
+
 Find file in the catalog. It is possible to search files by name, size, and checksum value.
 
+Available options:
+
+    -f <hash function>
+    --function <hash function>
+
+Specifies the `<hash function>`.
+
+    -c <hash value>
+    --checksum <hash value>
+
+Specifies the `<hash value>`.
+
+    -s <size>
+    --size <size>
+
+Size in bytes.
+
+    -n <mask>
+    --name <mask>
+
+Include files by name matching <mask>.
+
 ### list
+
+    ctlg list
 
 List all files in the catalog.
 
 ### backup
 
+    ctlg backup -f -n <backup name> -s <mask> <directory>
+
 Backup files from specified directory.
+
+Available options:
+
+    -n <backup name>
+    --name <backup name>
+
+Backup name. Required.
+
+    -s <mask>
+    --search <mask>
+
+Include files by name matching <mask>.
+
+    -f
+    --fast
+
+Fast mode. Does not recalculate hashes if file was not modified since last backup.
 
 ### restore
 
+    ctlg restore -n <backup name> -d <date> <directory>
+
 Restore files from backup to specified directory.
+
+Available options:
+
+    -n <backup name>
+    --name <backup name>
+
+Backup name. Required.
+
+    -d <date>
+    --date <date>
+
+Date when backup was taken. When there is no exact match, finds most recent backup that was taken before the <date>.
+
 
 ## Implementation details
 
- - .NET console application.
+ - .NET console application (.NET Framework 4.6.2).
  - Entity Framework with SQLite DB, database migrations in SQL.
  - Pri.LongPath is used to support long paths.
  - Autofac is used to inject dpendencies.

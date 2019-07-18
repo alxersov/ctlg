@@ -10,7 +10,7 @@ namespace Ctlg.Service
     /// </summary>
     public static class DomainEvents
     {
-        public static ILifetimeScope Container { get; set; }
+        public static IComponentContext Context { private get; set; }
 
         [ThreadStatic]
         private static List<Delegate> _actions;
@@ -31,9 +31,9 @@ namespace Ctlg.Service
 
         public static void Raise<T>(T args) where T : IDomainEvent
         {
-            if (Container != null)
+            if (Context != null)
             {
-                foreach (var handler in Container.Resolve<IEnumerable<IHandle<T>>>())
+                foreach (var handler in Context.Resolve<IEnumerable<IHandle<T>>>())
                 {
                     handler.Handle(args);
                 }

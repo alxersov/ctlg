@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using Autofac;
+using AutoMapper;
 using CommandLine;
 using Ctlg.CommandLineOptions;
 using Ctlg.Core;
@@ -21,7 +22,7 @@ namespace Ctlg
     class Program: IProgram, IHandle<ErrorEvent>
     {
         private ICtlgService CtlgService { get; set; }
-        private ILifetimeScope Scope { get; set; }
+        private IMapper Mapper { get; }
         private int ExitCode { get; set; }
 
         static int Main(string[] args)
@@ -29,131 +30,61 @@ namespace Ctlg
             var container = BuildIocContainer();
             using (var scope = container.BeginLifetimeScope())
             {
-                DomainEvents.Container = scope;
+                DomainEvents.Context = scope.Resolve<IComponentContext>();
 
                 var program = scope.Resolve<IProgram>();
-                return program.Run(scope, args);
+                return program.Run(args);
             }
         }
 
-        public Program(ICtlgService ctlgService)
+        public Program(ICtlgService ctlgService, IMapper mapper)
         {
             CtlgService = ctlgService;
+            Mapper = mapper;
         }
 
-        public int Run(ILifetimeScope scope, string[] args)
+        public int Run(string[] args)
         {
             ExitCode = 0;
 
-            Scope = scope;
-
             CtlgService.ApplyDbMigrations();
 
-
             Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show>(args)
-            .WithParsed<Add>(opts => RunAdd(opts))
-            .WithParsed<Backup>(opts => RunBackupCommand(opts))
-            .WithParsed<Find>(opts => RunFindCommand(opts))
-            .WithParsed<List>(opts => RunListCommand(opts))
-            .WithParsed<Restore>(opts => RunRestoreCommand(opts))
-            .WithParsed<Show>(opts => RunShowCommand(opts))
-            .WithNotParsed(errors => { ExitCode = 1; });
+                .WithParsed<Add>(opts => Run<AddCommand>(opts))
+                .WithParsed<Backup>(opts => Run<BackupCommand>(opts))
+                .WithParsed<Find>(opts => Run<FindCommand>(opts))
+                .WithParsed<List>(opts => Run<ListCommand>(opts))
+                .WithParsed<Restore>(opts => Run<RestoreCommand>(opts))
+                .WithParsed<Show>(opts => Run<ShowCommand>(opts))
+                .WithNotParsed(errors => { ExitCode = 1; });
 
             return ExitCode;
         }
 
-        private void RunAdd(Add options)
+        private void Run<T>(object options) where T : ICommand
         {
-            var command = Scope.Resolve<AddCommand>();
+            var command = Mapper.Map<T>(options);
 
-            command.Path = options.Path.First();
-            command.SearchPattern = options.SearchPattern;
-            command.HashFunctionName = options.HashFunctionName;
-
-            command.Execute(CtlgService);
-        }
-
-        private void RunBackupCommand(Backup options)
-        {
-            var command = Scope.Resolve<BackupCommand>();
-            command.Path = options.Path;
-            command.SearchPattern = options.SearchPattern;
-            command.SnapshotName = options.Name;
-            command.IsFastMode = options.Fast;
-
-            command.Execute(CtlgService);
-        }
-
-        private void RunFindCommand(Find options)
-        {
-            if (options.Checksum != null && options.HashFunctionName == null)
-            {
-                DomainEvents.Raise(new ErrorEvent("Checksum value parameter requires Hash function to be provided."));
-                return;
-            }
-
-            if (options.Checksum == null &&
-                options.Size == null &&
-                options.NamePattern == null)
-            {
-                DomainEvents.Raise(new ErrorEvent("No parameters provided."));
-                return;
-            }
-
-            var command = Scope.Resolve<FindCommand>();
-
-            command.Hash = options.Checksum;
-            command.HashFunctionName = options.HashFunctionName;
-            command.NamePattern = options.NamePattern;
-            command.Size = options.Size;
-
-            command.Execute(CtlgService);
-        }
-
-        private void RunListCommand(List options)
-        {
-            var command = Scope.Resolve<ListCommand>();
-
-            command.Execute(CtlgService);
-        }
-
-        private void RunRestoreCommand(Restore options)
-        {
-            var command = Scope.Resolve<RestoreCommand>();
-
-            command.Path = options.Path;
-            command.Name = options.Name;
-            command.Date = options.Date;
-
-            command.Execute(CtlgService);
-        }
-
-        private void RunShowCommand(Show options)
-        {
-            var ids = options.CatalogEntryIds.Select(int.Parse).ToList();
-
-            var command = Scope.Resolve<ShowCommand>(new NamedParameter("catalogEntryIds", ids));
-
-            command.Execute(CtlgService);
+            command.Execute();
         }
 
         private static IContainer BuildIocContainer()
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<DataService>().As<IDataService>();
-            builder.RegisterType<MigrationService>().As<IMigrationService>();
+            builder.RegisterType<DataService>().As<IDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<MigrationService>().As<IMigrationService>().InstancePerLifetimeScope();
 
             if (IsMonoRuntime())
             {
-                builder.RegisterType<FilesystemService>().As<IFilesystemService>();
+                builder.RegisterType<FilesystemService>().As<IFilesystemService>().InstancePerLifetimeScope();
             }
             else
             {
-                builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>();
+                builder.RegisterType<FilesystemServiceLongPath>().As<IFilesystemService>().InstancePerLifetimeScope();
             }
-            builder.RegisterType<ArchiveService>().As<IArchiveService>();
-            builder.RegisterType<SnapshotService>().As<ISnapshotService>();
+            builder.RegisterType<ArchiveService>().As<IArchiveService>().InstancePerLifetimeScope();
+            builder.RegisterType<SnapshotService>().As<ISnapshotService>().InstancePerLifetimeScope();
             builder.RegisterCryptographyHashFunction<MD5Cng>("MD5", HashAlgorithmId.MD5);
             builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1", HashAlgorithmId.SHA1);
             builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256", HashAlgorithmId.SHA256);
@@ -161,8 +92,8 @@ namespace Ctlg
             builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512", HashAlgorithmId.SHA512);
             builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32", HashAlgorithmId.CRC32);
 
-            builder.RegisterType<CtlgContext>().As<ICtlgContext>();
-            builder.RegisterType<CtlgService>().As<ICtlgService>();
+            builder.RegisterType<CtlgContext>().As<ICtlgContext>().InstancePerLifetimeScope();
+            builder.RegisterType<CtlgService>().As<ICtlgService>().InstancePerLifetimeScope();
 
             var genericHandlerType = typeof(IHandle<>);
             builder.RegisterAssemblyTypes(typeof(Program).Assembly)
@@ -173,13 +104,35 @@ namespace Ctlg
             builder.RegisterAssemblyTypes(typeof(AddCommand).Assembly)
                 .Where(t => t.IsAssignableTo<ICommand>())
                 .AsSelf()
-                .InstancePerLifetimeScope();
+                .InstancePerDependency();
 
-            builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>();
-            builder.RegisterType<SnapshotReader>().As<ISnapshotReader>();
+            builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<SnapshotReader>().As<ISnapshotReader>().InstancePerLifetimeScope();
+            builder.Register(context => CreateMappingConfiguration())
+                .As<IConfigurationProvider>().InstancePerLifetimeScope();
 
+            builder.Register(context =>
+            {
+                var scope = context.Resolve<IComponentContext>();
+                var configuration = context.Resolve<IConfigurationProvider>();
+
+                return new Mapper(configuration, scope.Resolve);
+            }).As<IMapper>().InstancePerLifetimeScope();
 
             return builder.Build();
+        }
+
+        private static IConfigurationProvider CreateMappingConfiguration()
+        {
+            return new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Add, AddCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<Backup, BackupCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<Find, FindCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<List, ListCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<Restore, RestoreCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<Show, ShowCommand>().ConstructUsingServiceLocator();
+            });
         }
 
         private static bool IsMonoRuntime()

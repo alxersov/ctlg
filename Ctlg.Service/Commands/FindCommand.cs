@@ -1,4 +1,5 @@
 ﻿using Ctlg.Core;
+using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 
 namespace Ctlg.Service.Commands
@@ -10,18 +11,39 @@ namespace Ctlg.Service.Commands
         public long? Size { get; set; }
         public string NamePattern { get; set; }
 
-        public void Execute(ICtlgService ctlgService)
+        public FindCommand(ICtlgService ctlgService)
         {
+            CtlgService = ctlgService;
+        }
+
+        public void Execute()
+        {
+            if (Hash != null && HashFunctionName == null)
+            {
+                DomainEvents.Raise(new ErrorEvent("Checksum value parameter requires Hash function to be provided."));
+                return;
+            }
+
+            if (Hash == null &&
+                Size == null &&
+                NamePattern == null)
+            {
+                DomainEvents.Raise(new ErrorEvent("No parameters provided."));
+                return;
+            }
+
             Hash hash = null;
             if (HashFunctionName != null && Hash != null)
             {
-                var hashAlgorithm = ctlgService.GetHashAlgorithm(HashFunctionName.ToUpperInvariant());
+                var hashAlgorithm = CtlgService.GetHashAlgorithm(HashFunctionName.ToUpperInvariant());
                 var bytes = FormatBytes.ToByteArray(Hash);
 
                 hash = new Hash(hashAlgorithm.HashAlgorithmId, bytes);
             }
 
-            ctlgService.FindFiles(hash, Size, NamePattern);
+            CtlgService.FindFiles(hash, Size, NamePattern);
         }
+
+        private ICtlgService CtlgService { get; }
     }
 }
