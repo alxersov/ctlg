@@ -21,7 +21,7 @@ namespace Ctlg.UnitTests
 
                 var command = mock.Create<BackupCommand>();
                 command.Path = "test-path";
-                command.SnapshotName = "test-name";
+                command.Name = "test-name";
 
                 command.Execute();
 
@@ -43,7 +43,7 @@ namespace Ctlg.UnitTests
 
                 var command = mock.Create<BackupCommand>();
                 command.Path = "test-path";
-                command.SnapshotName = "test-name";
+                command.Name = "test-name";
                 command.IsFastMode = true;
 
                 command.Execute();

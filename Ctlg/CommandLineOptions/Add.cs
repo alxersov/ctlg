@@ -7,7 +7,7 @@ namespace Ctlg.CommandLineOptions
     class Add
     {
         [Value(0, MetaName = "Path")]
-        public IList<string> Path { get; set; }
+        public string Path { get; set; }
 
         [Option('s', "search", HelpText = "Search pattern. Can contain wildcards * and ?.")]
         public string SearchPattern { get; set; }

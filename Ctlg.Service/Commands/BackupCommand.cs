@@ -6,7 +6,7 @@ namespace Ctlg.Service.Commands
 {
     public class BackupCommand: ICommand
     {
-        public string SnapshotName { get; set; }
+        public string Name { get; set; }
         public string Path { get; set; }
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
@@ -24,12 +24,12 @@ namespace Ctlg.Service.Commands
 
             if (IsFastMode)
             {
-                SnapshotReader.ReadHashesFromLatestSnapshot(SnapshotName, root);
+                SnapshotReader.ReadHashesFromLatestSnapshot(Name, root);
             }
 
             var treeWalker = new TreeWalker(root);
 
-            using (var snapshot = SnapshotService.CreateSnapshotWriter(SnapshotName))
+            using (var snapshot = SnapshotService.CreateSnapshotWriter(Name))
             {
                 treeWalker.Walk(snapshot.AddFile);
             }

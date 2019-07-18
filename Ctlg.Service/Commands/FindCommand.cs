@@ -1,4 +1,5 @@
 ﻿using Ctlg.Core;
+using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 
 namespace Ctlg.Service.Commands
@@ -17,6 +18,20 @@ namespace Ctlg.Service.Commands
 
         public void Execute()
         {
+            if (Hash != null && HashFunctionName == null)
+            {
+                DomainEvents.Raise(new ErrorEvent("Checksum value parameter requires Hash function to be provided."));
+                return;
+            }
+
+            if (Hash == null &&
+                Size == null &&
+                NamePattern == null)
+            {
+                DomainEvents.Raise(new ErrorEvent("No parameters provided."));
+                return;
+            }
+
             Hash hash = null;
             if (HashFunctionName != null && Hash != null)
             {
