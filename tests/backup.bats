@@ -6,7 +6,7 @@ load helper
   echo -n "hello" > ${CTLG_FILESDIR}/hi.txt
   output=$($CTLG_EXECUTABLE backup -n Test ${CTLG_FILESDIR})
 
-  [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]]
+  [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]] || false
 
   ${CTLG_EXECUTABLE} restore -n "Test" "${CTLG_RESTOREDIR}"
 
@@ -17,7 +17,7 @@ load helper
   echo -n "hello" > ${CTLG_FILESDIR}/hi.txt
   output=$($CTLG_EXECUTABLE backup -f -n Test ${CTLG_FILESDIR})
 
-  [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]]
+  [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]] || false
 
   ${CTLG_EXECUTABLE} restore -n "Test" "${CTLG_RESTOREDIR}"
 
@@ -64,7 +64,7 @@ load helper
 @test "restore backup for differnt dates" {
   echo -n "1" > "$CTLG_FILESDIR/hi.txt"
   $CTLG_EXECUTABLE backup -n Test $CTLG_FILESDIR
-  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-02_03-04-05"
+  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-01_09-10-15"
 
   echo -n "2" > "$CTLG_FILESDIR/hi.txt"
   $CTLG_EXECUTABLE backup -n Test $CTLG_FILESDIR
@@ -78,11 +78,23 @@ load helper
   grep -Fxq "3" "$CTLG_RESTOREDIR/hi.txt"
   rm "$CTLG_RESTOREDIR/hi.txt"
 
-  $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-02T03:04:10" "$CTLG_RESTOREDIR"
+  $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-02_03-04-10" "$CTLG_RESTOREDIR"
   grep -Fxq "2" "$CTLG_RESTOREDIR/hi.txt"
   rm "$CTLG_RESTOREDIR/hi.txt"
 
-  $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-02T03:04:07" "$CTLG_RESTOREDIR"
+  $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-01" "$CTLG_RESTOREDIR"
   grep -Fxq "1" "$CTLG_RESTOREDIR/hi.txt"
   rm "$CTLG_RESTOREDIR/hi.txt"
+
+  run $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-02" "$CTLG_RESTOREDIR"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"snapshot date is ambiguous"* ]] || false
+
+  run $CTLG_EXECUTABLE restore -n "Test" -d "2019-01-03" "$CTLG_RESTOREDIR"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"Snapshot Test is not found"* ]] || false
+
+  run $CTLG_EXECUTABLE restore -n "DoesNotExist" -d "2019-01-01" "$CTLG_RESTOREDIR"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"Snapshot DoesNotExist is not found"* ]] || false
 }

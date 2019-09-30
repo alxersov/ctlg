@@ -27,6 +27,11 @@ namespace Ctlg.Service.Commands
         public void Execute()
         {
             var snapshotPath = SnapshotService.FindSnapshotPath(Name, Date);
+            if (string.IsNullOrEmpty(snapshotPath))
+            {
+                throw new Exception($"Snapshot {Name} is not found");
+            }
+
             var snapshotRecords = SnapshotService.ReadSnapshotFile(snapshotPath);
             foreach (var record in snapshotRecords)
             {
