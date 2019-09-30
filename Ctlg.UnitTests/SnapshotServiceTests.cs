@@ -13,7 +13,7 @@ namespace Ctlg.UnitTests
     public class SnapshotServiceTests : BackupTestFixture
     {
         [Test]
-        public void FindSnapshotFile_WithoutDate_ReturnsLatest()
+        public void FindSnapshotPath_WithoutDate_ReturnsLatest()
         {
             using (var mock = AutoMock.GetLoose())
             {
@@ -25,31 +25,55 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void FindSnapshotFile_WithExactDate()
+        public void FindSnapshotPath_WithExactDate()
         {
             using (var mock = AutoMock.GetLoose())
             {
                 var service = CreateService(mock);
 
-                var snapshotPath = service.FindSnapshotPath("Test", "2019-01-01T00:00:00");
+                var snapshotPath = service.FindSnapshotPath("Test", "2019-01-01_00-00-00");
                 Assert.That(snapshotPath, Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-01-01_00-00-00"));
             }
         }
 
         [Test]
-        public void FindSnapshotFile_WithDate_ReturnsNearestPrevious()
+        public void FindSnapshotPath_WithOneDateMatching()
         {
             using (var mock = AutoMock.GetLoose())
             {
                 var service = CreateService(mock);
 
-                var snapshotPath = service.FindSnapshotPath("Test", "2019-01-01T05:00:30");
+                var snapshotPath = service.FindSnapshotPath("Test", "2019-01-01_02");
                 Assert.That(snapshotPath, Is.EqualTo("X:\\current-directory\\snapshots\\Test\\2019-01-01_02-30-00"));
             }
         }
 
         [Test]
-        public void FindSnapshotFile_WhenSnapshotDoesNotExist_ReturnsNull()
+        public void FindSnapshotPath_WithMoreThanOneDateMatching()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var service = CreateService(mock);
+
+                Assert.That(() => service.FindSnapshotPath("Test", "2019-01-01"),
+                    Throws.InstanceOf<Exception>().With.Message.Contain("date is ambiguous"));
+            }
+        }
+
+        [Test]
+        public void FindSnapshotPath_WhenNoSnapshotMatchesProvidedDate_ReturnsNull()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var service = CreateService(mock);
+
+                var snapshotPath = service.FindSnapshotPath("Test", "2019-09-03");
+                Assert.That(snapshotPath, Is.Null);
+            }
+        }
+
+        [Test]
+        public void FindSnapshotPath_WhenSnapshotDoesNotExist_ReturnsNull()
         {
             using (var mock = AutoMock.GetLoose())
             {

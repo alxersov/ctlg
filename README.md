@@ -64,7 +64,7 @@ Size in bytes.
     -n <mask>
     --name <mask>
 
-Include files by name matching <mask>.
+Include files by name matching `<mask>`.
 
 ### list
 
@@ -88,7 +88,7 @@ Backup name. Required.
     -s <mask>
     --search <mask>
 
-Include files by name matching <mask>.
+Include files by name matching `<mask>`.
 
     -f
     --fast
@@ -111,7 +111,8 @@ Backup name. Required.
     -d <date>
     --date <date>
 
-Date when backup was taken. When there is no exact match, finds most recent backup that was taken before the <date>.
+Date when backup was taken in `yyyy-MM-dd_HH-mm-ss` format. It is possible to skip date parts from the right e.g.
+`yyyy-MM-dd_HH-mm`, `yyyy-MM-dd` are laso valid.
 
 
 ## Implementation details

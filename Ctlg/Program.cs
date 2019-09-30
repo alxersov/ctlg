@@ -65,7 +65,14 @@ namespace Ctlg
         {
             var command = Mapper.Map<T>(options);
 
-            command.Execute();
+            try
+            {
+                command.Execute();
+            }
+            catch (Exception ex)
+            {
+                DomainEvents.Raise(new ErrorEvent(ex));
+            }
         }
 
         private static IContainer BuildIocContainer()

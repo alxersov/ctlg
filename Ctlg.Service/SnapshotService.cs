@@ -72,6 +72,10 @@ namespace Ctlg.Service
             }
 
             var fileName = SelectSnapshotByDate(allSnapshots, snapshotDate);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
 
             return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName, fileName);
         }
@@ -116,14 +120,17 @@ namespace Ctlg.Service
             }
             else
             {
-                var date = DateTime.Parse(snapshotDate);
-                var snapshotDateFormatted = FormatSnapshotName(date);
-                return snapshots.Last(s => string.Compare(s, snapshotDateFormatted) <= 0);
+                var foundFiles = snapshots.Where(s => s.StartsWith(snapshotDate, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                if (foundFiles.Count > 1)
+                {
+                    throw new Exception(
+                        $"Provided snapshot date is ambiguous. {foundFiles.Count} snapshots exist: {string.Join(", ", foundFiles)}.");
+                }
+                return foundFiles.FirstOrDefault();
             }
         }
 
         private IFilesystemService FilesystemService { get; }
         private ICtlgService CtlgService { get; }
-        private IIndex<string, IHashFunction> HashFunctions { get; }
     }
 }

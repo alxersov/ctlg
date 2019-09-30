@@ -11,6 +11,19 @@ namespace Ctlg.UnitTests
     public class RestoreCommandTests: BackupTestFixture
     {
         [Test]
+        public void Execute_WhenSnapshotNotFound_ThrowsException()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.SetupFindSnapshotFile(BackupName, null);
+
+                Assert.That(() => Execute(mock),
+                    Throws.TypeOf<Exception>()
+                        .With.Message.Contain($"Snapshot {BackupName} is not found"));
+            }
+        }
+
+        [Test]
         public void Execute_WhenBackupFileNotFound_RaisesExceptionEvent()
         {
             using (var mock = AutoMock.GetLoose())
