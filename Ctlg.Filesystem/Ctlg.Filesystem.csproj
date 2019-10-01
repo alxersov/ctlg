@@ -44,7 +44,7 @@
       <HintPath>..\packages\Pri.LongPath.2.0.47\lib\net45\Pri.LongPath.dll</HintPath>
     </Reference>
     <Reference Include="SharpCompress">
-      <HintPath>..\packages\SharpCompress.0.23.0\lib\net45\SharpCompress.dll</HintPath>
+      <HintPath>..\packages\SharpCompress.0.24.0\lib\net45\SharpCompress.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
