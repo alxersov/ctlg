@@ -86,6 +86,10 @@
     <Compile Include="Commands\SnapshotReader.cs" />
     <Compile Include="SnapshotService.cs" />
     <Compile Include="SnapshotWriter.cs" />
+    <Compile Include="IndexService.cs" />
+    <Compile Include="ByteArrayComparer.cs" />
+    <Compile Include="IndexFileService.cs" />
+    <Compile Include="Commands\RebuildIndexCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">

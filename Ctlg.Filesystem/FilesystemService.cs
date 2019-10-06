@@ -30,6 +30,11 @@ namespace Ctlg.Filesystem
             return File.Open(path, FileMode.CreateNew);
         }
 
+        public Stream CreateFileForWrite(string path)
+        {
+            return File.Open(path, FileMode.Create);
+        }
+
         public bool FileExists(string path)
         {
             return File.Exists(path);

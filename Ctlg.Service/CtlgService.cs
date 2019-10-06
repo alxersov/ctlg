@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using File = Ctlg.Core.File;
 
@@ -20,10 +18,12 @@ namespace Ctlg.Service
 
             CurrentDirectory = FilesystemService.GetCurrentDirectory();
             FileStorageDirectory = FilesystemService.CombinePath(CurrentDirectory, "file_storage");
+            IndexPath = FilesystemService.CombinePath(CurrentDirectory, "index.bin");
         }
 
         public string CurrentDirectory { get; private set; }
         public string FileStorageDirectory {get; private set; }
+        public string IndexPath { get; private set; }
 
         public void ApplyDbMigrations()
         {

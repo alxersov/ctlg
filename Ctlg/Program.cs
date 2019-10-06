@@ -49,13 +49,14 @@ namespace Ctlg
 
             CtlgService.ApplyDbMigrations();
 
-            Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show>(args)
+            Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show, RebuildIndex>(args)
                 .WithParsed<Add>(opts => Run<AddCommand>(opts))
                 .WithParsed<Backup>(opts => Run<BackupCommand>(opts))
                 .WithParsed<Find>(opts => Run<FindCommand>(opts))
                 .WithParsed<List>(opts => Run<ListCommand>(opts))
                 .WithParsed<Restore>(opts => Run<RestoreCommand>(opts))
                 .WithParsed<Show>(opts => Run<ShowCommand>(opts))
+                .WithParsed<RebuildIndex>(opts => Run<RebuildIndexCommand>(opts))
                 .WithNotParsed(errors => { ExitCode = 1; });
 
             return ExitCode;
@@ -101,6 +102,8 @@ namespace Ctlg
 
             builder.RegisterType<CtlgContext>().As<ICtlgContext>().InstancePerLifetimeScope();
             builder.RegisterType<CtlgService>().As<ICtlgService>().InstancePerLifetimeScope();
+            builder.RegisterType<IndexService>().As<IIndexService>().InstancePerLifetimeScope();
+            builder.RegisterType<IndexFileService>().As<IIndexFileService>().InstancePerLifetimeScope();
 
             var genericHandlerType = typeof(IHandle<>);
             builder.RegisterAssemblyTypes(typeof(Program).Assembly)
@@ -139,6 +142,7 @@ namespace Ctlg
                 cfg.CreateMap<List, ListCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<Restore, RestoreCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<Show, ShowCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<RebuildIndex, RebuildIndexCommand>().ConstructUsingServiceLocator();
             });
         }
 

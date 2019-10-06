@@ -121,6 +121,10 @@
     <Compile Include="SnapshotServiceTests.cs" />
     <Compile Include="ArchiveServiceTests.cs" />
     <Compile Include="FilesystemServiceBaseTests.cs" />
+    <Compile Include="IndexServiceTests.cs" />
+    <Compile Include="ByteArrayComparerTests.cs" />
+    <Compile Include="IndexFileServiceTests.cs" />
+    <Compile Include="RebuildIndexCommandTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
