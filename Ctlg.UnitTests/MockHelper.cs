@@ -7,6 +7,7 @@ using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service;
 using Moq;
+using File = Ctlg.Core.File;
 
 namespace Ctlg.UnitTests
 {
@@ -17,6 +18,21 @@ namespace Ctlg.UnitTests
             mock.Mock<IFilesystemService>()
                 .Setup(s => s.FileExists(It.Is<string>(p => p == path)))
                 .Returns(exists);
+        }
+
+        public static IFilesystemDirectory MockDirectory(string name,
+            IEnumerable<File> childFiles,
+            IEnumerable<IFilesystemDirectory> childDirectories = null)
+        {
+            var fsDirectory = new Mock<IFilesystemDirectory>();
+
+            fsDirectory.Setup(d => d.EnumerateDirectories()).Returns(childDirectories);
+
+            fsDirectory.Setup(d => d.EnumerateFiles(It.IsAny<string>())).Returns(childFiles);
+
+            fsDirectory.SetupGet(d => d.Directory).Returns(new File(name, true));
+
+            return fsDirectory.Object;
         }
 
         public static void SetupGetDirectory(this AutoMock mock, string path)

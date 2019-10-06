@@ -92,6 +92,7 @@
     <Compile Include="CommandLineOptions\Restore.cs" />
     <Compile Include="CommandLineOptions\List.cs" />
     <Compile Include="IProgram.cs" />
+    <Compile Include="CommandLineOptions\RebuildIndex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

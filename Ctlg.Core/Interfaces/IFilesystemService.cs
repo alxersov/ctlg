@@ -9,6 +9,7 @@ namespace Ctlg.Core.Interfaces
         IEnumerable<File> EnumerateFiles(string path, string searchMask = null);
         Stream OpenFileForRead(string path);
         Stream CreateNewFileForWrite(string path);
+        Stream CreateFileForWrite(string path);
         void CreateDirectory(string path);
         string GetCurrentDirectory();
         bool FileExists(string path);

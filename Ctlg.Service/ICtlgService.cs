@@ -22,5 +22,6 @@ namespace Ctlg.Service
 
         string CurrentDirectory { get; }
         string FileStorageDirectory { get; }
+        string IndexPath { get; }
     }
 }
