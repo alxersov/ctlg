@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
@@ -215,6 +216,36 @@ namespace Ctlg.UnitTests
 
                 var ctlg = mock.Create<CtlgService>();
                 Assert.That(ctlg.IndexPath, Is.EqualTo("current-dir/index.bin"));
+            }
+        }
+
+        [TestCase("FOO")]
+        [TestCase("foo")]
+        public void GetHashFunction_WhenFunctionExists_ReturnsIt(string name)
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.SetupHashFunction("FOO", null);
+
+                var service = mock.Create<CtlgService>();
+                var function = service.GetHashFunction(name);
+
+                Assert.That(function, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void GetHashFunction_WhenFunctionDoesNotExists()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                mock.SetupHashFunction("FOO", null);
+
+                var service = mock.Create<CtlgService>();
+
+                Assert.That(() => service.GetHashFunction("BAR"),
+                    Throws.InstanceOf<Exception>()
+                        .With.Message.Contain("Unsupported hash function BAR"));
             }
         }
 

@@ -40,3 +40,8 @@ load helper
   output=$($CTLG_EXECUTABLE add --search "*.txt" --function CRC32 $CTLG_FILESDIR)
   [[ "${output}" == *"2 files found"* ]] || false
 }
+
+@test "hash algorithm name is case insensitive" {
+  echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
+  $CTLG_EXECUTABLE add --function crc32 "$CTLG_FILESDIR"
+}

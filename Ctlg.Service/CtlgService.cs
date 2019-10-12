@@ -73,8 +73,8 @@ namespace Ctlg.Service
 
         public IHashFunction GetHashFunction(string name)
         {
-            var canonicName = name.ToUpperInvariant();
-            if (!HashFunctions.TryGetValue(name, out IHashFunction hashFunction))
+            var canonicalName = name.ToUpperInvariant();
+            if (!HashFunctions.TryGetValue(canonicalName, out IHashFunction hashFunction))
             {
                 throw new Exception($"Unsupported hash function {name}");
             }
