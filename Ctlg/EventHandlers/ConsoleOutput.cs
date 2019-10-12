@@ -20,7 +20,8 @@ namespace Ctlg.EventHandlers
         IHandle<CatalogEntryFound>,
         IHandle<BackupEntryCreated>,
         IHandle<BackupEntryRestored>,
-        IHandle<BackupCommandStarted>
+        IHandle<BackupCommandStarted>,
+        IHandle<Warning>
     {
         public void Handle(DirectoryFound args)
         {
@@ -155,6 +156,15 @@ namespace Ctlg.EventHandlers
         public string FormatSnapshotRecord(SnapshotRecord record)
         {
             return $"{record.Hash.Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
+        }
+
+        public void Handle(Warning args)
+        {
+            using (new ConsoleTextAttributesScope())
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(args.Message);
+            }
         }
 
         private int _filesFound = 0;

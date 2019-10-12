@@ -90,6 +90,7 @@
     <Compile Include="ByteArrayComparer.cs" />
     <Compile Include="IndexFileService.cs" />
     <Compile Include="Commands\RebuildIndexCommand.cs" />
+    <Compile Include="Events\Warning.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
