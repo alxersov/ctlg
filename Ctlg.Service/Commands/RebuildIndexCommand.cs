@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 
 namespace Ctlg.Service.Commands
@@ -12,6 +14,7 @@ namespace Ctlg.Service.Commands
             FilesystemService = filesystemService;
             IndexService = indexService;
             IndexFileService = indexFileService;
+
         }
 
 
@@ -20,10 +23,23 @@ namespace Ctlg.Service.Commands
             var storageDir = FilesystemService.GetDirectory(CtlgService.FileStorageDirectory);
             foreach (var dir in storageDir.EnumerateDirectories())
             {
+                if (!StorageSubDirRegex.IsMatch(dir.Directory.Name))
+                {
+                    DomainEvents.Raise(new Warning($"Unexpected directory in storage: {dir.Directory.Name}"));
+                    continue;
+                }
+
                 foreach (var file in dir.EnumerateFiles("*"))
                 {
-                    var hash = FormatBytes.ToByteArray(file.Name);
-                    IndexService.Add(hash);
+                    if (StorageFileRegex.IsMatch(file.Name))
+                    {
+                        var hash = FormatBytes.ToByteArray(file.Name);
+                        IndexService.Add(hash);
+                    }
+                    else
+                    {
+                        DomainEvents.Raise(new Warning($"Unexpected file in storage: {file.Name}"));
+                    }
                 }
             }
             IndexFileService.Save();
@@ -33,5 +49,7 @@ namespace Ctlg.Service.Commands
         private IFilesystemService FilesystemService { get; }
         private IIndexService IndexService { get; }
         private IIndexFileService IndexFileService { get; }
+        private Regex StorageSubDirRegex { get; } = new Regex("^[a-h0-9]{2}$", RegexOptions.IgnoreCase);
+        private Regex StorageFileRegex { get; } = new Regex("^[a-h0-9]{64}$", RegexOptions.IgnoreCase);
     }
 }
