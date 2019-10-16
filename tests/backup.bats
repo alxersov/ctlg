@@ -24,6 +24,15 @@ load helper
   diff -r "$CTLG_FILESDIR" "${CTLG_RESTOREDIR}"
 }
 
+@test "backup in fast mode works when files are deleted" {
+  echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
+  $CTLG_EXECUTABLE backup -n Test "$CTLG_FILESDIR"
+
+  rm "$CTLG_FILESDIR/hi.txt"
+
+  $CTLG_EXECUTABLE backup -f -n Test "$CTLG_FILESDIR"
+}
+
 @test "backup and restore multiple files and directories" {
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   mkdir "$CTLG_FILESDIR/foo"
