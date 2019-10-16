@@ -47,7 +47,7 @@ namespace Ctlg.Service.Commands
                 ++i;
             }
 
-            if (i == path.Length &&
+            if (currentFile != null &&
                 currentFile.Size == record.Size &&
                 currentFile.FileModifiedDateTime == record.Date)
             {
