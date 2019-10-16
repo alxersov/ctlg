@@ -17,20 +17,12 @@ namespace Ctlg.UnitTests
         private AutoMock AutoMock;
         private Mock<ISnapshotService> SnapshotServiceMock;
         private Mock<ICtlgService> CtlgServiceMock;
-        private IEnumerable<SnapshotRecord> SnapshotRecords
-        {
-            get
-            {
-                if (SnapshotRecord == null)
-                {
-                    yield break;
-                }
-
-                yield return SnapshotRecord;
-            }
-        }
         private string SnapshotPath;
         private SnapshotRecord SnapshotRecord;
+        private IEnumerable<SnapshotRecord> SnapshotRecords
+        {
+            get { yield return SnapshotRecord; }
+        }
         private File Root;
         private File File;
 
@@ -96,7 +88,7 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void ReadHashesFromLatestSnapshot_WhenDateAndSizeDontMatch()
+        public void ReadHashesFromLatestSnapshot_WhenFileDateAndSizeDontMatch()
         {
             ReadHashes();
 
@@ -107,7 +99,7 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void ReadHashesFromLatestSnapshot_WhenDateDoesNotMatch()
+        public void ReadHashesFromLatestSnapshot_WhenFileDateDoesNotMatch()
         {
             File.Size = SnapshotRecord.Size;
 
@@ -120,7 +112,7 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void ReadHashesFromLatestSnapshot_WhenDateAndSizeMatch()
+        public void ReadHashesFromLatestSnapshot_WhenFileDateAndSizeMatch()
         {
             File.Size = SnapshotRecord.Size;
             File.FileModifiedDateTime = SnapshotRecord.Date;
