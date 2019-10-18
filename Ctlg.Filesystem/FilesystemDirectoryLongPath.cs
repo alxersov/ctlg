@@ -36,7 +36,7 @@ namespace Ctlg.Filesystem
 
         public IEnumerable<IFilesystemDirectory> EnumerateDirectories()
         {
-            foreach (var directoryInfo in _directoryInfo.GetDirectories())
+            foreach (var directoryInfo in _directoryInfo.EnumerateDirectories())
             {
                 var dir = new FilesystemDirectoryLongPath(directoryInfo);
                 dir.Directory.RelativePath = CombineRelativePath(directoryInfo.Name);
@@ -47,7 +47,7 @@ namespace Ctlg.Filesystem
 
         public IEnumerable<File> EnumerateFiles(string searchPattern)
         {
-            foreach (var fileInfo in _directoryInfo.GetFiles(searchPattern))
+            foreach (var fileInfo in _directoryInfo.EnumerateFiles(searchPattern))
             {
                 var file = CreateFilesystemEntry(fileInfo);
                 file.RelativePath = CombineRelativePath(fileInfo.Name);
