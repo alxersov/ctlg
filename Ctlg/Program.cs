@@ -59,6 +59,8 @@ namespace Ctlg
                 .WithParsed<RebuildIndex>(opts => Run<RebuildIndexCommand>(opts))
                 .WithNotParsed(errors => { ExitCode = 1; });
 
+            NLog.LogManager.Shutdown();
+
             return ExitCode;
         }
 
