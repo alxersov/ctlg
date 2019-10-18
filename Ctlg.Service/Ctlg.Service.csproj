@@ -76,7 +76,6 @@
     <Compile Include="Events\BackupEntryCreated.cs" />
     <Compile Include="Commands\RestoreCommand.cs" />
     <Compile Include="Events\BackupEntryRestored.cs" />
-    <Compile Include="Events\BackupCommandStarted.cs" />
     <Compile Include="Utils\FileSize.cs" />
     <Compile Include="Commands\BackupCommand.cs" />
     <Compile Include="Commands\ITreeProvider.cs" />
@@ -91,6 +90,7 @@
     <Compile Include="IndexFileService.cs" />
     <Compile Include="Commands\RebuildIndexCommand.cs" />
     <Compile Include="Events\Warning.cs" />
+    <Compile Include="Events\BackupCommandEnded.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">

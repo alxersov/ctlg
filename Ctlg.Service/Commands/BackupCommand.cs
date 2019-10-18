@@ -1,6 +1,7 @@
 ﻿using System;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
 {
@@ -33,6 +34,8 @@ namespace Ctlg.Service.Commands
             {
                 treeWalker.Walk(snapshot.AddFile);
             }
+
+            DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ITreeProvider TreeProvider { get; set; }

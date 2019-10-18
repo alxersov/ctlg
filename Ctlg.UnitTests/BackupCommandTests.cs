@@ -3,6 +3,7 @@ using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
+using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 using Moq;
 using NUnit.Framework;
@@ -16,6 +17,8 @@ namespace Ctlg.UnitTests
         {
             using (var mock = AutoMock.GetLoose())
             {
+                var events = SetupEvents<BackupCommandEnded>();
+
                 SetupTreeProvider(mock);
                 var writerMock = SetupSnapshotWriter(mock);
 
@@ -26,6 +29,8 @@ namespace Ctlg.UnitTests
                 command.Execute();
 
                 writerMock.VerifyAll();
+
+                Assert.That(events.Count, Is.EqualTo(1));
             }
         }
 
