@@ -7,6 +7,8 @@ load helper
   output=$($CTLG_EXECUTABLE backup -n Test ${CTLG_FILESDIR})
 
   [[ "${output}" == *"1/1 HN 2cf24dba      5 hi.txt"* ]] || false
+  [[ "${output}" == *"Processed: 5"* ]] || false
+  [[ "${output}" == *"Added to storage: 5"* ]] || false
 
   ${CTLG_EXECUTABLE} restore -n "Test" "${CTLG_RESTOREDIR}"
 

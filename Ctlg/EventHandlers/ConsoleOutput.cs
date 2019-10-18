@@ -20,7 +20,7 @@ namespace Ctlg.EventHandlers
         IHandle<CatalogEntryFound>,
         IHandle<BackupEntryCreated>,
         IHandle<BackupEntryRestored>,
-        IHandle<BackupCommandStarted>,
+        IHandle<BackupCommandEnded>,
         IHandle<Warning>
     {
         public void Handle(DirectoryFound args)
@@ -130,6 +130,11 @@ namespace Ctlg.EventHandlers
         public void Handle(BackupEntryCreated args)
         {
             ++_filesProcessed;
+            bytesProcessed += args.BackupEntry.Size;
+            if (args.NewFileAddedToStorage)
+            {
+                bytesAddedToStorage += args.BackupEntry.Size;
+            }
 
             var h = args.HashCalculated ? 'H' : ' ';
             var n = args.NewFileAddedToStorage ? 'N' : ' ';
@@ -147,15 +152,10 @@ namespace Ctlg.EventHandlers
             Console.WriteLine($"{_filesProcessed} {args.BackupEntry}");
         }
 
-        public void Handle(BackupCommandStarted args)
+        public void Handle(BackupCommandEnded args)
         {
-            Console.WriteLine($"Snapshot: {args.SnapshotFile}");
-            Console.WriteLine($"Storage: {args.FileStorage}");
-        }
-
-        public string FormatSnapshotRecord(SnapshotRecord record)
-        {
-            return $"{record.Hash.Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
+            Console.WriteLine($"Processed: {FileSize.Format(bytesProcessed)}");
+            Console.WriteLine($"Added to storage: {FileSize.Format(bytesAddedToStorage)}");
         }
 
         public void Handle(Warning args)
@@ -167,9 +167,16 @@ namespace Ctlg.EventHandlers
             }
         }
 
+        private string FormatSnapshotRecord(SnapshotRecord record)
+        {
+            return $"{record.Hash.Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
+        }
+
         private int _filesFound = 0;
         private int _filesProcessed = 0;
         private int _directoriesFound = 0;
         private int _archivesFound = 0;
+        private long bytesProcessed = 0;
+        private long bytesAddedToStorage = 0;
     }
 }
