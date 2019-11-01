@@ -13,10 +13,8 @@ using NUnit.Framework;
 
 namespace Ctlg.UnitTests
 {
-    [TestFixture]
-    public class RebuildIndexCommandTests: BaseTestFixture
+    public class RebuildIndexCommandTests: AutoMockTestFixture
     {
-        private AutoMock AutoMock;
         private Mock<IIndexService> IndexServiceMock;
         private Mock<IIndexFileService> IndexFileServiceMock;
         private string Dir1;
@@ -29,8 +27,6 @@ namespace Ctlg.UnitTests
         [SetUp]
         public void Setup()
         {
-            AutoMock = AutoMock.GetLoose();
-
             IndexServiceMock = AutoMock.Mock<IIndexService>();
             IndexFileServiceMock = AutoMock.Mock<IIndexFileService>();
 
@@ -41,12 +37,6 @@ namespace Ctlg.UnitTests
             File3 = "bb0202030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
 
             Warnings = SetupEvents<Warning>();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            AutoMock.Dispose();
         }
 
         [Test]

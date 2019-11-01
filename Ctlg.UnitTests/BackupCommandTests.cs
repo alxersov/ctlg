@@ -2,6 +2,7 @@
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
@@ -20,7 +21,7 @@ namespace Ctlg.UnitTests
                 var events = SetupEvents<BackupCommandEnded>();
 
                 SetupTreeProvider(mock);
-                var writerMock = SetupSnapshotWriter(mock);
+                var writerMock = SetupBackupWriter(mock);
 
                 var command = mock.Create<BackupCommand>();
                 command.Path = "test-path";
@@ -40,7 +41,7 @@ namespace Ctlg.UnitTests
             using (var mock = AutoMock.GetLoose())
             {
                 SetupTreeProvider(mock);
-                SetupSnapshotWriter(mock);
+                SetupBackupWriter(mock);
 
                 var snapshotReaderMock = mock.Mock<ISnapshotReader>();
                 snapshotReaderMock.Setup(r => r.ReadHashesFromLatestSnapshot(It.Is<string>(s => s == "test-name"),
@@ -65,13 +66,13 @@ namespace Ctlg.UnitTests
 
         private File Tree;
 
-        private static Mock<ISnapshotWriter> SetupSnapshotWriter(AutoMock mock)
+        private static Mock<IBackupWriter> SetupBackupWriter(AutoMock mock)
         {
-            var writerMock = new Mock<ISnapshotWriter>();
+            var writerMock = new Mock<IBackupWriter>();
             writerMock.Setup(w => w.AddFile(It.Is<File>(file => file.Name == "test-1.txt")));
 
-            mock.Mock<ISnapshotService>()
-                .Setup(p => p.CreateSnapshotWriter(It.Is<string>(name => name == "test-name")))
+            mock.Mock<ICtlgService>()
+                .Setup(p => p.CreateBackupWriter(It.Is<string>(name => name == "test-name"), It.IsAny<bool>()))
                 .Returns(writerMock.Object);
 
             return writerMock;

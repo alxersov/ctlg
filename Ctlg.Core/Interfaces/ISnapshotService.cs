@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Ctlg.Core.Interfaces
 {
@@ -8,6 +9,7 @@ namespace Ctlg.Core.Interfaces
         IEnumerable<File> GetSnapshotFiles(string snapshotName);
         string FindSnapshotPath(string snapshotName, string snapshotDate = null);
         IEnumerable<SnapshotRecord> ReadSnapshotFile(string path);
-        ISnapshotWriter CreateSnapshotWriter(string name);
+        StreamWriter CreateSnapshotWriter(string name);
+        SnapshotRecord CreateSnapshotRecord(File file);
     }
 }

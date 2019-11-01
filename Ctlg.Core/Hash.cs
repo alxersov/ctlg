@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Ctlg.Service.Utils;
 
 namespace Ctlg.Core
 {
@@ -108,6 +109,11 @@ namespace Ctlg.Core
         public static bool operator !=(Hash x, Hash y)
         {
             return !(x == y);
+        }
+
+        public override string ToString()
+        {
+            return FormatBytes.ToHexString(Value);
         }
     }
 }

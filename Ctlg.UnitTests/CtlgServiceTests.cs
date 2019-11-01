@@ -315,8 +315,12 @@ namespace Ctlg.UnitTests
                                 .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
 
                 mock.Mock<ICtlgService>()
-                    .Setup(s => s.GetHashFunction(It.Is<string>(name => name == "XHASH")))
-                    .Returns(hashFunctionMock.Object);
+                    .Setup(s => s.CalculateHashForFile(It.IsAny<File>(), It.IsAny<IHashFunction>()))
+                    .Returns<File, IHashFunction>((file, _) =>
+                    {
+                        file.Hashes.Add(new Hash(1, new byte[] { 1, 2, 3, 4 }));
+                        return new Hash(1, new byte[] { 1, 2, 3, 4 });
+                    });
 
                 var addCommand = mock.Create<AddCommand>();
 

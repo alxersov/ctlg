@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Autofac;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -10,11 +12,13 @@ namespace Ctlg.Service
 {
     public class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService, IIndex<string, IHashFunction> hashFunction)
+        public CtlgService(IDataService dataService, IFilesystemService filesystemService, ISnapshotService snapshotService, IIndex<string, IHashFunction> hashFunction, IComponentContext componentContext)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
+            SnapshotService = snapshotService;
             HashFunctions = hashFunction;
+            ComponentContext = componentContext;
 
             CurrentDirectory = FilesystemService.GetCurrentDirectory();
             FileStorageDirectory = FilesystemService.CombinePath(CurrentDirectory, "file_storage");
@@ -98,6 +102,26 @@ namespace Ctlg.Service
             return FilesystemService.CombinePath(backupFileDir, hash);
         }
 
+        public void AddFileToStorage(File file)
+        {
+            var backupFile = GetBackupPathForFile(file);
+            var backupFileDir = FilesystemService.GetDirectoryName(backupFile);
+            FilesystemService.CreateDirectory(backupFileDir);
+            FilesystemService.Copy(file.FullPath, backupFile);
+        }
+
+        public Hash CalculateHashForFile(File file, IHashFunction hashFunction)
+        {
+            using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
+            {
+                var hash = hashFunction.CalculateHash(stream);
+
+                file.Hashes.Add(hash);
+
+                return hash;
+            }
+        }
+
         public void SortTree(File directory)
         {
             directory.Contents.Sort(FileNameComparer);
@@ -119,9 +143,47 @@ namespace Ctlg.Service
             return container.Contents[index];
         }
 
+        public IBackupWriter CreateBackupWriter(string name, bool shouldUseIndex)
+        {
+            NamedParameter[] parameters =
+            {
+                new NamedParameter("shouldUseIndex", shouldUseIndex),
+                new NamedParameter("hashFunction", GetHashFunction("SHA-256")),
+                new NamedParameter("writer", SnapshotService.CreateSnapshotWriter(name))
+            };
+
+            return ComponentContext.Resolve<BackupWriter>(parameters);
+        }
+
+        public bool IsFileInStorage(File file)
+        {
+            var backupFile = GetBackupPathForFile(file);
+
+            if (FilesystemService.FileExists(backupFile))
+            {
+                if (file.Size.HasValue && FilesystemService.GetFileSize(backupFile) != file.Size)
+                {
+                    throw new Exception($"The size of \"{file.RelativePath}\" and \"{backupFile}\" do not match.");
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private string GetBackupPathForFile(File file)
+        {
+            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+
+            return GetBackupFilePath(hash.ToString());
+        }
+
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
-        private IIndex<string, IHashFunction> HashFunctions { get; }
+        private ISnapshotService SnapshotService { get; set; }
+        private IIndex<string, IHashFunction> HashFunctions { get; set; }
+        private IComponentContext ComponentContext { get; set; }
         private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

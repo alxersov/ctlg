@@ -11,10 +11,8 @@ using NUnit.Framework;
 
 namespace Ctlg.UnitTests
 {
-    [TestFixture]
-    public class SnapshotReaderTests
+    public class SnapshotReaderTests : AutoMockTestFixture
     {
-        private AutoMock AutoMock;
         private Mock<ISnapshotService> SnapshotServiceMock;
         private Mock<ICtlgService> CtlgServiceMock;
         private string SnapshotPath;
@@ -31,7 +29,8 @@ namespace Ctlg.UnitTests
         {
             SnapshotPath = "snapshot_path";
 
-            SnapshotRecord = new SnapshotRecord("ab",
+            SnapshotRecord = new SnapshotRecord(
+                new Hash(HashAlgorithmId.SHA256, new byte[] { 0xab }),
                 new DateTime(2019, 1, 1), 1024, "foo");
 
             Root = new File("root", true);
@@ -41,8 +40,6 @@ namespace Ctlg.UnitTests
                 Size = 1234,
                 FileModifiedDateTime = new DateTime(2019, 10, 15)
             };
-
-            AutoMock = AutoMock.GetLoose();
 
             SnapshotServiceMock = AutoMock.Mock<ISnapshotService>();
             CtlgServiceMock = AutoMock.Mock<ICtlgService>();
@@ -56,12 +53,6 @@ namespace Ctlg.UnitTests
             CtlgServiceMock.Setup(s => s.GetInnerFile(
                 It.IsAny<File>(), It.IsAny<string>()))
                 .Returns(() => File);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            AutoMock.Dispose();
         }
 
         [Test]

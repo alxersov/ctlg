@@ -126,6 +126,8 @@
     <Compile Include="IndexFileServiceTests.cs" />
     <Compile Include="RebuildIndexCommandTests.cs" />
     <Compile Include="SnapshotReaderTests.cs" />
+    <Compile Include="AutoMockTestFixture.cs" />
+    <Compile Include="BackupWriterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

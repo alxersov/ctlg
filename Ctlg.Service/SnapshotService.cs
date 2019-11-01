@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
@@ -11,12 +10,11 @@ using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {
-    public class SnapshotService: ISnapshotService
+    public class SnapshotService : ISnapshotService
     {
-        public SnapshotService(IFilesystemService filesystemService, ICtlgService ctlgService)
+        public SnapshotService(IFilesystemService filesystemService)
         {
             FilesystemService = filesystemService;
-            CtlgService = ctlgService;
 
             var currentDirectory = FilesystemService.GetCurrentDirectory();
             SnapshotsDirectory = FilesystemService.CombinePath(currentDirectory, "snapshots");
@@ -80,10 +78,8 @@ namespace Ctlg.Service
             return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName, fileName);
         }
 
-        public ISnapshotWriter CreateSnapshotWriter(string name)
+        public StreamWriter CreateSnapshotWriter(string name)
         {
-            var hashFunction = CtlgService.GetHashFunction("SHA-256");
-
             var backupDirectory = GetSnapshotDirectory(name);
             FilesystemService.CreateDirectory(backupDirectory);
 
@@ -91,8 +87,17 @@ namespace Ctlg.Service
             var snapshotPath = FilesystemService.CombinePath(backupDirectory, snapshotName);
 
             var fileList = FilesystemService.CreateNewFileForWrite(snapshotPath);
-            var fileListWriter = new StreamWriter(fileList);
-            return new SnapshotWriter(fileListWriter, FilesystemService, CtlgService, hashFunction);
+            return new StreamWriter(fileList);
+        }
+
+        public SnapshotRecord CreateSnapshotRecord(File file)
+        {
+            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+            var date = file.FileModifiedDateTime ?? DateTime.MinValue;
+            var size = file.Size ?? 0;
+            var path = file.RelativePath;
+
+            return new SnapshotRecord(hash, date, size, path);
         }
 
         private string SnapshotsDirectory { get; set; }
@@ -118,19 +123,16 @@ namespace Ctlg.Service
             {
                 return snapshots.Last();
             }
-            else
+
+            var foundFiles = snapshots.Where(s => s.StartsWith(snapshotDate, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            if (foundFiles.Count > 1)
             {
-                var foundFiles = snapshots.Where(s => s.StartsWith(snapshotDate, StringComparison.InvariantCultureIgnoreCase)).ToList();
-                if (foundFiles.Count > 1)
-                {
                     throw new Exception(
-                        $"Provided snapshot date is ambiguous. {foundFiles.Count} snapshots exist: {string.Join(", ", foundFiles)}.");
-                }
-                return foundFiles.FirstOrDefault();
+                    $"Provided snapshot date is ambiguous. {foundFiles.Count} snapshots exist: {string.Join(", ", foundFiles)}.");
             }
+            return foundFiles.FirstOrDefault();
         }
 
         private IFilesystemService FilesystemService { get; }
-        private ICtlgService CtlgService { get; }
     }
 }
