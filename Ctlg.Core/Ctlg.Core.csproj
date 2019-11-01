@@ -56,10 +56,15 @@
     <Compile Include="FileNameComparer.cs" />
     <Compile Include="SnapshotRecord.cs" />
     <Compile Include="Interfaces\ISnapshotService.cs" />
-    <Compile Include="Interfaces\ISnapshotWriter.cs" />
+    <Compile Include="Interfaces\IBackupWriter.cs" />
     <Compile Include="Interfaces\IArchiveService.cs" />
     <Compile Include="Interfaces\IIndexService.cs" />
     <Compile Include="Interfaces\IIndexFileService.cs" />
+    <Compile Include="Utils\FileSize.cs" />
+    <Compile Include="Utils\FormatBytes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utils\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

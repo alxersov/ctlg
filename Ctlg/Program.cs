@@ -105,7 +105,7 @@ namespace Ctlg
             builder.RegisterType<CtlgContext>().As<ICtlgContext>().InstancePerLifetimeScope();
             builder.RegisterType<CtlgService>().As<ICtlgService>().InstancePerLifetimeScope();
             builder.RegisterType<IndexService>().WithParameter("hashLength", 32).As<IIndexService>().InstancePerLifetimeScope();
-            builder.RegisterType<IndexFileService>().As<IIndexFileService>().InstancePerLifetimeScope();
+            builder.RegisterType<IndexFileService>().WithParameter("hashLength", 32).As<IIndexFileService>().InstancePerLifetimeScope();
 
             var genericHandlerType = typeof(IHandle<>);
             builder.RegisterAssemblyTypes(typeof(Program).Assembly)
@@ -120,6 +120,7 @@ namespace Ctlg
 
             builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>().InstancePerLifetimeScope();
             builder.RegisterType<SnapshotReader>().As<ISnapshotReader>().InstancePerLifetimeScope();
+            builder.RegisterType<BackupWriter>().AsSelf().InstancePerDependency();
             builder.Register(context => CreateMappingConfiguration())
                 .As<IConfigurationProvider>().InstancePerLifetimeScope();
 

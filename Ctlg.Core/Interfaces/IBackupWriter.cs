@@ -3,7 +3,7 @@ using Ctlg.Core;
 
 namespace Ctlg.Core.Interfaces
 {
-    public interface ISnapshotWriter: IDisposable
+    public interface IBackupWriter: IDisposable
     {
         void AddFile(File file);
     }

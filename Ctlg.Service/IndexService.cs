@@ -15,7 +15,7 @@ namespace Ctlg.Service
         {
             if (hash.Length != HashLength)
             {
-                throw new Exception($"Hash is {hash.Length} bytes. Expected hash to have lenght {HashLength} bytes.");
+                throw new Exception($"Hash is {hash.Length} bytes. Expected hash to have length {HashLength} bytes.");
             }
             _set.Add(hash);
         }
@@ -23,6 +23,11 @@ namespace Ctlg.Service
         public IEnumerable<byte[]> GetAllHashes()
         {
             return _set;
+        }
+
+        public bool IsInIndex(byte[] hash)
+        {
+            return _set.Contains(hash);
         }
 
         private SortedSet<byte[]> _set = new SortedSet<byte[]>(new ByteArrayComparer());

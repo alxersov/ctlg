@@ -11,9 +11,9 @@ namespace Ctlg.Core
         public DateTime Date { get; set; }
         public string Name { get; set; }
 
-        public SnapshotRecord(string hash, DateTime date, long size, string name)
+        public SnapshotRecord(Hash hash, DateTime date, long size, string name)
         {
-            Hash = hash;
+            Hash = hash.ToString();
             Date = date;
             Size = size;
             Name = name;

@@ -49,14 +49,8 @@ namespace Ctlg.Service.Commands
         {
             try
             {
-                using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-                {
-                    var hash = HashFunction.CalculateHash(stream);
-
-                    DomainEvents.Raise(new HashCalculated(file.RelativePath, hash.Value));
-
-                    file.Hashes.Add(hash);
-                }
+                var hash = CtlgService.CalculateHashForFile(file, HashFunction);
+                DomainEvents.Raise(new HashCalculated(file.RelativePath, hash.Value));
             }
             catch (Exception e)
             {

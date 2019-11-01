@@ -12,11 +12,11 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider, ISnapshotService snapshotService, ISnapshotReader snapshotReader)
+        public BackupCommand(ITreeProvider treeProvider, ISnapshotService snapshotService, ISnapshotReader snapshotReader, ICtlgService ctlgService)
         {
             TreeProvider = treeProvider;
-            SnapshotService = snapshotService;
             SnapshotReader = snapshotReader;
+            CtlgService = ctlgService;
         }
 
         public void Execute()
@@ -30,16 +30,16 @@ namespace Ctlg.Service.Commands
 
             var treeWalker = new TreeWalker(root);
 
-            using (var snapshot = SnapshotService.CreateSnapshotWriter(Name))
+            using (var writer = CtlgService.CreateBackupWriter(Name, IsFastMode))
             {
-                treeWalker.Walk(snapshot.AddFile);
+                treeWalker.Walk(writer.AddFile);
             }
 
             DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ITreeProvider TreeProvider { get; set; }
-        private ISnapshotService SnapshotService { get; set; }
+        private ICtlgService CtlgService { get; set; }
         private ISnapshotReader SnapshotReader { get; set; }
     }
 }

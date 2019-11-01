@@ -3,7 +3,7 @@ namespace Ctlg.Service.Utils
 {
     public static class FileSize
     {
-        private static string[] Prefixes = new string[]{"", "k", "M", "G", "T", "P"};
+        private static string[] Prefixes = {"", "k", "M", "G", "T", "P"};
 
         public static string Format(long size)
         {
