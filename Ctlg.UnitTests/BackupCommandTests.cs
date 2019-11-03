@@ -1,88 +1,109 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
-using Ctlg.Service.Utils;
 using Moq;
 using NUnit.Framework;
 
 namespace Ctlg.UnitTests
 {
-    public class BackupCommandTests: BackupTestFixture
+    public class BackupCommandTests: AutoMockTestFixture
     {
-        [Test]
-        public void Execute_AddsFilesToSnapshot()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                var events = SetupEvents<BackupCommandEnded>();
+        private readonly string Path = "test-path";
+        private readonly string BackupName = "test-name";
+        private readonly string FileName = "test-1.txt";
+        private File File;
+        private bool IsFastMode;
+        private File Tree;
 
-                SetupTreeProvider(mock);
-                var writerMock = SetupBackupWriter(mock);
+        private Mock<IBackupWriter> BackupWriterMock;
+        private Mock<ISnapshotReader> SnapshotReaderMock;
+        private Mock<IIndexFileService> IndexFileServiceMock;
 
-                var command = mock.Create<BackupCommand>();
-                command.Path = "test-path";
-                command.Name = "test-name";
-
-                command.Execute();
-
-                writerMock.VerifyAll();
-
-                Assert.That(events.Count, Is.EqualTo(1));
-            }
-        }
-
-        [Test]
-        public void Execute_WhenFastMode_ReadsLatesSnapshot()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                SetupTreeProvider(mock);
-                SetupBackupWriter(mock);
-
-                var snapshotReaderMock = mock.Mock<ISnapshotReader>();
-                snapshotReaderMock.Setup(r => r.ReadHashesFromLatestSnapshot(It.Is<string>(s => s == "test-name"),
-                        It.Is<File>(f => f == Tree)));
-
-                var command = mock.Create<BackupCommand>();
-                command.Path = "test-path";
-                command.Name = "test-name";
-                command.IsFastMode = true;
-
-                command.Execute();
-
-                snapshotReaderMock.VerifyAll();
-            }
-        }
+        private IList<BackupCommandEnded> BackupCommandEndedEvents;
 
         [SetUp]
         public void Init()
         {
-            Tree = new File("test-path", true) { Contents = { new File("test-1.txt") } };
+            IsFastMode = false;
+            File = new File(FileName);
+            Tree = new File(Path, true) { Contents = { File } };
+
+            SetupTreeProvider();
+            SetupBackupReader();
+            SetupBackupWriter();
+            SetupIndexFileService();
+
+            BackupCommandEndedEvents = SetupEvents<BackupCommandEnded>();
         }
 
-        private File Tree;
-
-        private static Mock<IBackupWriter> SetupBackupWriter(AutoMock mock)
+        [Test]
+        public void Execute_AddsFilesToSnapshot()
         {
-            var writerMock = new Mock<IBackupWriter>();
-            writerMock.Setup(w => w.AddFile(It.Is<File>(file => file.Name == "test-1.txt")));
+            Execute();
 
-            mock.Mock<ICtlgService>()
-                .Setup(p => p.CreateBackupWriter(It.Is<string>(name => name == "test-name"), It.IsAny<bool>()))
-                .Returns(writerMock.Object);
+            BackupWriterMock.VerifyAll();
 
-            return writerMock;
+            Assert.That(BackupCommandEndedEvents.Count, Is.EqualTo(1));
+
+            SnapshotReaderMock.Verify(s => s.ReadHashesFromLatestSnapshot(
+                BackupName, Tree), Times.Never);
+
+            IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
+            IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
         }
 
-        private void SetupTreeProvider(AutoMock mock)
+        [Test]
+        public void Execute_WhenFastMode_ReadsLatestSnapshot()
         {
-            mock.Mock<ITreeProvider>()
-                .Setup(d => d.ReadTree(It.Is<string>(s => s == "test-path"), It.Is<string>(s => s == null)))
+            IsFastMode = true;
+
+            Execute();
+
+            SnapshotReaderMock.Verify(s => s.ReadHashesFromLatestSnapshot(
+                BackupName, Tree), Times.Once);
+        }
+
+        private void Execute()
+        {
+            var command = AutoMock.Create<BackupCommand>();
+            command.Path = Path;
+            command.Name = BackupName;
+            command.IsFastMode = IsFastMode;
+
+            command.Execute();
+        }
+
+        private void SetupBackupReader()
+        {
+            SnapshotReaderMock = AutoMock.Mock<ISnapshotReader>();
+        }
+
+        private void SetupBackupWriter()
+        {
+            BackupWriterMock = new Mock<IBackupWriter>();
+            BackupWriterMock.Setup(w => w.AddFile(File));
+
+            AutoMock.Mock<ICtlgService>()
+                .Setup(p => p.CreateBackupWriter(
+                    BackupName, It.Is<bool>(shouldUseIndex => shouldUseIndex == IsFastMode)))
+                .Returns(BackupWriterMock.Object);
+        }
+
+        private void SetupTreeProvider()
+        {
+            AutoMock.Mock<ITreeProvider>()
+                .Setup(d => d.ReadTree(Path, null))
                 .Returns(Tree);
+        }
+
+        private void SetupIndexFileService()
+        {
+            IndexFileServiceMock = AutoMock.Mock<IIndexFileService>();
         }
     }
 }

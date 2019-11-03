@@ -1,5 +1,4 @@
 ﻿using System;
-using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
 
@@ -12,15 +11,19 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider, ISnapshotService snapshotService, ISnapshotReader snapshotReader, ICtlgService ctlgService)
+        public BackupCommand(ITreeProvider treeProvider, ISnapshotReader snapshotReader, ICtlgService ctlgService,
+            IIndexFileService indexFileService)
         {
             TreeProvider = treeProvider;
             SnapshotReader = snapshotReader;
             CtlgService = ctlgService;
+            IndexFileService = indexFileService;
         }
 
         public void Execute()
         {
+            IndexFileService.Load();
+
             var root = TreeProvider.ReadTree(Path, SearchPattern);
 
             if (IsFastMode)
@@ -35,11 +38,14 @@ namespace Ctlg.Service.Commands
                 treeWalker.Walk(writer.AddFile);
             }
 
+            IndexFileService.Save();
+
             DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ITreeProvider TreeProvider { get; set; }
         private ICtlgService CtlgService { get; set; }
+        private IIndexFileService IndexFileService { get; set; }
         private ISnapshotReader SnapshotReader { get; set; }
     }
 }

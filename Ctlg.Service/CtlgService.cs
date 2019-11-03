@@ -12,11 +12,14 @@ namespace Ctlg.Service
 {
     public class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService, ISnapshotService snapshotService, IIndex<string, IHashFunction> hashFunction, IComponentContext componentContext)
+        public CtlgService(IDataService dataService, IFilesystemService filesystemService,
+            ISnapshotService snapshotService, IIndexService indexService,
+            IIndex<string, IHashFunction> hashFunction, IComponentContext componentContext)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
             SnapshotService = snapshotService;
+            IndexService = indexService;
             HashFunctions = hashFunction;
             ComponentContext = componentContext;
 
@@ -108,6 +111,9 @@ namespace Ctlg.Service
             var backupFileDir = FilesystemService.GetDirectoryName(backupFile);
             FilesystemService.CreateDirectory(backupFileDir);
             FilesystemService.Copy(file.FullPath, backupFile);
+
+            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+            IndexService.Add(hash.Value);
         }
 
         public Hash CalculateHashForFile(File file, IHashFunction hashFunction)
@@ -182,6 +188,7 @@ namespace Ctlg.Service
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
         private ISnapshotService SnapshotService { get; set; }
+        private IIndexService IndexService { get; set; }
         private IIndex<string, IHashFunction> HashFunctions { get; set; }
         private IComponentContext ComponentContext { get; set; }
         private IComparer<File> FileNameComparer { get; } = new FileNameComparer();

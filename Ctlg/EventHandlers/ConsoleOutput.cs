@@ -7,8 +7,8 @@ using Ctlg.Service.Utils;
 
 namespace Ctlg.EventHandlers
 {
-    public class ConsoleOutput : 
-        IHandle<FileFound>, 
+    public class ConsoleOutput :
+        IHandle<FileFound>,
         IHandle<DirectoryFound>,
         IHandle<ArchiveFound>,
         IHandle<ArchiveEntryFound>,
@@ -137,7 +137,7 @@ namespace Ctlg.EventHandlers
             }
 
             var h = args.HashCalculated ? 'H' : ' ';
-            var n = args.NewFileAddedToStorage ? 'N' : ' ';
+            var n = args.IsHashFoundInIndex ? 'I' : args.NewFileAddedToStorage ? 'N' : ' ';
 
             var maxCounterLength = _filesFound.ToString().Length;
             var counter = _filesProcessed.ToString().PadLeft(maxCounterLength);

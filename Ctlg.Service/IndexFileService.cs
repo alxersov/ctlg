@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.Events;
 
 namespace Ctlg.Service
 {
@@ -27,24 +28,35 @@ namespace Ctlg.Service
 
         public void Load()
         {
-            using (var reader = new BinaryReader(FilesystemService.OpenFileForRead(CtlgService.IndexPath)))
+            try
             {
-                while (true)
+                using (var reader = new BinaryReader(FilesystemService.OpenFileForRead(CtlgService.IndexPath)))
                 {
-                    var hash = reader.ReadBytes(HashLength);
-                    if (hash.Length == HashLength)
+                    while (true)
                     {
-                        IndexService.Add(hash);
-                    }
-                    else if(hash.Length == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        throw new Exception($"Corrupted index file.");
+                        var hash = reader.ReadBytes(HashLength);
+                        if (hash.Length == HashLength)
+                        {
+                            IndexService.Add(hash);
+                        }
+                        else if (hash.Length == 0)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new Exception($"Corrupted index file.");
+                        }
                     }
                 }
+            }
+            catch (FileNotFoundException)
+            {
+                // Ignore exception. Index file does not exist on the first run.
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 

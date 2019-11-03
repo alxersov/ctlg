@@ -1,7 +1,5 @@
 ﻿using System;
-using StreamReader = System.IO.StreamReader;
 using Ctlg.Core;
-using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 using Ctlg.Core.Interfaces;
 
@@ -35,7 +33,7 @@ namespace Ctlg.Service.Commands
             }
         }
 
-        private void ProcessRecord(SnapshotRecord record, Core.File root)
+        private void ProcessRecord(SnapshotRecord record, File root)
         {
             var path = record.Name.Split('\\', '/');
 
