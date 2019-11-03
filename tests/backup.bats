@@ -35,6 +35,20 @@ load helper
   $CTLG_EXECUTABLE backup -f -n Test "$CTLG_FILESDIR"
 }
 
+@test "bakup in fast mode uses index" {
+  echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
+  $CTLG_EXECUTABLE backup -n Test "$CTLG_FILESDIR"
+
+  cp "$CTLG_FILESDIR/hi.txt" "$CTLG_FILESDIR/hello.txt"
+
+  rm "$CTLG_WORKDIR/file_storage/2c/2cf24dba"*
+
+  output=$($CTLG_EXECUTABLE backup -f -n Test "${CTLG_FILESDIR}")
+
+  [[ "${output}" == *"1/2 HI 2cf24dba      5 hello.txt"* ]] || false
+  [[ "${output}" == *"2/2  I 2cf24dba      5 hi.txt"* ]] || false
+}
+
 @test "backup and restore multiple files and directories" {
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   mkdir "$CTLG_FILESDIR/foo"
