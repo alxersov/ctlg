@@ -35,39 +35,6 @@ namespace Ctlg.UnitTests
             return fsDirectory.Object;
         }
 
-        public static void SetupGetDirectory(this AutoMock mock, string path)
-        {
-            var fsDirectory = mock.Mock<IFilesystemDirectory>();
-
-            fsDirectory.Setup(d => d.EnumerateDirectories())
-                       .Returns(new IFilesystemDirectory[0]);
-
-            var file = new Core.File("1.txt");
-            file.FullPath = @"C:\foo\1.txt";
-            file.RelativePath = file.Name;
-            file.Size = 11;
-            file.FileModifiedDateTime = new DateTime(2018, 4, 22, 18, 5, 12, 0, DateTimeKind.Utc);
-            fsDirectory.Setup(d => d.EnumerateFiles(It.IsAny<string>()))
-                       .Returns(new Core.File[] { file });
-
-            var rootDir = new Ctlg.Core.File(path, true);
-            rootDir.FullPath = path;
-
-            fsDirectory.SetupGet(d => d.Directory)
-                       .Returns(rootDir);
-
-            mock.Mock<IFilesystemService>()
-                .Setup(s => s.GetDirectory(It.Is<string>(p => p == path)))
-                .Returns(fsDirectory.Object);
-        }
-
-        public static void SetupGetDirectoryName(this AutoMock mock, string filePath, string directoryPath)
-        {
-            mock.Mock<IFilesystemService>()
-                .Setup(s => s.GetDirectoryName(It.Is<string>(p => p == filePath)))
-                .Returns(directoryPath);
-        }
-
         public static void SetupGetBackupFilePath(this AutoMock mock, string hash, string path)
         {
             mock.Mock<ICtlgService>()

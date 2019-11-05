@@ -60,7 +60,7 @@ namespace Ctlg.UnitTests
             var a = new Hash(1, new byte[] { 1, 2, 3 });
             var b = "";
 
-            Assert.That(a.Equals(b), Is.False);;
+            Assert.That(a.Equals(b), Is.False);
         }
 
         [Test]

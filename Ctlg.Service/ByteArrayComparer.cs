@@ -11,7 +11,7 @@ namespace Ctlg.Service
             {
                 return -1;
             }
-            else if (x.Length > y.Length)
+            if (x.Length > y.Length)
             {
                 return 1;
             }

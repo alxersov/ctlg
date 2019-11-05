@@ -12,7 +12,6 @@ namespace Ctlg.Service
     public class BackupWriter: IBackupWriter
     {
         public BackupWriter(StreamWriter writer,
-            IFilesystemService filesystemService,
             ICtlgService ctlgService,
             ISnapshotService snapshotService,
             IIndexService indexService,
@@ -20,7 +19,6 @@ namespace Ctlg.Service
             bool shouldUseIndex)
         {
             _streamWriter = writer;
-            FilesystemService = filesystemService;
             CtlgService = ctlgService;
             SnapshotService = snapshotService;
             IndexService = indexService;
@@ -117,11 +115,10 @@ namespace Ctlg.Service
 
         private StreamWriter _streamWriter;
 
-        public IFilesystemService FilesystemService { get; }
-        public ICtlgService CtlgService { get; }
-        public ISnapshotService SnapshotService { get; }
-        public IIndexService IndexService { get; }
-        public IHashFunction HashFunction { get; }
-        public bool ShouldUseIndex { get; }
+        private ICtlgService CtlgService { get; }
+        private ISnapshotService SnapshotService { get; }
+        private IIndexService IndexService { get; }
+        private IHashFunction HashFunction { get; }
+        private bool ShouldUseIndex { get; }
     }
 }

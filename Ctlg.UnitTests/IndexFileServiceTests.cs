@@ -74,7 +74,7 @@ namespace Ctlg.UnitTests
                 .Setup(s => s.OpenFileForRead(IndexFilePath))
                 .Returns(stream);
 
-            Assert.That(() => IndexFileService.Load(),
+            Assert.That(IndexFileService.Load,
                 Throws.InstanceOf<Exception>()
                     .With.Message.Contain("Corrupted index file"));
         }
