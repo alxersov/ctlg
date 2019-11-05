@@ -13,22 +13,16 @@ namespace Ctlg.Core
                 {
                     return 0;
                 }
-                else
-                {
-                    return -1;
-                }
+
+                return -1;
             }
-            else
+
+            if (y == null || y.Name == null)
             {
-                if (y == null || y.Name == null)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
-                }
+                return 1;
             }
+
+            return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
         }
     }
 }

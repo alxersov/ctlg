@@ -14,9 +14,7 @@ namespace Ctlg.Service.Commands
             FilesystemService = filesystemService;
             IndexService = indexService;
             IndexFileService = indexFileService;
-
         }
-
 
         public void Execute()
         {

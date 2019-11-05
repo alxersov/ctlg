@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service.Events;
 
 namespace Ctlg.Service
 {

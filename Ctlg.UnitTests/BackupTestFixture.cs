@@ -17,7 +17,7 @@ namespace Ctlg.UnitTests
         protected readonly string RestorePath;
         protected readonly SnapshotRecord SnapshotRecordSample;
 
-        public BackupTestFixture()
+        protected BackupTestFixture()
         {
             BackupName = "MyBackup";
             SnapshotPath = @"snapshots\MyBackup\2019-01-01_02-30-00";
