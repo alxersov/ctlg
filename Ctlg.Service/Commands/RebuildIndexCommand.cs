@@ -8,9 +8,9 @@ namespace Ctlg.Service.Commands
 {
     public class RebuildIndexCommand : ICommand
     {
-        public RebuildIndexCommand(ICtlgService ctlgService, IFilesystemService filesystemService, IIndexService indexService, IIndexFileService indexFileService)
+        public RebuildIndexCommand(IFileStorageService fileStorageService, IFilesystemService filesystemService, IIndexService indexService, IIndexFileService indexFileService)
         {
-            CtlgService = ctlgService;
+            FileStorageService = fileStorageService;
             FilesystemService = filesystemService;
             IndexService = indexService;
             IndexFileService = indexFileService;
@@ -18,7 +18,7 @@ namespace Ctlg.Service.Commands
 
         public void Execute()
         {
-            var storageDir = FilesystemService.GetDirectory(CtlgService.FileStorageDirectory);
+            var storageDir = FilesystemService.GetDirectory(FileStorageService.FileStorageDirectory);
             foreach (var dir in storageDir.EnumerateDirectories())
             {
                 if (!StorageSubDirRegex.IsMatch(dir.Directory.Name))
@@ -43,7 +43,7 @@ namespace Ctlg.Service.Commands
             IndexFileService.Save();
         }
 
-        private ICtlgService CtlgService { get; }
+        private IFileStorageService FileStorageService { get; }
         private IFilesystemService FilesystemService { get; }
         private IIndexService IndexService { get; }
         private IIndexFileService IndexFileService { get; }

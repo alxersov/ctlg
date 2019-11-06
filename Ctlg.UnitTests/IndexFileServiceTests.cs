@@ -4,6 +4,7 @@ using Autofac;
 using Autofac.Extras.Moq;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service;
+using Ctlg.Service.Services;
 using Moq;
 using NUnit.Framework;
 
@@ -12,11 +13,10 @@ namespace Ctlg.UnitTests
     public class IndexFileServiceTests : AutoMockTestFixture
     {
         private Mock<IIndexService> IndexServiceMock;
-        private Mock<ICtlgService> CtlgServiceMock;
         private Mock<IFilesystemService> FilesystemServiceMock;
         private IndexFileService IndexFileService;
 
-        private const string IndexFilePath = "index-file-path";
+        private const string IndexFilePath = "current-dir/index.bin";
         private readonly byte[] Hash1 = { 1, 2 };
         private readonly byte[] Hash2 = { 3, 4 };
         private readonly byte[] AllHashes = { 1, 2, 3, 4 };
@@ -26,11 +26,14 @@ namespace Ctlg.UnitTests
         public void Setup()
         {
             IndexServiceMock = AutoMock.Mock<IIndexService>();
-            CtlgServiceMock = AutoMock.Mock<ICtlgService>();
             FilesystemServiceMock = AutoMock.Mock<IFilesystemService>();
-            IndexFileService = AutoMock.Create<IndexFileService>(new NamedParameter("hashLength", 2));
 
-            CtlgServiceMock.SetupGet(s => s.IndexPath).Returns(IndexFilePath);
+            FilesystemServiceMock.Setup(s => s.GetCurrentDirectory()).Returns("current-dir");
+            FilesystemServiceMock
+                .Setup(s => s.CombinePath("current-dir", "index.bin"))
+                .Returns(IndexFilePath);
+
+            IndexFileService = AutoMock.Create<IndexFileService>(new NamedParameter("hashLength", 2));
         }
 
 

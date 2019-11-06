@@ -76,7 +76,7 @@ namespace Ctlg.UnitTests
 
         private void SetupStorageDir()
         {
-            AutoMock.Mock<ICtlgService>().SetupGet(s => s.FileStorageDirectory).Returns("files-dir");
+            AutoMock.Mock<IFileStorageService>().SetupGet(s => s.FileStorageDirectory).Returns("files-dir");
 
             var dir1 = MockHelper.MockDirectory(Dir1, new File[] { new File(File1), new File(File2) });
             var dir2 = MockHelper.MockDirectory(Dir2, new File[] { new File(File3) });

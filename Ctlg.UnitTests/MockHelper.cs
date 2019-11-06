@@ -5,7 +5,6 @@ using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service;
 using Moq;
 using File = Ctlg.Core.File;
 
@@ -37,7 +36,7 @@ namespace Ctlg.UnitTests
 
         public static void SetupGetBackupFilePath(this AutoMock mock, string hash, string path)
         {
-            mock.Mock<ICtlgService>()
+            mock.Mock<IFileStorageService>()
                 .Setup(s => s.GetBackupFilePath(It.Is<string>(h => h == hash)))
                 .Returns(path);
         }

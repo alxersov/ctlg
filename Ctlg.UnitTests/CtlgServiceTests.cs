@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
-using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Data;
 using Ctlg.Filesystem;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
+using Ctlg.Service.Services;
 using Moq;
 using NUnit.Framework;
 using File = Ctlg.Core.File;
@@ -197,25 +196,6 @@ namespace Ctlg.UnitTests
                 ctlg.ApplyDbMigrations();
 
                 mock.Mock<IDataService>().Verify(s => s.ApplyDbMigrations(), Times.Once);
-            }
-        }
-
-        [Test]
-        public void IndexPath_ReturnsCorrectPath()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-
-                var fs = mock.Mock<IFilesystemService>();
-                fs.Setup(s => s.GetCurrentDirectory()).Returns("current-dir");
-                fs
-                    .Setup(s => s.CombinePath(
-                        It.Is<string>(p => p == "current-dir"),
-                        It.Is<string>(p => p == "index.bin")))
-                    .Returns("current-dir/index.bin");
-
-                var ctlg = mock.Create<CtlgService>();
-                Assert.That(ctlg.IndexPath, Is.EqualTo("current-dir/index.bin"));
             }
         }
 

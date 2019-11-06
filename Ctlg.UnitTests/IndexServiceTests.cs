@@ -1,6 +1,7 @@
 ﻿using System;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service;
+using Ctlg.Service.Services;
 using NUnit.Framework;
 
 namespace Ctlg.UnitTests
