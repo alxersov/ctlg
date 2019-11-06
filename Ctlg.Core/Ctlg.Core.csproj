@@ -62,6 +62,11 @@
     <Compile Include="Interfaces\IIndexFileService.cs" />
     <Compile Include="Utils\FileSize.cs" />
     <Compile Include="Utils\FormatBytes.cs" />
+    <Compile Include="Interfaces\ICommand.cs" />
+    <Compile Include="Interfaces\ICtlgService.cs" />
+    <Compile Include="Interfaces\IDomainEvent.cs" />
+    <Compile Include="Interfaces\IHandle.cs" />
+    <Compile Include="Interfaces\IFileStorageService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Utils\" />

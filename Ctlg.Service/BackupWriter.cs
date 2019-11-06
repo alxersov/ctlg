@@ -9,12 +9,13 @@ using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {
-    public class BackupWriter: IBackupWriter
+    public sealed class BackupWriter: IBackupWriter
     {
         public BackupWriter(StreamWriter writer,
             ICtlgService ctlgService,
             ISnapshotService snapshotService,
             IIndexService indexService,
+            IFileStorageService fileStorageService,
             IHashFunction hashFunction,
             bool shouldUseIndex)
         {
@@ -22,6 +23,7 @@ namespace Ctlg.Service
             CtlgService = ctlgService;
             SnapshotService = snapshotService;
             IndexService = indexService;
+            FileStorageService = fileStorageService;
             HashFunction = hashFunction;
             ShouldUseIndex = shouldUseIndex;
         }
@@ -54,7 +56,10 @@ namespace Ctlg.Service
             {
                 if (fileStatus.HasFlag(BackupFileStatus.HashRecalculated))
                 {
-                    CtlgService.AddFileToStorage(file);
+                    FileStorageService.AddFileToStorage(file);
+
+                    var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+                    IndexService.Add(hash.Value);
                 }
                 else
                 {
@@ -95,7 +100,7 @@ namespace Ctlg.Service
             {
                 status |= BackupFileStatus.FoundInIndex;
             }
-            else if (CtlgService.IsFileInStorage(file))
+            else if (FileStorageService.IsFileInStorage(file))
             {
                 status |= BackupFileStatus.FoundInStorage;
             }
@@ -118,6 +123,7 @@ namespace Ctlg.Service
         private ICtlgService CtlgService { get; }
         private ISnapshotService SnapshotService { get; }
         private IIndexService IndexService { get; }
+        public IFileStorageService FileStorageService { get; }
         private IHashFunction HashFunction { get; }
         private bool ShouldUseIndex { get; }
     }

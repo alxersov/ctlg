@@ -15,16 +15,9 @@ namespace Ctlg.Service
 
         IHashFunction GetHashFunction(string name);
 
-        string GetBackupFilePath(string hash);
-        void AddFileToStorage(File file);
         void SortTree(File directory);
         Hash CalculateHashForFile(File file, IHashFunction hashFunction);
-        bool IsFileInStorage(File file);
         File GetInnerFile(File container, string name);
         IBackupWriter CreateBackupWriter(string name, bool shouldUseIndex);
-
-        string CurrentDirectory { get; }
-        string FileStorageDirectory { get; }
-        string IndexPath { get; }
     }
 }

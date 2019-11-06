@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
@@ -14,12 +12,12 @@ namespace Ctlg.Service.Commands
         public string Path { get; set; }
 
         private IFilesystemService FileSystemService { get; }
-        private ICtlgService CtlgService { get; }
+        private IFileStorageService FileStorageService { get; }
         private ISnapshotService SnapshotService { get; }
 
-        public RestoreCommand(IFilesystemService fileSystemService, ICtlgService ctlgService, ISnapshotService snapshotService)
+        public RestoreCommand(IFilesystemService fileSystemService, IFileStorageService fileStorageService, ISnapshotService snapshotService)
         {
-            CtlgService = ctlgService;
+            FileStorageService = fileStorageService;
             SnapshotService = snapshotService;
             FileSystemService = fileSystemService;
         }
@@ -48,7 +46,7 @@ namespace Ctlg.Service.Commands
 
         private void ProcessSnapshotRecord(SnapshotRecord record)
         {
-            var backupFilePath = CtlgService.GetBackupFilePath(record.Hash);
+            var backupFilePath = FileStorageService.GetBackupFilePath(record.Hash);
             if (!FileSystemService.FileExists(backupFilePath))
             {
                 throw new Exception($"Could not restore {record.Name}. Backup file {backupFilePath} not found.");

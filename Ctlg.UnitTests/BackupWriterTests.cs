@@ -27,6 +27,7 @@ namespace Ctlg.UnitTests
         private Mock<ISnapshotService> SnapshotServiceMock;
         private Mock<ICtlgService> CtlgServiceMock;
         private Mock<IIndexService> IndexServiceMock;
+        private Mock<IFileStorageService> FileStorageService;
 
         private IList<BackupEntryCreated> BackupEntryCreatedEvents;
 
@@ -44,13 +45,15 @@ namespace Ctlg.UnitTests
             SnapshotServiceMock.Setup(s => s.CreateSnapshotRecord(File)).Returns(SnapshotRecord);
 
             CtlgServiceMock = AutoMock.Mock<ICtlgService>();
-            CtlgServiceMock.Setup(s => s.IsFileInStorage(File)).Returns(() => IsFileInStorage);
             CtlgServiceMock.Setup(s => s.CalculateHashForFile(File, It.IsAny<IHashFunction>()))
                 .Callback<File, IHashFunction>(CalculateHashForFileImpl)
                 .Returns(Hash2);
 
             IndexServiceMock = AutoMock.Mock<IIndexService>();
             IndexServiceMock.Setup(s => s.IsInIndex(Hash1.Value)).Returns(() => IsFileInIndex);
+
+            FileStorageService = AutoMock.Mock<IFileStorageService>();
+            FileStorageService.Setup(s => s.IsFileInStorage(File)).Returns(() => IsFileInStorage);
 
             var stream = new MemoryStream();
             StreamWriterMock = new Mock<StreamWriter>(stream);
@@ -64,7 +67,7 @@ namespace Ctlg.UnitTests
         {
             Execute_AddFile();
 
-            CtlgServiceMock.Verify(m => m.AddFileToStorage(File), Times.Never);
+            FileStorageService.Verify(m => m.AddFileToStorage(File), Times.Never);
             Verify_BackupEventCreated(hashCalculated: false, isHashFoundInIndex: false, isFileAddedToStorage: false);
             Verify_StreamWriter();
         }
@@ -76,7 +79,7 @@ namespace Ctlg.UnitTests
 
             Execute_AddFile();
 
-            CtlgServiceMock.Verify(m => m.AddFileToStorage(File), Times.Never);
+            FileStorageService.Verify(m => m.AddFileToStorage(File), Times.Never);
             Verify_BackupEventCreated(hashCalculated: true, isHashFoundInIndex: false, isFileAddedToStorage: false);
         }
 
@@ -87,7 +90,7 @@ namespace Ctlg.UnitTests
 
             Execute_AddFile();
 
-            CtlgServiceMock.Verify(m => m.AddFileToStorage(File), Times.Never);
+            FileStorageService.Verify(m => m.AddFileToStorage(File), Times.Never);
             Verify_BackupEventCreated(hashCalculated: false, isHashFoundInIndex: true, isFileAddedToStorage: false);
         }
 
@@ -99,7 +102,7 @@ namespace Ctlg.UnitTests
 
             Execute_AddFile();
 
-            CtlgServiceMock.Verify(m => m.AddFileToStorage(File), Times.Never);
+            FileStorageService.Verify(m => m.AddFileToStorage(File), Times.Never);
             Verify_BackupEventCreated(hashCalculated: false, isHashFoundInIndex: false, isFileAddedToStorage: false);
         }
 
@@ -112,7 +115,8 @@ namespace Ctlg.UnitTests
             Execute_AddFile();
 
             Assert.That(File.Hashes.First(), Is.EqualTo(Hash2));
-            CtlgServiceMock.Verify(m => m.AddFileToStorage(File), Times.Once);
+            FileStorageService.Verify(m => m.AddFileToStorage(File), Times.Once);
+            IndexServiceMock.Verify(s => s.Add(Hash2.Value), Times.Once);
             Verify_BackupEventCreated(hashCalculated: true, isHashFoundInIndex: false, isFileAddedToStorage: true);
         }
 
@@ -124,7 +128,7 @@ namespace Ctlg.UnitTests
             Execute_AddFile();
 
             Assert.That(File.Hashes.First(), Is.EqualTo(Hash2));
-            CtlgServiceMock.Verify(m => m.AddFileToStorage(File), Times.Once);
+            FileStorageService.Verify(m => m.AddFileToStorage(File), Times.Once);
             Verify_BackupEventCreated(hashCalculated: true, isHashFoundInIndex: false, isFileAddedToStorage: true);
         }
 

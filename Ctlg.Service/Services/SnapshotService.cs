@@ -8,7 +8,7 @@ using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
 using File = Ctlg.Core.File;
 
-namespace Ctlg.Service
+namespace Ctlg.Service.Services
 {
     public class SnapshotService : ISnapshotService
     {

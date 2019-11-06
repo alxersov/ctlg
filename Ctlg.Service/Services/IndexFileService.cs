@@ -2,21 +2,23 @@
 using System.IO;
 using Ctlg.Core.Interfaces;
 
-namespace Ctlg.Service
+namespace Ctlg.Service.Services
 {
-    public class IndexFileService : IIndexFileService
+    public sealed class IndexFileService : IIndexFileService
     {
-        public IndexFileService(ICtlgService ctlgService, IFilesystemService filesystemService, IIndexService indexService, int hashLength)
+        public IndexFileService(IFilesystemService filesystemService, IIndexService indexService, int hashLength)
         {
-            CtlgService = ctlgService;
             FilesystemService = filesystemService;
             IndexService = indexService;
             HashLength = hashLength;
+
+            var currentDirectory = FilesystemService.GetCurrentDirectory();
+            IndexPath = FilesystemService.CombinePath(currentDirectory, "index.bin");
         }
 
         public void Save()
         {
-            using (var writer = new BinaryWriter(FilesystemService.CreateFileForWrite(CtlgService.IndexPath)))
+            using (var writer = new BinaryWriter(FilesystemService.CreateFileForWrite(IndexPath)))
             {
                 foreach (var hash in IndexService.GetAllHashes())
                 {
@@ -29,7 +31,7 @@ namespace Ctlg.Service
         {
             try
             {
-                using (var reader = new BinaryReader(FilesystemService.OpenFileForRead(CtlgService.IndexPath)))
+                using (var reader = new BinaryReader(FilesystemService.OpenFileForRead(IndexPath)))
                 {
                     while (true)
                     {
@@ -59,7 +61,8 @@ namespace Ctlg.Service
             }
         }
 
-        private ICtlgService CtlgService { get; }
+        private string IndexPath { get; set; }
+
         private IFilesystemService FilesystemService { get; }
         private IIndexService IndexService { get; }
         private readonly int HashLength;

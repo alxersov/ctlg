@@ -5,6 +5,7 @@ using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service;
 using Ctlg.Service.Events;
+using Ctlg.Service.Services;
 using Moq;
 using NUnit.Framework;
 
