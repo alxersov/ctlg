@@ -1,20 +1,19 @@
 # ctlg
 ![Build Status badge](https://ersh.visualstudio.com/_apis/public/build/definitions/c9754d86-e84f-486e-a3b3-f7f42d31c01d/1/badge)
 
-A tool to catalog files and folders.
+A tool to backup and catalog files and folders.
 
 ## Features
  - Calculates checksums. You can search files in catalog by checksum.
  - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32.
  - Can work with long paths.
  - Catalogs files inside archives. Supports common archive types: Zip, 7Zip, Rar.
- - Create file backups.
 
 ## Usage
 
     ctlg <command> [<options>]
 
-### Add
+### add
 
     ctlg add -s <mask> -f <hash function> <directory>
 
@@ -36,7 +35,7 @@ Apply `<hash function>` to files when adding them to the catalog. Default is `SH
 
     ctlg show <catalog entry IDs>
 
-Show detailed information about catalog enty.
+Show detailed information about catalog entry.
 
 ### find
 
@@ -120,7 +119,7 @@ Date when backup was taken in `yyyy-MM-dd_HH-mm-ss` format. It is possible to sk
  - .NET console application (.NET Framework 4.6.2).
  - Entity Framework with SQLite DB, database migrations in SQL.
  - Pri.LongPath is used to support long paths.
- - Autofac is used to inject dpendencies.
+ - Autofac is used to inject dependencies.
  - SharpCompress is used to read archive files.
  - Crc32.NET is used to calculate CRC32 checksums.
  - NUnit and Moq for testing.
