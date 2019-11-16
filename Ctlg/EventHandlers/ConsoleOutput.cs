@@ -142,7 +142,9 @@ namespace Ctlg.EventHandlers
             var maxCounterLength = _filesFound.ToString().Length;
             var counter = _filesProcessed.ToString().PadLeft(maxCounterLength);
 
-            Console.WriteLine($"{counter}/{_filesFound} {h}{n} {FormatSnapshotRecord(args.BackupEntry)}");
+            var filesFound = 0 < _filesFound ? $"/{_filesFound}" : "";
+
+            Console.WriteLine($"{counter}{filesFound} {h}{n} {FormatSnapshotRecord(args.BackupEntry)}");
         }
 
         public void Handle(BackupEntryRestored args)
@@ -154,8 +156,8 @@ namespace Ctlg.EventHandlers
 
         public void Handle(BackupCommandEnded args)
         {
-            Console.WriteLine($"Processed: {FileSize.Format(bytesProcessed)}");
-            Console.WriteLine($"Added to storage: {FileSize.Format(bytesAddedToStorage)}");
+            Console.WriteLine($"Processed: {FileSize.Format(bytesProcessed)}B");
+            Console.WriteLine($"Added to storage: {FileSize.Format(bytesAddedToStorage)}B");
         }
 
         public void Handle(Warning args)

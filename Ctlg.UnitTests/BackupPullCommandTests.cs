@@ -53,7 +53,9 @@ namespace Ctlg.UnitTests
 
             Assert.That(File.FullPath, Is.EqualTo(FileFullPath));
             BackupWriterMock.Verify(m => m.AddFile(File), Times.Once);
-        }
 
+            IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
+            IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
+        }
     }
 }
