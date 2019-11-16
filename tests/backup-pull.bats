@@ -19,4 +19,5 @@ load helper
 
   $CTLG_EXECUTABLE restore -n Test "$CTLG_RESTOREDIR"
   diff -r "$CTLG_FILESDIR" "$CTLG_RESTOREDIR"
+  diff "$CTLG_WORKDIR/backup1/index.bin" "$CTLG_WORKDIR/backup2/index.bin"
 }

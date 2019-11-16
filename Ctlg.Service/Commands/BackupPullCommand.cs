@@ -1,5 +1,6 @@
 ﻿using System;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
 {
@@ -10,15 +11,18 @@ namespace Ctlg.Service.Commands
         public string Date { get; set; }
 
         public BackupPullCommand(ISnapshotService snapshotService, ICtlgService ctlgService,
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService, IIndexFileService indexFileService)
         {
             SnapshotService = snapshotService;
             CtlgService = ctlgService;
             FileStorageService = fileStorageService;
+            IndexFileService = indexFileService;
         }
 
         public void Execute()
         {
+            IndexFileService.Load();
+
             var snapshotFile = SnapshotService.FindSnapshotFile(Path, Name, Date);
             using (var backupWriter = CtlgService.CreateBackupWriter(snapshotFile.Name, snapshotFile.Date, false, true))
             {
@@ -30,10 +34,15 @@ namespace Ctlg.Service.Commands
                     backupWriter.AddFile(file);
                 }
             }
+
+            IndexFileService.Save();
+
+            DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ISnapshotService SnapshotService { get; }
         private ICtlgService CtlgService { get; }
         private IFileStorageService FileStorageService { get; }
+        private IIndexFileService IndexFileService { get; }
     }
 }
