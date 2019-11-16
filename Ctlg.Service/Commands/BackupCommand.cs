@@ -33,7 +33,7 @@ namespace Ctlg.Service.Commands
 
             var treeWalker = new TreeWalker(root);
 
-            using (var writer = CtlgService.CreateBackupWriter(Name, IsFastMode))
+            using (var writer = CtlgService.CreateBackupWriter(Name, null, IsFastMode, false))
             {
                 treeWalker.Walk(writer.AddFile);
             }

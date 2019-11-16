@@ -1,4 +1,6 @@
-﻿namespace Ctlg.Service.Commands
+﻿using Ctlg.Core.Interfaces;
+
+namespace Ctlg.Service.Commands
 {
     public class ListCommand: ICommand
     {

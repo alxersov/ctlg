@@ -50,7 +50,7 @@ namespace Ctlg
 
             CtlgService.ApplyDbMigrations();
 
-            Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show, RebuildIndex>(args)
+            Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show, RebuildIndex, BackupPull>(args)
                 .WithParsed<Add>(opts => Run<AddCommand>(opts))
                 .WithParsed<Backup>(opts => Run<BackupCommand>(opts))
                 .WithParsed<Find>(opts => Run<FindCommand>(opts))
@@ -58,6 +58,7 @@ namespace Ctlg
                 .WithParsed<Restore>(opts => Run<RestoreCommand>(opts))
                 .WithParsed<Show>(opts => Run<ShowCommand>(opts))
                 .WithParsed<RebuildIndex>(opts => Run<RebuildIndexCommand>(opts))
+                .WithParsed<BackupPull>(opts => Run<BackupPullCommand>(opts))
                 .WithNotParsed(errors => { ExitCode = 1; });
 
             NLog.LogManager.Shutdown();
@@ -148,6 +149,7 @@ namespace Ctlg
                 cfg.CreateMap<Restore, RestoreCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<Show, ShowCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<RebuildIndex, RebuildIndexCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<BackupPull, BackupPullCommand>().ConstructUsingServiceLocator();
             });
         }
 

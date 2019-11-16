@@ -1,4 +1,4 @@
-﻿using Ctlg.Service;
+﻿using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
