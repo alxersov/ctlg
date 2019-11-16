@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
@@ -37,7 +38,7 @@ namespace Ctlg.UnitTests
         public static void SetupGetBackupFilePath(this AutoMock mock, string hash, string path)
         {
             mock.Mock<IFileStorageService>()
-                .Setup(s => s.GetBackupFilePath(It.Is<string>(h => h == hash)))
+                .Setup(s => s.GetBackupFilePath(It.Is<string>(h => h == hash), null))
                 .Returns(path);
         }
 
@@ -79,12 +80,35 @@ namespace Ctlg.UnitTests
 
         public static void SetupFindSnapshotFile(this AutoMock mock, string backupName, string snapshotPath)
         {
-            mock.Mock<ISnapshotService>().Setup(s => s.FindSnapshotPath(It.Is<string>(name => name == backupName), It.Is<string>(date => date == null))).Returns(snapshotPath);
+            mock.Mock<ISnapshotService>().Setup(s => s.FindSnapshotPath(backupName, null)).Returns(snapshotPath);
         }
 
         public static void SetupReadSnapshotFile(this AutoMock mock, string path, IEnumerable<SnapshotRecord> snapshotRecords)
         {
             mock.Mock<ISnapshotService>().Setup(s => s.ReadSnapshotFile(It.Is<string>(p => p == path))).Returns(snapshotRecords);
+        }
+
+        public static Mock<StreamWriter> SetupCreateSnapshotWriter(this AutoMock mock, string name, string date)
+        {
+            var stream = new MemoryStream();
+            var streamWriterMock = new Mock<StreamWriter>(stream);
+            mock.Mock<ISnapshotService>().Setup(s => s.CreateSnapshotWriter(name, date))
+                .Returns(streamWriterMock.Object);
+
+            return streamWriterMock;
+        }
+
+        public static Mock<IBackupWriter> SetupBackupWriter(this AutoMock mock, string name, string timestamp,
+            Expression<Func<bool, bool>> shouldUseIndex, bool shouldExistingHashMatch)
+        {
+            var backupWriterMock = new Mock<IBackupWriter>();
+
+            mock.Mock<ICtlgService>()
+                .Setup(p => p.CreateBackupWriter(
+                    name, timestamp, It.Is(shouldUseIndex), shouldExistingHashMatch))
+                .Returns(backupWriterMock.Object);
+
+            return backupWriterMock;
         }
     }
 }

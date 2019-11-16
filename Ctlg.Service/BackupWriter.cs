@@ -11,21 +11,24 @@ namespace Ctlg.Service
 {
     public sealed class BackupWriter: IBackupWriter
     {
-        public BackupWriter(StreamWriter writer,
-            ICtlgService ctlgService,
+        public BackupWriter(ICtlgService ctlgService,
             ISnapshotService snapshotService,
             IIndexService indexService,
             IFileStorageService fileStorageService,
             IHashFunction hashFunction,
-            bool shouldUseIndex)
+            string name,
+            string timestamp,
+            bool shouldUseIndex,
+            bool shouldExistingHashMatchCaclulated)
         {
-            _streamWriter = writer;
             CtlgService = ctlgService;
             SnapshotService = snapshotService;
             IndexService = indexService;
             FileStorageService = fileStorageService;
             HashFunction = hashFunction;
             ShouldUseIndex = shouldUseIndex;
+
+            _streamWriter = snapshotService.CreateSnapshotWriter(name, timestamp);
         }
 
         public void AddFile(File file)
@@ -81,6 +84,7 @@ namespace Ctlg.Service
             }
             else
             {
+                // todo check shouldExistingHashMatchCaclulated
                 hashCalculated = true;
                 return CtlgService.CalculateHashForFile(file, HashFunction);
             }

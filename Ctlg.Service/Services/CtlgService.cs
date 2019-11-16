@@ -12,12 +12,10 @@ namespace Ctlg.Service.Services
     public sealed class CtlgService : ICtlgService
     {
         public CtlgService(IDataService dataService, IFilesystemService filesystemService,
-            ISnapshotService snapshotService,
             IIndex<string, IHashFunction> hashFunction, IComponentContext componentContext)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
-            SnapshotService = snapshotService;
             HashFunctions = hashFunction;
             ComponentContext = componentContext;
         }
@@ -123,13 +121,16 @@ namespace Ctlg.Service.Services
             return container.Contents[index];
         }
 
-        public IBackupWriter CreateBackupWriter(string name, bool shouldUseIndex)
+        public IBackupWriter CreateBackupWriter(string name, string timestamp,
+            bool shouldUseIndex, bool shouldExistingHashMatchCaclulated)
         {
             NamedParameter[] parameters =
             {
-                new NamedParameter("shouldUseIndex", shouldUseIndex),
                 new NamedParameter("hashFunction", GetHashFunction("SHA-256")),
-                new NamedParameter("writer", SnapshotService.CreateSnapshotWriter(name))
+                new NamedParameter("name", name),
+                new NamedParameter("timestamp", timestamp),
+                new NamedParameter("shouldUseIndex", shouldUseIndex),
+                new NamedParameter("shouldExistingHashMatchCaclulated", shouldExistingHashMatchCaclulated)
             };
 
             return ComponentContext.Resolve<BackupWriter>(parameters);
@@ -137,7 +138,6 @@ namespace Ctlg.Service.Services
 
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
-        private ISnapshotService SnapshotService { get; set; }
         private IIndex<string, IHashFunction> HashFunctions { get; set; }
         private IComponentContext ComponentContext { get; set; }
         private IComparer<File> FileNameComparer { get; } = new FileNameComparer();

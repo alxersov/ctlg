@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Moq;
@@ -11,7 +10,7 @@ using NUnit.Framework;
 
 namespace Ctlg.UnitTests
 {
-    public class BackupCommandTests: AutoMockTestFixture
+    public class BackupCommandTests: CommandTestFixture<BackupCommand>
     {
         private readonly string Path = "test-path";
         private readonly string BackupName = "test-name";
@@ -22,7 +21,6 @@ namespace Ctlg.UnitTests
 
         private Mock<IBackupWriter> BackupWriterMock;
         private Mock<ISnapshotReader> SnapshotReaderMock;
-        private Mock<IIndexFileService> IndexFileServiceMock;
 
         private IList<BackupCommandEnded> BackupCommandEndedEvents;
 
@@ -36,7 +34,6 @@ namespace Ctlg.UnitTests
             SetupTreeProvider();
             SetupBackupReader();
             SetupBackupWriter();
-            SetupIndexFileService();
 
             BackupCommandEndedEvents = SetupEvents<BackupCommandEnded>();
         }
@@ -46,7 +43,7 @@ namespace Ctlg.UnitTests
         {
             Execute();
 
-            BackupWriterMock.VerifyAll();
+            BackupWriterMock.Verify(m => m.AddFile(File), Times.Once);
 
             Assert.That(BackupCommandEndedEvents.Count, Is.EqualTo(1));
 
@@ -70,12 +67,11 @@ namespace Ctlg.UnitTests
 
         private void Execute()
         {
-            var command = AutoMock.Create<BackupCommand>();
-            command.Path = Path;
-            command.Name = BackupName;
-            command.IsFastMode = IsFastMode;
+            Command.Path = Path;
+            Command.Name = BackupName;
+            Command.IsFastMode = IsFastMode;
 
-            command.Execute();
+            Command.Execute();
         }
 
         private void SetupBackupReader()
@@ -85,13 +81,8 @@ namespace Ctlg.UnitTests
 
         private void SetupBackupWriter()
         {
-            BackupWriterMock = new Mock<IBackupWriter>();
-            BackupWriterMock.Setup(w => w.AddFile(File));
-
-            AutoMock.Mock<ICtlgService>()
-                .Setup(p => p.CreateBackupWriter(
-                    BackupName, It.Is<bool>(shouldUseIndex => shouldUseIndex == IsFastMode)))
-                .Returns(BackupWriterMock.Object);
+            BackupWriterMock = AutoMock.SetupBackupWriter(BackupName, null,
+                shouldUseIndex => shouldUseIndex == IsFastMode, false);
         }
 
         private void SetupTreeProvider()
@@ -99,11 +90,6 @@ namespace Ctlg.UnitTests
             AutoMock.Mock<ITreeProvider>()
                 .Setup(d => d.ReadTree(Path, null))
                 .Returns(Tree);
-        }
-
-        private void SetupIndexFileService()
-        {
-            IndexFileServiceMock = AutoMock.Mock<IIndexFileService>();
         }
     }
 }

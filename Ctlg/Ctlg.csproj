@@ -101,6 +101,7 @@
     <Compile Include="IProgram.cs" />
     <Compile Include="CommandLineOptions\RebuildIndex.cs" />
     <Compile Include="EventHandlers\Logging.cs" />
+    <Compile Include="CommandLineOptions\BackupPull.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

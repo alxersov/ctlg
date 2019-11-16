@@ -22,7 +22,9 @@ namespace Ctlg.UnitTests
         private SnapshotRecord SnapshotRecord;
         private readonly Hash Hash1 = new Hash(HashAlgorithmId.SHA256, new byte[] { 1, 2, 3 });
         private readonly Hash Hash2 = new Hash(HashAlgorithmId.SHA256, new byte[] { 4, 5, 6 });
-
+        private readonly string SnapshotName = "Foo";
+        private readonly string SnapshotTimestamp = "2019-01-01_00-00-00";
+        
         private Mock<StreamWriter> StreamWriterMock;
         private Mock<ISnapshotService> SnapshotServiceMock;
         private Mock<ICtlgService> CtlgServiceMock;
@@ -55,9 +57,7 @@ namespace Ctlg.UnitTests
             FileStorageService = AutoMock.Mock<IFileStorageService>();
             FileStorageService.Setup(s => s.IsFileInStorage(File)).Returns(() => IsFileInStorage);
 
-            var stream = new MemoryStream();
-            StreamWriterMock = new Mock<StreamWriter>(stream);
-            AutoMock.Provide(StreamWriterMock.Object);
+            StreamWriterMock = AutoMock.SetupCreateSnapshotWriter(SnapshotName, SnapshotTimestamp);
 
             BackupEntryCreatedEvents = SetupEvents<BackupEntryCreated>();
         }
@@ -139,7 +139,11 @@ namespace Ctlg.UnitTests
 
         private void Execute_AddFile()
         {
-            var writer = AutoMock.Create<BackupWriter>(new NamedParameter("shouldUseIndex", ShouldUseIndex));
+            var writer = AutoMock.Create<BackupWriter>(
+                new NamedParameter("shouldUseIndex", ShouldUseIndex),
+                new NamedParameter("name", SnapshotName),
+                new NamedParameter("timestamp", SnapshotTimestamp),
+                new NamedParameter("shouldExistingHashMatchCaclulated", false));
 
             writer.AddFile(File);
         }

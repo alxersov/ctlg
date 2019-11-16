@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Service.Commands
 {

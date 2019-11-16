@@ -88,6 +88,7 @@
     <Compile Include="Services\IndexService.cs" />
     <Compile Include="Services\SnapshotService.cs" />
     <Compile Include="Services\FileStorageService.cs" />
+    <Compile Include="Commands\BackupPullCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">

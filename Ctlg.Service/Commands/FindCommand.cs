@@ -1,4 +1,5 @@
 ﻿using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 

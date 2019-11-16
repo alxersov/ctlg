@@ -6,6 +6,7 @@ using System.Text;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
+using Ctlg.Service.Utils;
 using File = Ctlg.Core.File;
 
 namespace Ctlg.Service.Services
@@ -16,18 +17,7 @@ namespace Ctlg.Service.Services
         {
             FilesystemService = filesystemService;
 
-            var currentDirectory = FilesystemService.GetCurrentDirectory();
-            SnapshotsDirectory = FilesystemService.CombinePath(currentDirectory, "snapshots");
-        }
-
-        public IEnumerable<File> GetSnapshotFiles(string snapshotName)
-        {
-            var snapshotsPath = GetSnapshotDirectory(snapshotName);
-            if (!FilesystemService.DirectoryExists(snapshotsPath))
-            {
-                return Enumerable.Empty<File>();
-            }
-            return FilesystemService.EnumerateFiles(snapshotsPath, "????-??-??_??-??-??");
+            CurrentDirectory = FilesystemService.GetCurrentDirectory();
         }
 
         public IEnumerable<SnapshotRecord> ReadSnapshotFile(string path)
@@ -62,7 +52,13 @@ namespace Ctlg.Service.Services
 
         public string FindSnapshotPath(string snapshotName, string snapshotDate = null)
         {
-            var allSnapshots = GetSnapshotFiles(snapshotName).Select(d => d.Name).OrderBy(s => s).ToList();
+            return FindSnapshotFile(CurrentDirectory, snapshotName, snapshotDate)?.FullPath;
+        }
+
+        public SnapshotFile FindSnapshotFile(string rootPath, string snapshotName, string snapshotDate)
+        {
+            var snapshotDirectory = GetSnapshotDirectory(rootPath, snapshotName);
+            var allSnapshots = GetSnapshotFiles(snapshotDirectory).Select(d => d.Name).OrderBy(s => s).ToList();
 
             if (allSnapshots.Count == 0)
             {
@@ -75,19 +71,21 @@ namespace Ctlg.Service.Services
                 return null;
             }
 
-            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName, fileName);
+            string fullPath = FilesystemService.CombinePath(snapshotDirectory, fileName);
+
+            return new SnapshotFile(snapshotName, fileName, fullPath);
         }
 
-        public StreamWriter CreateSnapshotWriter(string name)
+        public StreamWriter CreateSnapshotWriter(string name, string timestamp = null)
         {
-            var backupDirectory = GetSnapshotDirectory(name);
-            FilesystemService.CreateDirectory(backupDirectory);
+            var snapshotDirectory = GetSnapshotDirectory(CurrentDirectory, name);
+            FilesystemService.CreateDirectory(snapshotDirectory);
 
-            var snapshotName = GenerateSnapshotFileName();
-            var snapshotPath = FilesystemService.CombinePath(backupDirectory, snapshotName);
+            var snapshotFileName = timestamp ?? GenerateSnapshotFileName();
+            var snapshotPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
 
-            var fileList = FilesystemService.CreateNewFileForWrite(snapshotPath);
-            return new StreamWriter(fileList);
+            var snapshot = FilesystemService.CreateNewFileForWrite(snapshotPath);
+            return new StreamWriter(snapshot);
         }
 
         public SnapshotRecord CreateSnapshotRecord(File file)
@@ -100,11 +98,34 @@ namespace Ctlg.Service.Services
             return new SnapshotRecord(hash, date, size, path);
         }
 
-        private string SnapshotsDirectory { get; set; }
-
-        private string GetSnapshotDirectory(string snapshotName)
+        public File CreateFile(SnapshotRecord record)
         {
-            return FilesystemService.CombinePath(SnapshotsDirectory, snapshotName);
+            var file = new File(record.Name)
+            {
+                FileModifiedDateTime = record.Date,
+                Size = record.Size,
+                RelativePath = record.Name
+            };
+
+            file.Hashes.Add(new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(record.Hash)));
+
+            return file;
+        }
+
+        private string CurrentDirectory { get; set; }
+
+        private string GetSnapshotDirectory(string root, string snapshotName)
+        {
+            return FilesystemService.CombinePath(root, "snapshots", snapshotName);
+        }
+
+        private IEnumerable<File> GetSnapshotFiles(string snapshotDirectory)
+        {
+            if (!FilesystemService.DirectoryExists(snapshotDirectory))
+            {
+                return Enumerable.Empty<File>();
+            }
+            return FilesystemService.EnumerateFiles(snapshotDirectory, "????-??-??_??-??-??");
         }
 
         private string GenerateSnapshotFileName()

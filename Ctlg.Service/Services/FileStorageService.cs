@@ -12,12 +12,14 @@ namespace Ctlg.Service.Services
             FilesystemService = filesystemService;
 
             var currentDirectory = FilesystemService.GetCurrentDirectory();
-            FileStorageDirectory = FilesystemService.CombinePath(currentDirectory, "file_storage");
+            FileStorageDirectory = GetFileStorageDirectory(currentDirectory);
         }
 
-        public string GetBackupFilePath(string hash)
+        public string GetBackupFilePath(string hash, string backupRootPath = null)
         {
-            var backupFileDir = FilesystemService.CombinePath(FileStorageDirectory, hash.Substring(0, 2));
+            var fileStorageDirectory = backupRootPath != null ? GetFileStorageDirectory(backupRootPath) : FileStorageDirectory;
+
+            var backupFileDir = FilesystemService.CombinePath(fileStorageDirectory, hash.Substring(0, 2));
             return FilesystemService.CombinePath(backupFileDir, hash);
         }
 
@@ -44,6 +46,11 @@ namespace Ctlg.Service.Services
             }
 
             return false;
+        }
+
+        private string GetFileStorageDirectory(string rootBackupPath)
+        {
+            return FilesystemService.CombinePath(rootBackupPath, "file_storage");
         }
 
         private string GetBackupPathForFile(File file)

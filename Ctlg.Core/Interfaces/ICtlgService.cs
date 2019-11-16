@@ -1,7 +1,4 @@
-﻿using Ctlg.Core;
-using Ctlg.Core.Interfaces;
-
-namespace Ctlg.Service
+﻿namespace Ctlg.Core.Interfaces
 {
     public interface ICtlgService
     {
@@ -18,6 +15,7 @@ namespace Ctlg.Service
         void SortTree(File directory);
         Hash CalculateHashForFile(File file, IHashFunction hashFunction);
         File GetInnerFile(File container, string name);
-        IBackupWriter CreateBackupWriter(string name, bool shouldUseIndex);
+        IBackupWriter CreateBackupWriter(string name, string timestamp,
+            bool shouldUseIndex, bool shouldExistingHashMatchCaclulated);
     }
 }

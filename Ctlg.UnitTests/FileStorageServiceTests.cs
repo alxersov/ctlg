@@ -10,12 +10,11 @@ namespace Ctlg.UnitTests
     public class FileStorageServiceTests : AutoMockTestFixture
     {
         private Mock<IFilesystemService> FilesystemServiceMock { get; set; }
-        private FileStorageService FileStorageService { get; set; }
 
-        private readonly string CurrentDir = "current-dir";
-        private readonly string FileStorageDirectory = "current-dir/file_storage";
-        private readonly string BackupFileDir = "current-dir/file_storage/ab";
-        private readonly string BackupFilePath = "current-dir/file_storage/ab/ab123456";
+        private string CurrentDir;
+        private readonly string FileStorageDirectory = "some-path/file_storage";
+        private readonly string BackupFileDir = "some-path/file_storage/ab";
+        private readonly string BackupFilePath = "some-path/file_storage/ab/ab123456";
         private readonly string FullFilePath = "some/full/path/file.ext";
         private readonly Hash Hash = new Hash((int)HashAlgorithmId.SHA256, new byte[] { 0xab, 0x12, 0x34, 0x56 });
 
@@ -23,9 +22,19 @@ namespace Ctlg.UnitTests
         private bool BackedUpFileExists;
         private long BackedUpFileSize;
 
+        private Lazy<FileStorageService> LazySnapshotService;
+        private FileStorageService FileStorageService
+        {
+            get
+            {
+                return LazySnapshotService.Value;
+            }
+        }
+
         [SetUp]
         public void Setup()
         {
+            CurrentDir = "some-path";
             File = new File("test")
             {
                 FullPath = FullFilePath,
@@ -57,13 +66,23 @@ namespace Ctlg.UnitTests
                 .Setup(s => s.GetFileSize(BackupFilePath))
                 .Returns(() => BackedUpFileSize);
 
-            FileStorageService = AutoMock.Create<FileStorageService>();
+            LazySnapshotService = new Lazy<FileStorageService>(() => AutoMock.Create<FileStorageService>());
         }
 
         [Test]
         public void GetBackupFilePath_ReturnsExpectedPath()
         {
             var path = FileStorageService.GetBackupFilePath("ab123456");
+
+            Assert.That(path, Is.EqualTo(BackupFilePath));
+        }
+
+        [Test]
+        public void GetBackupFilePath_WhenRootPathProvided()
+        {
+            CurrentDir = "foo";
+
+            var path = FileStorageService.GetBackupFilePath("ab123456", "some-path");
 
             Assert.That(path, Is.EqualTo(BackupFilePath));
         }

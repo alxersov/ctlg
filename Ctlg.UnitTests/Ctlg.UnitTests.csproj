@@ -129,6 +129,9 @@
     <Compile Include="AutoMockTestFixture.cs" />
     <Compile Include="BackupWriterTests.cs" />
     <Compile Include="FileStorageServiceTests.cs" />
+    <Compile Include="BackupPullCommandTests.cs" />
+    <Compile Include="Factories.cs" />
+    <Compile Include="CommandTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

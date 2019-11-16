@@ -1,5 +1,6 @@
 ﻿using System;
 using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Utils;
