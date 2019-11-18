@@ -15,6 +15,7 @@ namespace Ctlg.UnitTests
         private readonly string Hash = "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c";
         private readonly string FilePath = "1.txt";
         private readonly string FileListLine;
+        private readonly string CommentLine = "# Comment";
         private readonly string RootDirectory = "X:\\some-directory";
         private readonly string Date1 = "2019-01-01_00-00-00";
         private readonly string Date2 = "2019-01-01_02-30-00";
@@ -132,6 +133,19 @@ namespace Ctlg.UnitTests
 
             Assert.That(records.Count, Is.EqualTo(1));
             Assert.That(records[0].ToString(), Is.EqualTo(FileListLine));
+        }
+
+        [Test]
+        public void ReadSnapshotFile_FileContainsComment_ReturnsSnapshotRecords()
+        {
+            AutoMock.SetupOpenFileForRead(SnapshotFile3, $"{CommentLine}\n{FileListLine}");
+            var errors = SetupEvents<ErrorEvent>();
+
+            var records = SnapshotService.ReadSnapshotFile(SnapshotFile3).ToList();
+
+            Assert.That(records.Count, Is.EqualTo(1));
+            Assert.That(records[0].ToString(), Is.EqualTo(FileListLine));
+            Assert.That(errors.Count, Is.EqualTo(0));
         }
 
         [Test]

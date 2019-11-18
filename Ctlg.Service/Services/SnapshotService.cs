@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
@@ -18,6 +19,8 @@ namespace Ctlg.Service.Services
             FilesystemService = filesystemService;
 
             CurrentDirectory = FilesystemService.GetCurrentDirectory();
+
+            CommentLineRegex = new Regex(@"^\s*#");
         }
 
         public IEnumerable<SnapshotRecord> ReadSnapshotFile(string path)
@@ -32,7 +35,10 @@ namespace Ctlg.Service.Services
                         SnapshotRecord snapshotRecord = null;
                         try
                         {
-                            snapshotRecord = new SnapshotRecord(line);
+                            if (!CommentLineRegex.IsMatch(line))
+                            {
+                                snapshotRecord = new SnapshotRecord(line);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -155,5 +161,6 @@ namespace Ctlg.Service.Services
         }
 
         private IFilesystemService FilesystemService { get; }
+        private Regex CommentLineRegex { get; }
     }
 }
