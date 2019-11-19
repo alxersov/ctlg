@@ -7,6 +7,7 @@ using CommandLine;
 using Ctlg.CommandLineOptions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Core.Utils;
 using Ctlg.Data;
 using Ctlg.Db.Migrations;
 using Ctlg.Filesystem;
@@ -16,7 +17,6 @@ using Ctlg.Service.Events;
 using Ctlg.Service.Services;
 using Ctlg.Service.Utils;
 using Force.Crc32;
-
 
 namespace Ctlg
 {
@@ -28,6 +28,8 @@ namespace Ctlg
 
         static int Main(string[] args)
         {
+            Logger.Info("ctlg {version}", AppVersion.Version);
+
             var container = BuildIocContainer();
             using (var scope = container.BeginLifetimeScope())
             {
@@ -162,5 +164,7 @@ namespace Ctlg
         {
             ExitCode = 2;
         }
+
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
     }
 }

@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Ctlg.Db.Migrations")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("Ctlg.Db.Migrations")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCompany("alxersov")]
+[assembly: AssemblyProduct("ctlg")]
+[assembly: AssemblyCopyright("Copyright (c) 2019 Alexei Ersov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
