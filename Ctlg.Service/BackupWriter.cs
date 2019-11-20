@@ -52,6 +52,11 @@ namespace Ctlg.Service
             }
         }
 
+        public void AddComment(string message)
+        {
+            _streamWriter.WriteLine($"# {message}");
+        }
+
         private BackupFileStatus Process(File file)
         {
             var fileStatus = FindFile(file);

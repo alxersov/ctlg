@@ -1,5 +1,6 @@
 ﻿using System;
 using Ctlg.Core.Interfaces;
+using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
@@ -35,6 +36,7 @@ namespace Ctlg.Service.Commands
 
             using (var writer = CtlgService.CreateBackupWriter(Name, null, IsFastMode, false))
             {
+                writer.AddComment($"ctlg {AppVersion.Version}");
                 treeWalker.Walk(writer.AddFile);
             }
 
