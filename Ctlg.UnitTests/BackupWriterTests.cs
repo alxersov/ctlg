@@ -24,6 +24,7 @@ namespace Ctlg.UnitTests
         private readonly Hash Hash2 = new Hash(HashAlgorithmId.SHA256, new byte[] { 4, 5, 6 });
         private readonly string SnapshotName = "Foo";
         private readonly string SnapshotTimestamp = "2019-01-01_00-00-00";
+        private readonly string CommentMessage = "Lorem Ipsum";
         
         private Mock<StreamWriter> StreamWriterMock;
         private Mock<ISnapshotService> SnapshotServiceMock;
@@ -132,6 +133,16 @@ namespace Ctlg.UnitTests
             Verify_BackupEventCreated(hashCalculated: true, isHashFoundInIndex: false, isFileAddedToStorage: true);
         }
 
+        [Test]
+        public void AddComment_WritesMessageToStream()
+        {
+            var writer = CreateBackupWriter();
+
+            writer.AddComment(CommentMessage);
+
+            StreamWriterMock.Verify(m => m.WriteLine($"# {CommentMessage}"), Times.Once);
+        }
+
         private void CalculateHashForFileImpl(File f, IHashFunction hashFunction)
         {
             f.Hashes.Add(Hash2);
@@ -139,13 +150,16 @@ namespace Ctlg.UnitTests
 
         private void Execute_AddFile()
         {
-            var writer = AutoMock.Create<BackupWriter>(
+            CreateBackupWriter().AddFile(File);
+        }
+
+        private BackupWriter CreateBackupWriter()
+        {
+            return AutoMock.Create<BackupWriter>(
                 new NamedParameter("shouldUseIndex", ShouldUseIndex),
                 new NamedParameter("name", SnapshotName),
                 new NamedParameter("timestamp", SnapshotTimestamp),
                 new NamedParameter("shouldExistingHashMatchCaclulated", false));
-
-            writer.AddFile(File);
         }
 
         private void Verify_BackupEventCreated(bool hashCalculated, bool isHashFoundInIndex, bool isFileAddedToStorage)

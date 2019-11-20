@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -23,6 +24,8 @@ namespace Ctlg.UnitTests
         private Mock<ISnapshotReader> SnapshotReaderMock;
 
         private IList<BackupCommandEnded> BackupCommandEndedEvents;
+
+        private readonly Regex SnapshotCommentRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");
 
         [SetUp]
         public void Init()
@@ -52,6 +55,9 @@ namespace Ctlg.UnitTests
 
             IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
             IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
+
+            BackupWriterMock.Verify(m => m.AddComment(It.Is<string>(
+                s => SnapshotCommentRegEx.IsMatch(s))));
         }
 
         [Test]
