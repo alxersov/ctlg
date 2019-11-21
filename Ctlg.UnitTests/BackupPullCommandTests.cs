@@ -21,6 +21,7 @@ namespace Ctlg.UnitTests
         private string FileFullPath = "file/full/path";
         private Mock<IBackupWriter> BackupWriterMock;
 
+
         public BackupPullCommandTests()
         {
             SnapshotFile = Factories.CreateSnapshotFile();
@@ -56,6 +57,9 @@ namespace Ctlg.UnitTests
 
             IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
             IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
+
+            BackupWriterMock.VerifyAppVersionWritten();
+            BackupWriterMock.Verify(m => m.AddComment("Created with pull-backup command."), Times.Once);
         }
     }
 }
