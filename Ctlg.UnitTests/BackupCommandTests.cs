@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -24,8 +23,6 @@ namespace Ctlg.UnitTests
         private Mock<ISnapshotReader> SnapshotReaderMock;
 
         private IList<BackupCommandEnded> BackupCommandEndedEvents;
-
-        private readonly Regex SnapshotCommentRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");
 
         [SetUp]
         public void Init()
@@ -56,8 +53,8 @@ namespace Ctlg.UnitTests
             IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
             IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
 
-            BackupWriterMock.Verify(m => m.AddComment(It.Is<string>(
-                s => SnapshotCommentRegEx.IsMatch(s))));
+            BackupWriterMock.VerifyAppVersionWritten();
+            BackupWriterMock.Verify(m => m.AddComment("FastMode=False"), Times.Once);
         }
 
         [Test]
@@ -69,6 +66,7 @@ namespace Ctlg.UnitTests
 
             SnapshotReaderMock.Verify(s => s.ReadHashesFromLatestSnapshot(
                 BackupName, Tree), Times.Once);
+            BackupWriterMock.Verify(m => m.AddComment("FastMode=True"), Times.Once);
         }
 
         private void Execute()

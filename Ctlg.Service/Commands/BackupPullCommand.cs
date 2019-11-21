@@ -1,5 +1,6 @@
 ﻿using System;
 using Ctlg.Core.Interfaces;
+using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
@@ -26,6 +27,9 @@ namespace Ctlg.Service.Commands
             var snapshotFile = SnapshotService.FindSnapshotFile(Path, Name, Date);
             using (var backupWriter = CtlgService.CreateBackupWriter(snapshotFile.Name, snapshotFile.Date, false, true))
             {
+                backupWriter.AddComment($"ctlg {AppVersion.Version}");
+                backupWriter.AddComment($"Created with pull-backup command.");
+
                 foreach (var snapshotRecord in SnapshotService.ReadSnapshotFile(snapshotFile.FullPath))
                 {
                     var file = SnapshotService.CreateFile(snapshotRecord);

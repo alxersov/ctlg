@@ -37,6 +37,7 @@ namespace Ctlg.Service.Commands
             using (var writer = CtlgService.CreateBackupWriter(Name, null, IsFastMode, false))
             {
                 writer.AddComment($"ctlg {AppVersion.Version}");
+                writer.AddComment($"FastMode={IsFastMode}");
                 treeWalker.Walk(writer.AddFile);
             }
 

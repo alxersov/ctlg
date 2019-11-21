@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
@@ -110,5 +111,13 @@ namespace Ctlg.UnitTests
 
             return backupWriterMock;
         }
+
+        public static void VerifyAppVersionWritten(this Mock<IBackupWriter> backupWriterMock)
+        {
+            backupWriterMock.Verify(m => m.AddComment(It.Is<string>(
+                s => SnapshotCommentRegEx.IsMatch(s))));
+        }
+
+        private static readonly Regex SnapshotCommentRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");
     }
 }
