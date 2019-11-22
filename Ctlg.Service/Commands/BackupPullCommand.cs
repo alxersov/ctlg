@@ -25,6 +25,11 @@ namespace Ctlg.Service.Commands
             IndexFileService.Load();
 
             var snapshotFile = SnapshotService.FindSnapshotFile(Path, Name, Date);
+            if (snapshotFile == null)
+            {
+                throw new Exception($"Snapshot {Name} is not found in {Path}.");
+            }
+
             using (var backupWriter = CtlgService.CreateBackupWriter(snapshotFile.Name, snapshotFile.Date, false, true))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
