@@ -14,7 +14,7 @@ namespace Ctlg.UnitTests
         public readonly string Name = "testfoo";
         public readonly string DateToSearch = "2019-01-01";
 
-        public readonly SnapshotFile SnapshotFile;
+        private SnapshotFile SnapshotFile;
         private SnapshotRecord SnapshotRecord;
 
         private File File;
@@ -24,7 +24,6 @@ namespace Ctlg.UnitTests
 
         public BackupPullCommandTests()
         {
-            SnapshotFile = Factories.CreateSnapshotFile();
             SnapshotRecord = Factories.SnapshotRecords[0];
         }
 
@@ -36,8 +35,9 @@ namespace Ctlg.UnitTests
             Command.Date = DateToSearch;
  
             File = new File();
+            SnapshotFile = Factories.CreateSnapshotFile();
 
-            SnapshotServiceMock.Setup(s => s.FindSnapshotFile(Path, Name, DateToSearch)).Returns(SnapshotFile);
+            SnapshotServiceMock.Setup(s => s.FindSnapshotFile(Path, Name, DateToSearch)).Returns(() => SnapshotFile);
             SnapshotServiceMock.Setup(s => s.ReadSnapshotFile(SnapshotFile.FullPath)).Returns(new[] { SnapshotRecord });
             SnapshotServiceMock.Setup(s => s.CreateFile(SnapshotRecord)).Returns(File);
 
@@ -48,7 +48,7 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
-        public void Execute_WhenFileIsAlreadyInStorage()
+        public void Execute_AddsFilesToBackup()
         {
             Command.Execute();
 
@@ -60,6 +60,15 @@ namespace Ctlg.UnitTests
 
             BackupWriterMock.VerifyAppVersionWritten();
             BackupWriterMock.Verify(m => m.AddComment("Created with pull-backup command."), Times.Once);
+        }
+
+        [Test]
+        public void Execute_WhenSnapshotFileIsNotFound()
+        {
+            SnapshotFile = null;
+
+            Assert.That(() => Command.Execute(),
+                Throws.TypeOf<Exception>().With.Message.Contain("Snapshot testfoo is not found in some-path"));
         }
     }
 }
