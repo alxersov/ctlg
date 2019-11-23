@@ -17,6 +17,7 @@ namespace Ctlg.UnitTests
     {
         private File File;
         private bool ShouldUseIndex;
+        private bool ShouldExistingHashMatchCaclulated;
         private bool IsFileInIndex;
         private bool IsFileInStorage;
         private SnapshotRecord SnapshotRecord;
@@ -37,9 +38,10 @@ namespace Ctlg.UnitTests
         [SetUp]
         public void SetUp()
         {
-            File = new File("test");
+            File = new File("test") { FullPath = "foo" };
             File.Hashes.Add(Hash1);
             ShouldUseIndex = false;
+            ShouldExistingHashMatchCaclulated = false;
             IsFileInIndex = true;
             IsFileInStorage = true;
 
@@ -134,6 +136,19 @@ namespace Ctlg.UnitTests
         }
 
         [Test]
+        public void AddFile_WhenExistingHashDoesNotMatchCalculateWhenItShould()
+        {
+            IsFileInStorage = false;
+            ShouldExistingHashMatchCaclulated = true;
+
+            var errors = SetupEvents<ErrorEvent>();
+
+            Execute_AddFile();
+
+            Assert.That(errors[0].Exception.Message, Does.Contain("Caclulated hash does not match expected for file foo"));
+        }
+
+        [Test]
         public void AddComment_WritesMessageToStream()
         {
             var writer = CreateBackupWriter();
@@ -159,11 +174,12 @@ namespace Ctlg.UnitTests
                 new NamedParameter("shouldUseIndex", ShouldUseIndex),
                 new NamedParameter("name", SnapshotName),
                 new NamedParameter("timestamp", SnapshotTimestamp),
-                new NamedParameter("shouldExistingHashMatchCaclulated", false));
+                new NamedParameter("shouldExistingHashMatchCaclulated", ShouldExistingHashMatchCaclulated));
         }
 
         private void Verify_BackupEventCreated(bool hashCalculated, bool isHashFoundInIndex, bool isFileAddedToStorage)
         {
+            Assert.That(BackupEntryCreatedEvents.Count, Is.EqualTo(1), "Expected one Backup Entry to be created.");
             var created = BackupEntryCreatedEvents.First();
 
             Assert.That(created.HashCalculated, Is.EqualTo(hashCalculated));

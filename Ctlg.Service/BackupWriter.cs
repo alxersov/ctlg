@@ -27,6 +27,7 @@ namespace Ctlg.Service
             FileStorageService = fileStorageService;
             HashFunction = hashFunction;
             ShouldUseIndex = shouldUseIndex;
+            ShouldExistingHashMatchCaclulated = shouldExistingHashMatchCaclulated;
 
             _streamWriter = snapshotService.CreateSnapshotWriter(name, timestamp);
         }
@@ -71,8 +72,19 @@ namespace Ctlg.Service
                 }
                 else
                 {
+                    var previousHash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
                     file.Hashes.Clear();
-                    return Process(file);
+                    fileStatus = Process(file);
+
+                    if (ShouldExistingHashMatchCaclulated)
+                    {
+                        var calculatedHash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+
+                        if (previousHash != calculatedHash)
+                        {
+                            throw new Exception($"Caclulated hash does not match expected for file {file.FullPath}.");
+                        }
+                    }
                 }
             }
 
@@ -89,7 +101,6 @@ namespace Ctlg.Service
             }
             else
             {
-                // todo check shouldExistingHashMatchCaclulated
                 hashCalculated = true;
                 return CtlgService.CalculateHashForFile(file, HashFunction);
             }
@@ -135,5 +146,6 @@ namespace Ctlg.Service
         public IFileStorageService FileStorageService { get; }
         private IHashFunction HashFunction { get; }
         private bool ShouldUseIndex { get; }
+        private bool ShouldExistingHashMatchCaclulated { get; }
     }
 }
