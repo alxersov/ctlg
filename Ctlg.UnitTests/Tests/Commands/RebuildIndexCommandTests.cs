@@ -4,14 +4,14 @@ using System.Linq;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
+using Ctlg.UnitTests.Fixtures;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands
 {
     public class RebuildIndexCommandTests: AutoMockTestFixture
     {

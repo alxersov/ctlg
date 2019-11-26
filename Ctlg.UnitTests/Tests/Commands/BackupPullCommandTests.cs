@@ -5,8 +5,9 @@ using Ctlg.Service.Commands;
 using NUnit.Framework;
 using Moq;
 using Ctlg.Core.Interfaces;
+using Ctlg.UnitTests.Fixtures;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands
 {
     public class BackupPullCommandTests: CommandTestFixture<BackupPullCommand>
     {

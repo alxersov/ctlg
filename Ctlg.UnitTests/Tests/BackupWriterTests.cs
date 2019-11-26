@@ -10,8 +10,9 @@ using System.Linq;
 using Ctlg.Core.Interfaces;
 using System.Collections.Generic;
 using Ctlg.Service.Events;
+using Ctlg.UnitTests.Fixtures;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests
 {
     public class BackupWriterTests : AutoMockTestFixture
     {

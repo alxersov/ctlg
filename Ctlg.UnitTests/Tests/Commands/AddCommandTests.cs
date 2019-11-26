@@ -1,12 +1,11 @@
 ﻿using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands
 {
     [TestFixture]
     public class AddCommandTests

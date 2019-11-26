@@ -2,12 +2,11 @@
 using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
-using Ctlg.Core.Interfaces;
 using Ctlg.Service;
 using Ctlg.Service.Utils;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     public class ArchiveServiceTests
     {

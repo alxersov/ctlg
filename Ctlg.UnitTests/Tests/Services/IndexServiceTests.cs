@@ -1,10 +1,9 @@
 ﻿using System;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service;
 using Ctlg.Service.Services;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     [TestFixture]
     public class IndexServiceTests

@@ -5,10 +5,9 @@ using Autofac.Extras.Moq;
 using Ctlg.Core.Interfaces;
 using Ctlg.Core;
 using Ctlg.Service.Commands;
-using System.Collections.Generic;
-using System.Linq;
+using Ctlg.UnitTests.Fixtures;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands.Steps
 {
     public class FileEnumerateTests: BaseTestFixture
     {

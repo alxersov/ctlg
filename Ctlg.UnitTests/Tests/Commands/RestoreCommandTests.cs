@@ -1,12 +1,11 @@
 ﻿using System;
 using Autofac.Extras.Moq;
-using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
-using Moq;
+using Ctlg.UnitTests.Fixtures;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands
 {
     public class RestoreCommandTests: BackupTestFixture
     {

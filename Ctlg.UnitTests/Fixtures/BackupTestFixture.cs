@@ -1,7 +1,7 @@
 ﻿using System;
 using Ctlg.Core;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Fixtures
 {
     public abstract class BackupTestFixture: BaseTestFixture
     {

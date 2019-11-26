@@ -5,10 +5,11 @@ using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
+using Ctlg.UnitTests.Fixtures;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands
 {
     public class BackupCommandTests: CommandTestFixture<BackupCommand>
     {

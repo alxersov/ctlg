@@ -101,37 +101,37 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="AddCommandTests.cs" />
-    <Compile Include="CtlgServiceTests.cs" />
-    <Compile Include="DataServiceTests.cs" />
-    <Compile Include="FileTests.cs" />
-    <Compile Include="FindCommandTests.cs" />
-    <Compile Include="HashTests.cs" />
     <Compile Include="Index.cs" />
-    <Compile Include="ListCommandTests.cs" />
-    <Compile Include="MigrationServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestoreCommandTests.cs" />
-    <Compile Include="BaseTestFixture.cs" />
-    <Compile Include="BackupTestFixture.cs" />
     <Compile Include="MockHelper.cs" />
-    <Compile Include="BackupCommandTests.cs" />
-    <Compile Include="FileSizeTests.cs" />
-    <Compile Include="FileEnumerateTests.cs" />
-    <Compile Include="SnapshotServiceTests.cs" />
-    <Compile Include="ArchiveServiceTests.cs" />
-    <Compile Include="FilesystemServiceBaseTests.cs" />
-    <Compile Include="IndexServiceTests.cs" />
-    <Compile Include="ByteArrayComparerTests.cs" />
-    <Compile Include="IndexFileServiceTests.cs" />
-    <Compile Include="RebuildIndexCommandTests.cs" />
-    <Compile Include="SnapshotReaderTests.cs" />
-    <Compile Include="AutoMockTestFixture.cs" />
-    <Compile Include="BackupWriterTests.cs" />
-    <Compile Include="FileStorageServiceTests.cs" />
-    <Compile Include="BackupPullCommandTests.cs" />
     <Compile Include="Factories.cs" />
-    <Compile Include="CommandTestFixture.cs" />
+    <Compile Include="Fixtures\AutoMockTestFixture.cs" />
+    <Compile Include="Fixtures\BackupTestFixture.cs" />
+    <Compile Include="Tests\BackupWriterTests.cs" />
+    <Compile Include="Fixtures\BaseTestFixture.cs" />
+    <Compile Include="Tests\ByteArrayComparerTests.cs" />
+    <Compile Include="Fixtures\CommandTestFixture.cs" />
+    <Compile Include="Tests\FileSizeTests.cs" />
+    <Compile Include="Tests\FileTests.cs" />
+    <Compile Include="Tests\HashTests.cs" />
+    <Compile Include="Tests\Commands\AddCommandTests.cs" />
+    <Compile Include="Tests\Commands\BackupCommandTests.cs" />
+    <Compile Include="Tests\Commands\BackupPullCommandTests.cs" />
+    <Compile Include="Tests\Commands\FindCommandTests.cs" />
+    <Compile Include="Tests\Commands\ListCommandTests.cs" />
+    <Compile Include="Tests\Commands\RebuildIndexCommandTests.cs" />
+    <Compile Include="Tests\Commands\RestoreCommandTests.cs" />
+    <Compile Include="Tests\Commands\Steps\FileEnumerateTests.cs" />
+    <Compile Include="Tests\Commands\Steps\SnapshotReaderTests.cs" />
+    <Compile Include="Tests\Services\ArchiveServiceTests.cs" />
+    <Compile Include="Tests\Services\CtlgServiceTests.cs" />
+    <Compile Include="Tests\Services\DataServiceTests.cs" />
+    <Compile Include="Tests\Services\FileStorageServiceTests.cs" />
+    <Compile Include="Tests\Services\FilesystemServiceBaseTests.cs" />
+    <Compile Include="Tests\Services\IndexFileServiceTests.cs" />
+    <Compile Include="Tests\Services\IndexServiceTests.cs" />
+    <Compile Include="Tests\Services\MigrationServiceTests.cs" />
+    <Compile Include="Tests\Services\SnapshotServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -162,6 +162,13 @@
       <Project>{9d3b1072-a9ed-476e-b68b-1f7c5fac58ef}</Project>
       <Name>Ctlg</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tests\" />
+    <Folder Include="Fixtures\" />
+    <Folder Include="Tests\Commands\" />
+    <Folder Include="Tests\Commands\Steps\" />
+    <Folder Include="Tests\Services\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

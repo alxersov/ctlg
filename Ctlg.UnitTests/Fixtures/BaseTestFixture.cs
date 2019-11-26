@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Ctlg.Service;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Fixtures
 {
     [TestFixture]
     public abstract class BaseTestFixture

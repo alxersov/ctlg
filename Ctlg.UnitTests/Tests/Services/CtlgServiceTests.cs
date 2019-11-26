@@ -6,15 +6,15 @@ using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Filesystem;
-using Ctlg.Service;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Ctlg.Service.Services;
+using Ctlg.UnitTests.Fixtures;
 using Moq;
 using NUnit.Framework;
 using File = Ctlg.Core.File;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     public class CtlgServiceTests: BaseTestFixture
     {
