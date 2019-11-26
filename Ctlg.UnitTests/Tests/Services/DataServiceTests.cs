@@ -4,7 +4,7 @@ using Ctlg.Db.Migrations;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     [TestFixture]
     public class DataServiceTests

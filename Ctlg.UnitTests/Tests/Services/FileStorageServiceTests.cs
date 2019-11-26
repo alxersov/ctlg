@@ -2,10 +2,11 @@
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Services;
+using Ctlg.UnitTests.Fixtures;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     public class FileStorageServiceTests : AutoMockTestFixture
     {

@@ -2,7 +2,7 @@
 using Ctlg.Service;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests
 {
     [TestFixture]
     public class ByteArrayComparerTests

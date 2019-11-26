@@ -3,7 +3,7 @@ using Ctlg.Data;
 using Ctlg.Db.Migrations;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     [TestFixture]
     public class MigrationServiceTests

@@ -3,7 +3,7 @@ using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Commands
 {
     [TestFixture]
     public class ListCommandTests

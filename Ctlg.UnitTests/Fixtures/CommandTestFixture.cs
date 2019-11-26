@@ -5,7 +5,7 @@ using Ctlg.Service.Commands;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Fixtures
 {
     public abstract class CommandTestFixture<S>: AutoMockTestFixture where S: ICommand
     {

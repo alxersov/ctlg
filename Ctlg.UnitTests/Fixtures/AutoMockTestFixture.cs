@@ -2,7 +2,7 @@
 using Autofac.Extras.Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Fixtures
 {
     public abstract class AutoMockTestFixture : BaseTestFixture
     {

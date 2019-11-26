@@ -6,7 +6,7 @@ using Ctlg.Filesystem;
 using Moq;
 using NUnit.Framework;
 
-namespace Ctlg.UnitTests
+namespace Ctlg.UnitTests.Tests.Services
 {
     public class FilesystemServiceBaseTests
     {
