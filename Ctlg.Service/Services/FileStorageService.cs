@@ -7,60 +7,21 @@ namespace Ctlg.Service.Services
 {
     public sealed class FileStorageService: IFileStorageService
     {
-        public FileStorageService(IFilesystemService filesystemService)
+        public FileStorageService(IFilesystemService filesystemService, ICtlgService ctlgService, IFileStorageIndexService indexService)
         {
             FilesystemService = filesystemService;
-
-            var currentDirectory = FilesystemService.GetCurrentDirectory();
-            FileStorageDirectory = GetFileStorageDirectory(currentDirectory);
+            CtlgService = ctlgService;
+            IndexService = indexService;
         }
 
-        public string GetBackupFilePath(string hash, string backupRootPath = null)
+        public IFileStorage GetFileStorage(string backupRootDirectory, bool shouldUseIndex, bool shouldExistingHashMatchCaclulated)
         {
-            var fileStorageDirectory = backupRootPath != null ? GetFileStorageDirectory(backupRootPath) : FileStorageDirectory;
-
-            var backupFileDir = FilesystemService.CombinePath(fileStorageDirectory, hash.Substring(0, 2));
-            return FilesystemService.CombinePath(backupFileDir, hash);
+            return new FileStorage(FilesystemService, CtlgService, IndexService,
+                backupRootDirectory, shouldUseIndex, shouldExistingHashMatchCaclulated);
         }
 
-        public void AddFileToStorage(File file)
-        {
-            var backupFile = GetBackupPathForFile(file);
-            var backupFileDir = FilesystemService.GetDirectoryName(backupFile);
-            FilesystemService.CreateDirectory(backupFileDir);
-            FilesystemService.Copy(file.FullPath, backupFile);
-        }
-
-        public bool IsFileInStorage(File file)
-        {
-            var backupFile = GetBackupPathForFile(file);
-
-            if (FilesystemService.FileExists(backupFile))
-            {
-                if (file.Size.HasValue && FilesystemService.GetFileSize(backupFile) != file.Size)
-                {
-                    throw new Exception($"The size of \"{file.RelativePath}\" and \"{backupFile}\" do not match.");
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private string GetFileStorageDirectory(string rootBackupPath)
-        {
-            return FilesystemService.CombinePath(rootBackupPath, "file_storage");
-        }
-
-        private string GetBackupPathForFile(File file)
-        {
-            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
-
-            return GetBackupFilePath(hash.ToString());
-        }
-
-        public string FileStorageDirectory { get; }
         private IFilesystemService FilesystemService { get; }
+        public ICtlgService CtlgService { get; }
+        public IFileStorageIndexService IndexService { get; }
     }
 }

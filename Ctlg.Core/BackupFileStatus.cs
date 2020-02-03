@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Ctlg.Service
+namespace Ctlg.Core
 {
     [Flags]
     public enum BackupFileStatus

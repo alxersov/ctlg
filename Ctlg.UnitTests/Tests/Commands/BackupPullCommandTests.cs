@@ -11,21 +11,24 @@ namespace Ctlg.UnitTests.Tests.Commands
 {
     public class BackupPullCommandTests: CommandTestFixture<BackupPullCommand>
     {
+        public readonly string CurrentDir = "current-dir";
         public readonly string Path = "some-path";
         public readonly string Name = "testfoo";
         public readonly string DateToSearch = "2019-01-01";
+        public readonly string Timestamp = "2019-01-01_02-02-20";
 
-        private SnapshotFile SnapshotFile;
-        private SnapshotRecord SnapshotRecord;
+        public ISnapshot SourceSnapshot;
+
+        public Mock<ISnapshotWriter> SnapshotWriterMock;
+        public Mock<IFileStorage> DestinationFileStorageMock;
+
 
         private File File;
-        private string FileFullPath = "file/full/path";
-        private Mock<IBackupWriter> BackupWriterMock;
 
 
         public BackupPullCommandTests()
         {
-            SnapshotRecord = Factories.SnapshotRecords[0];
+            File = new File();
         }
 
         [SetUp]
@@ -34,42 +37,40 @@ namespace Ctlg.UnitTests.Tests.Commands
             Command.Path = Path;
             Command.Name = Name;
             Command.Date = DateToSearch;
- 
-            File = new File();
-            SnapshotFile = Factories.CreateSnapshotFile();
 
-            SnapshotServiceMock.Setup(s => s.FindSnapshotFile(Path, Name, DateToSearch)).Returns(() => SnapshotFile);
-            SnapshotServiceMock.Setup(s => s.ReadSnapshotFile(SnapshotFile.FullPath)).Returns(new[] { SnapshotRecord });
-            SnapshotServiceMock.Setup(s => s.CreateFile(SnapshotRecord)).Returns(File);
+            FilesystemServiceMock.Setup(m => m.GetCurrentDirectory()).Returns(CurrentDir);
 
-            BackupWriterMock = AutoMock.SetupBackupWriter(SnapshotFile.Name, SnapshotFile.Date,
-                shouldUseIndex => shouldUseIndex == false, true);
+            SnapshotServiceMock.Setup(s => s.GetSnapshot(Path, Name, DateToSearch))
+                .Returns(() => SourceSnapshot);
 
-            FileStorageServiceMock.Setup(s => s.GetBackupFilePath(SnapshotRecord.Hash, Path)).Returns(FileFullPath);
+            DestinationFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDir, false, true);
+
+            var sourceFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(Path, true, true);
+
+            SnapshotWriterMock = SnapshotServiceMock.SetupCreateSnapshot(CurrentDir, Name, Timestamp);
+
+            SnapshotServiceMock.Setup(s => s.CreateFile(It.IsAny<SnapshotRecord>()))
+                .Returns(File);
+
+            SourceSnapshot = Factories.CreateSnapshotMock(Name, Timestamp).Object;
         }
 
         [Test]
-        public void Execute_AddsFilesToBackup()
+        public void WhenSourceSnapshotNotFound()
         {
-            Command.Execute();
-
-            Assert.That(File.FullPath, Is.EqualTo(FileFullPath));
-            BackupWriterMock.Verify(m => m.AddFile(File), Times.Once);
-
-            IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
-            IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
-
-            BackupWriterMock.VerifyAppVersionWritten();
-            BackupWriterMock.Verify(m => m.AddComment("Created with pull-backup command."), Times.Once);
-        }
-
-        [Test]
-        public void Execute_WhenSnapshotFileIsNotFound()
-        {
-            SnapshotFile = null;
+            SourceSnapshot = null;
 
             Assert.That(() => Command.Execute(),
                 Throws.TypeOf<Exception>().With.Message.Contain("Snapshot testfoo is not found in some-path"));
+        }
+
+        [Test]
+        public void WritesBackup()
+        {
+            Command.Execute();
+
+            SnapshotWriterMock.Verify(m => m.AddFile(File), Times.Once);
+            DestinationFileStorageMock.Verify(m => m.AddFileToStorage(File), Times.Once);
         }
     }
 }

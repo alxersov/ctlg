@@ -15,7 +15,5 @@
         void SortTree(File directory);
         Hash CalculateHashForFile(File file, IHashFunction hashFunction);
         File GetInnerFile(File container, string name);
-        IBackupWriter CreateBackupWriter(string name, string timestamp,
-            bool shouldUseIndex, bool shouldExistingHashMatchCaclulated);
     }
 }

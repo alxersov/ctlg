@@ -1,4 +1,6 @@
 ﻿using System;
+using Ctlg.Core;
+
 namespace Ctlg.Service.Utils
 {
     public static class BackupFileStatusHelper

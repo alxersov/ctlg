@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac.Extras.Moq;
+using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Ctlg.Service.Events;
 using Ctlg.UnitTests.Fixtures;
@@ -7,72 +8,43 @@ using NUnit.Framework;
 
 namespace Ctlg.UnitTests.Tests.Commands
 {
-    public class RestoreCommandTests: BackupTestFixture
+    public class RestoreCommandTests: CommandTestFixture<RestoreCommand>
     {
+        public string Name = "test-name";
+        public string Date = "2019-01-01";
+        public string Path = "foo";
+        private readonly string CurrentDirectory = "current-dir";
+        public ISnapshot Snapshot;
+
+
+        [SetUp]
+        public void Init()
+        {
+            FilesystemServiceMock.Setup(s => s.GetCurrentDirectory()).Returns(CurrentDirectory);
+            SnapshotServiceMock.Setup(s => s.GetSnapshot(CurrentDirectory, Name, Date))
+                .Returns(() => Snapshot);
+
+            Snapshot = Factories.CreateSnapshotMock(Name, Date).Object;
+
+            var fileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDirectory, true, true);
+        }
+
         [Test]
         public void Execute_WhenSnapshotNotFound_ThrowsException()
         {
-            using (var mock = AutoMock.GetLoose())
-            {
-                mock.SetupFindSnapshotFile(BackupName, null);
-
-                Assert.That(() => Execute(mock),
-                    Throws.TypeOf<Exception>()
-                        .With.Message.Contain($"Snapshot {BackupName} is not found"));
-            }
+            Snapshot = null;
+            Assert.That(() => Execute(),
+                Throws.TypeOf<Exception>()
+                    .With.Message.Contain($"Snapshot {Name} is not found"));
         }
 
-        [Test]
-        public void Execute_WhenBackupFileNotFound_RaisesExceptionEvent()
+        private void Execute()
         {
-            using (var mock = AutoMock.GetLoose())
-            {
-                mock.SetupFindSnapshotFile(BackupName, SnapshotPath);
+            Command.Path = Path;
+            Command.Name = Name;
+            Command.Date = Date;
 
-                mock.SetupReadSnapshotFile(SnapshotPath, new[] { SnapshotRecordSample });
-
-                mock.SetupGetBackupFilePath(Hash, BackupFileName);
-
-                mock.SetupFileExists(BackupFileName, false);
-
-                var events = SetupEvents<ErrorEvent>();
-
-                Execute(mock);
-
-                Assert.That(events.Count, Is.EqualTo(1));
-                Assert.That(events[0].Exception.Message, Does.Contain($"{BackupFileName} not found"));
-            }
-        }
-
-        [Test]
-        public void Execute_WhenRestoreIsSuccessfull_RaisesBackupProcessedEvent()
-        {
-            using (var mock = AutoMock.GetLoose())
-            {
-                mock.SetupFindSnapshotFile(BackupName, SnapshotPath);
-
-                mock.SetupReadSnapshotFile(SnapshotPath, new[] { SnapshotRecordSample });
-
-                mock.SetupGetBackupFilePath(Hash, BackupFileName);
-
-                mock.SetupFileExists(BackupFileName, true);
-
-                var events = SetupEvents<BackupEntryRestored>();
-
-                Execute(mock);
-
-                Assert.That(events.Count, Is.EqualTo(1));
-                Assert.That(events[0].BackupEntry, Does.Contain(FilePath));
-            }
-        }
-
-        private void Execute(AutoMock mock)
-        {
-            var command = mock.Create<RestoreCommand>();
-            command.Name = BackupName;
-            command.Path = @"C:\foo";
-
-            command.Execute();
+            Command.Execute();
         }
     }
 }

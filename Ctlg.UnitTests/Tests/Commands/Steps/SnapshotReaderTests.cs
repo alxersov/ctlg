@@ -5,6 +5,7 @@ using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
+using Ctlg.Service.Utils;
 using Ctlg.UnitTests.Fixtures;
 using Moq;
 using NUnit.Framework;
@@ -23,32 +24,23 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
         }
         private File Root;
         private File File;
+        private ISnapshot Snapshot;
 
         [SetUp]
         public void Setup()
         {
-            SnapshotPath = "snapshot_path";
-
-            SnapshotRecord = new SnapshotRecord(
-                new Hash(HashAlgorithmId.SHA256, new byte[] { 0xab }),
-                new DateTime(2019, 1, 1), 1024, "foo");
+            Snapshot = Factories.CreateSnapshotMock("test", "2019_01_01").Object;
+            SnapshotRecord = Factories.SnapshotRecords[0];
 
             Root = new File("root", true);
 
             File = new File("foo")
             {
-                Size = 1234,
-                FileModifiedDateTime = new DateTime(2019, 10, 15)
+                Size = SnapshotRecord.Size + 10,
+                FileModifiedDateTime = SnapshotRecord.Date.Add(new TimeSpan(1,2,3))
             };
 
-            SnapshotServiceMock = AutoMock.Mock<ISnapshotService>();
             CtlgServiceMock = AutoMock.Mock<ICtlgService>();
-
-            SnapshotServiceMock.Setup(s => s.FindSnapshotPath("snapshot", null))
-                .Returns(() => SnapshotPath);
-
-            SnapshotServiceMock.Setup(s => s.ReadSnapshotFile("snapshot_path"))
-                .Returns(() => SnapshotRecords);
 
             CtlgServiceMock.Setup(s => s.GetInnerFile(
                 It.IsAny<File>(), It.IsAny<string>()))
@@ -56,26 +48,14 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
         }
 
         [Test]
-        public void ReadHashesFromLatestSnapshot_WhenSnapshotDoesNotExist()
-        {
-            SnapshotPath = null;
-
-            ReadHashes();
-
-            CtlgServiceMock.Verify(s => s.SortTree(It.IsAny<File>()), Times.Never);
-
-            Assert.That(File.Hashes, Is.Empty);
-        }
-
-        [Test]
-        public void ReadHashesFromLatestSnapshot_WhenFileNotFound()
+        public void ReadHashesFromSnapshot_WhenFileNotFound()
         {
             File = null;
 
             ReadHashes();
 
             CtlgServiceMock.Verify(s => s.SortTree(Root), Times.Once);
-            CtlgServiceMock.Verify(s => s.GetInnerFile(Root, "foo"), Times.Once);
+            CtlgServiceMock.Verify(s => s.GetInnerFile(Root, SnapshotRecord.Name), Times.Once);
         }
 
         [Test]
@@ -84,7 +64,7 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
             ReadHashes();
 
             CtlgServiceMock.Verify(s => s.SortTree(Root), Times.Once);
-            CtlgServiceMock.Verify(s => s.GetInnerFile(Root, "foo"), Times.Once);
+            CtlgServiceMock.Verify(s => s.GetInnerFile(Root, SnapshotRecord.Name), Times.Once);
 
             Assert.That(File.Hashes, Is.Empty);
         }
@@ -97,7 +77,7 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
             ReadHashes();
 
             CtlgServiceMock.Verify(s => s.SortTree(Root), Times.Once);
-            CtlgServiceMock.Verify(s => s.GetInnerFile(Root, "foo"), Times.Once);
+            CtlgServiceMock.Verify(s => s.GetInnerFile(Root, SnapshotRecord.Name), Times.Once);
 
             Assert.That(File.Hashes, Is.Empty);
         }
@@ -112,13 +92,13 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
 
             Assert.That(File.Hashes.Count, Is.EqualTo(1));
             Assert.That(File.Hashes.First, Is.EqualTo(new Hash(
-                HashAlgorithmId.SHA256, new byte[] { 0xab })));
+                HashAlgorithmId.SHA256, FormatBytes.ToByteArray(SnapshotRecord.Hash))));
         }
 
         private void ReadHashes()
         {
             var reader = AutoMock.Create<SnapshotReader>();
-            reader.ReadHashesFromLatestSnapshot("snapshot", Root);
+            reader.ReadHashesFromSnapshot(Snapshot, Root);
         }
     }
 }

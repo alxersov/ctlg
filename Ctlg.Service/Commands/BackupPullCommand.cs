@@ -11,47 +11,50 @@ namespace Ctlg.Service.Commands
         public string Name { get; set; }
         public string Date { get; set; }
 
-        public BackupPullCommand(ISnapshotService snapshotService, ICtlgService ctlgService,
-            IFileStorageService fileStorageService, IIndexFileService indexFileService)
+        public BackupPullCommand(ISnapshotService snapshotService,
+            IFileStorageService fileStorageService, IFilesystemService filesystemService)
         {
             SnapshotService = snapshotService;
-            CtlgService = ctlgService;
             FileStorageService = fileStorageService;
-            IndexFileService = indexFileService;
+            FilesystemService = filesystemService;
         }
 
         public void Execute()
         {
-            IndexFileService.Load();
-
-            var snapshotFile = SnapshotService.FindSnapshotFile(Path, Name, Date);
-            if (snapshotFile == null)
+            var sourceSnapshot = SnapshotService.GetSnapshot(Path, Name, Date);
+            if (sourceSnapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found in {Path}.");
             }
 
-            using (var backupWriter = CtlgService.CreateBackupWriter(snapshotFile.Name, snapshotFile.Date, false, true))
+            var currentDirectory = FilesystemService.GetCurrentDirectory();
+            using (var fileStorage = FileStorageService.GetFileStorage(currentDirectory, false, true))
             {
-                backupWriter.AddComment($"ctlg {AppVersion.Version}");
-                backupWriter.AddComment($"Created with pull-backup command.");
-
-                foreach (var snapshotRecord in SnapshotService.ReadSnapshotFile(snapshotFile.FullPath))
+                var sourceFileStorage = FileStorageService.GetFileStorage(Path, true, true);
+                var destinationSnapshot = SnapshotService.CreateSnapshot(currentDirectory,
+                    sourceSnapshot.Name, sourceSnapshot.Timestamp);
+                using (var snapshotWriter = destinationSnapshot.GetWriter())
                 {
-                    var file = SnapshotService.CreateFile(snapshotRecord);
-                    file.FullPath = FileStorageService.GetBackupFilePath(snapshotRecord.Hash, Path);
+                    snapshotWriter.AddComment($"ctlg {AppVersion.Version}");
+                    snapshotWriter.AddComment($"Created with pull-backup command.");
 
-                    backupWriter.AddFile(file);
+                    var backupWriter = new BackupWriter(fileStorage, snapshotWriter);
+
+                    foreach (var snapshotRecord in sourceSnapshot.EnumerateFiles())
+                    {
+                        var file = SnapshotService.CreateFile(snapshotRecord);
+                        file.FullPath = sourceFileStorage.GetBackupFilePath(snapshotRecord.Hash);
+
+                        backupWriter.AddFile(file);
+                    }
                 }
             }
-
-            IndexFileService.Save();
 
             DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ISnapshotService SnapshotService { get; }
-        private ICtlgService CtlgService { get; }
         private IFileStorageService FileStorageService { get; }
-        private IIndexFileService IndexFileService { get; }
+        private IFilesystemService FilesystemService { get; }
     }
 }

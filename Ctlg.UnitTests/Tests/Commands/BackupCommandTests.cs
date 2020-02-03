@@ -15,13 +15,16 @@ namespace Ctlg.UnitTests.Tests.Commands
     {
         private readonly string Path = "test-path";
         private readonly string BackupName = "test-name";
+        private readonly string CurrentDirectory = "current-dir";
         private readonly string FileName = "test-1.txt";
         private File File;
         private bool IsFastMode;
         private File Tree;
 
-        private Mock<IBackupWriter> BackupWriterMock;
         private Mock<ISnapshotReader> SnapshotReaderMock;
+
+        private Mock<IFileStorage> FileStorageMock;
+        private Mock<ISnapshotWriter> SnapshotWriterMock;
 
         private IList<BackupCommandEnded> BackupCommandEndedEvents;
 
@@ -33,29 +36,34 @@ namespace Ctlg.UnitTests.Tests.Commands
             Tree = new File(Path, true) { Contents = { File } };
 
             SetupTreeProvider();
-            SetupBackupReader();
-            SetupBackupWriter();
+            SetupSnapshotReader();
+
+            FilesystemServiceMock.Setup(s => s.GetCurrentDirectory()).Returns(CurrentDirectory);
+
+            FileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDirectory, IsFastMode, false);
+
+            SnapshotServiceMock
+                .Setup(s => s.GetSnapshot(CurrentDirectory, BackupName, null))
+                .Returns(new Mock<ISnapshot>().Object);
+
+            SnapshotWriterMock = SnapshotServiceMock.SetupCreateSnapshot(CurrentDirectory, BackupName, null);
 
             BackupCommandEndedEvents = SetupEvents<BackupCommandEnded>();
         }
 
         [Test]
-        public void Execute_AddsFilesToSnapshot()
+        public void AddsFilesToBackup()
         {
             Execute();
 
-            BackupWriterMock.Verify(m => m.AddFile(File), Times.Once);
+            FileStorageMock.Verify(m => m.AddFileToStorage(File), Times.Once);
+            SnapshotWriterMock.Verify(m => m.AddFile(File), Times.Once);
+            SnapshotWriterMock.VerifyAppVersionWritten();
+            SnapshotWriterMock.Verify(m => m.AddComment("FastMode=False"), Times.Once);
 
             Assert.That(BackupCommandEndedEvents.Count, Is.EqualTo(1));
-
-            SnapshotReaderMock.Verify(s => s.ReadHashesFromLatestSnapshot(
-                BackupName, Tree), Times.Never);
-
-            IndexFileServiceMock.Verify(s => s.Load(), Times.Once);
-            IndexFileServiceMock.Verify(s => s.Save(), Times.Once);
-
-            BackupWriterMock.VerifyAppVersionWritten();
-            BackupWriterMock.Verify(m => m.AddComment("FastMode=False"), Times.Once);
+            SnapshotReaderMock.Verify(s => s.ReadHashesFromSnapshot(
+                It.IsAny<ISnapshot>(), Tree), Times.Never);
         }
 
         [Test]
@@ -65,9 +73,9 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             Execute();
 
-            SnapshotReaderMock.Verify(s => s.ReadHashesFromLatestSnapshot(
-                BackupName, Tree), Times.Once);
-            BackupWriterMock.Verify(m => m.AddComment("FastMode=True"), Times.Once);
+            SnapshotReaderMock.Verify(s => s.ReadHashesFromSnapshot(
+                It.IsAny<ISnapshot>(), Tree), Times.Once);
+            SnapshotWriterMock.Verify(m => m.AddComment("FastMode=True"), Times.Once);
         }
 
         private void Execute()
@@ -79,15 +87,9 @@ namespace Ctlg.UnitTests.Tests.Commands
             Command.Execute();
         }
 
-        private void SetupBackupReader()
+        private void SetupSnapshotReader()
         {
             SnapshotReaderMock = AutoMock.Mock<ISnapshotReader>();
-        }
-
-        private void SetupBackupWriter()
-        {
-            BackupWriterMock = AutoMock.SetupBackupWriter(BackupName, null,
-                shouldUseIndex => shouldUseIndex == IsFastMode, false);
         }
 
         private void SetupTreeProvider()
