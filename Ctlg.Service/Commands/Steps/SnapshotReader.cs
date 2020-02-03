@@ -7,27 +7,19 @@ namespace Ctlg.Service.Commands
 {
     public class SnapshotReader : ISnapshotReader
     {
-        public SnapshotReader(ICtlgService ctlgService, ISnapshotService snapshotService)
+        public SnapshotReader(ICtlgService ctlgService)
         {
             CtlgService = ctlgService;
-            SnapshotService = snapshotService;
         }
 
         public ICtlgService CtlgService { get; }
         public ISnapshotService SnapshotService { get; }
 
-        public void ReadHashesFromLatestSnapshot(string snapshotName, File destinationTree)
+        public void ReadHashesFromSnapshot(ISnapshot snapshot, File destinationTree)
         {
-            var snapshotPath = SnapshotService.FindSnapshotPath(snapshotName);
-            if (snapshotPath == null)
-            {
-                return;
-            }
-
             CtlgService.SortTree(destinationTree);
 
-            var snapshotRecords = SnapshotService.ReadSnapshotFile(snapshotPath);
-            foreach (var record in snapshotRecords)
+            foreach (var record in snapshot.EnumerateFiles())
             {
                 ProcessRecord(record, destinationTree);
             }

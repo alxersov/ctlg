@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
@@ -36,26 +35,26 @@ namespace Ctlg.UnitTests
             return fsDirectory.Object;
         }
 
-        public static void SetupGetBackupFilePath(this AutoMock mock, string hash, string path)
+        public static void SetupOpenFileForRead(this Mock<IFilesystemService> mock, string path, byte[] content)
         {
-            mock.Mock<IFileStorageService>()
-                .Setup(s => s.GetBackupFilePath(It.Is<string>(h => h == hash), null))
-                .Returns(path);
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter(stream);
+            writer.Write(content);
+            writer.Flush();
+            stream.Position = 0;
+
+            mock.Setup(s => s.OpenFileForRead(path)).Returns(stream);
         }
 
-        public static void SetupOpenFileForRead(this AutoMock mock, string fileName, string content)
+        public static void SetupOpenFileForRead(this AutoMock mock, string path, string content)
         {
-            var fileSystemServiceMock = mock.Mock<IFilesystemService>();
-
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(content);
             writer.Flush();
             stream.Position = 0;
 
-            fileSystemServiceMock
-                .Setup(s => s.OpenFileForRead(It.Is<string>(name => name == fileName)))
-                .Returns(stream);
+            mock.Mock<IFilesystemService>().Setup(s => s.OpenFileForRead(path)).Returns(stream);
         }
 
         public static MemoryStream SetupCreateNewFileForWrite(this AutoMock mock)
@@ -79,45 +78,53 @@ namespace Ctlg.UnitTests
             mock.Provide<IIndex<string, IHashFunction>>(index);
         }
 
-        public static void SetupFindSnapshotFile(this AutoMock mock, string backupName, string snapshotPath)
-        {
-            mock.Mock<ISnapshotService>().Setup(s => s.FindSnapshotPath(backupName, null)).Returns(snapshotPath);
-        }
-
-        public static void SetupReadSnapshotFile(this AutoMock mock, string path, IEnumerable<SnapshotRecord> snapshotRecords)
-        {
-            mock.Mock<ISnapshotService>().Setup(s => s.ReadSnapshotFile(It.Is<string>(p => p == path))).Returns(snapshotRecords);
-        }
-
-        public static Mock<StreamWriter> SetupCreateSnapshotWriter(this AutoMock mock, string name, string date)
-        {
-            var stream = new MemoryStream();
-            var streamWriterMock = new Mock<StreamWriter>(stream);
-            mock.Mock<ISnapshotService>().Setup(s => s.CreateSnapshotWriter(name, date))
-                .Returns(streamWriterMock.Object);
-
-            return streamWriterMock;
-        }
-
-        public static Mock<IBackupWriter> SetupBackupWriter(this AutoMock mock, string name, string timestamp,
-            Expression<Func<bool, bool>> shouldUseIndex, bool shouldExistingHashMatch)
-        {
-            var backupWriterMock = new Mock<IBackupWriter>();
-
-            mock.Mock<ICtlgService>()
-                .Setup(p => p.CreateBackupWriter(
-                    name, timestamp, It.Is(shouldUseIndex), shouldExistingHashMatch))
-                .Returns(backupWriterMock.Object);
-
-            return backupWriterMock;
-        }
-
-        public static void VerifyAppVersionWritten(this Mock<IBackupWriter> backupWriterMock)
+        public static void VerifyAppVersionWritten(this Mock<ISnapshotWriter> backupWriterMock)
         {
             backupWriterMock.Verify(m => m.AddComment(It.Is<string>(
-                s => SnapshotCommentRegEx.IsMatch(s))));
+                s => AppVersionRegEx.IsMatch(s))));
         }
 
-        private static readonly Regex SnapshotCommentRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");
+        public static void SetupPath(this Mock<IFilesystemService> mock,
+            string path1, string path2, string result)
+        {
+            mock.Setup(m => m.CombinePath(path1, path2)).Returns(result);
+            mock.Setup(m => m.GetDirectoryName(result)).Returns(path1);
+        }
+
+        public static void SetupPath(this Mock<IFilesystemService> mock,
+            string path1, string path2, string path3, string result)
+        {
+            mock.Setup(m => m.CombinePath(path1, path2, path3)).Returns(result);
+        }
+
+        public static void VerifyCopyNeverCalled(this Mock<IFilesystemService> mock)
+        {
+            mock.Verify(m => m.Copy(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        public static Mock<IFileStorage> SetupGetFileStorage(this Mock<IFileStorageService> mock,
+            string backupRootDirectory, bool shouldUseIndex, bool shouldExistingHashMatchCaclulated)
+        {
+            var fileStorageMock = new Mock<IFileStorage>();
+
+            mock.Setup(s => s.GetFileStorage(backupRootDirectory, shouldUseIndex, shouldExistingHashMatchCaclulated))
+                .Returns(fileStorageMock.Object);
+
+            return fileStorageMock;
+        }
+
+        public static Mock<ISnapshotWriter> SetupCreateSnapshot(this Mock<ISnapshotService> mock,
+            string backupRootPath, string name, string timestamp)
+        {
+            var snapshotMock = new Mock<ISnapshot>();
+            mock.Setup(s => s.CreateSnapshot(backupRootPath, name, timestamp))
+                .Returns(snapshotMock.Object);
+
+            var snapshotWriterMock = new Mock<ISnapshotWriter>();
+            snapshotMock.Setup(s => s.GetWriter()).Returns(snapshotWriterMock.Object);
+            return snapshotWriterMock;
+        }
+
+        private static readonly Regex AppVersionRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");
     }
 }

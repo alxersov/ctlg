@@ -107,7 +107,6 @@
     <Compile Include="Factories.cs" />
     <Compile Include="Fixtures\AutoMockTestFixture.cs" />
     <Compile Include="Fixtures\BackupTestFixture.cs" />
-    <Compile Include="Tests\BackupWriterTests.cs" />
     <Compile Include="Fixtures\BaseTestFixture.cs" />
     <Compile Include="Tests\ByteArrayComparerTests.cs" />
     <Compile Include="Fixtures\CommandTestFixture.cs" />
@@ -126,12 +125,12 @@
     <Compile Include="Tests\Services\ArchiveServiceTests.cs" />
     <Compile Include="Tests\Services\CtlgServiceTests.cs" />
     <Compile Include="Tests\Services\DataServiceTests.cs" />
-    <Compile Include="Tests\Services\FileStorageServiceTests.cs" />
     <Compile Include="Tests\Services\FilesystemServiceBaseTests.cs" />
-    <Compile Include="Tests\Services\IndexFileServiceTests.cs" />
-    <Compile Include="Tests\Services\IndexServiceTests.cs" />
+    <Compile Include="Tests\Services\FileIndexTests.cs" />
     <Compile Include="Tests\Services\MigrationServiceTests.cs" />
     <Compile Include="Tests\Services\SnapshotServiceTests.cs" />
+    <Compile Include="Tests\Services\FileStorageTests.cs" />
+    <Compile Include="Tests\SnapshotTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

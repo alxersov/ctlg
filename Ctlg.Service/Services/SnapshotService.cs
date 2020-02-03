@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 using File = Ctlg.Core.File;
 
@@ -17,53 +14,11 @@ namespace Ctlg.Service.Services
         public SnapshotService(IFilesystemService filesystemService)
         {
             FilesystemService = filesystemService;
-
-            CurrentDirectory = FilesystemService.GetCurrentDirectory();
-
-            CommentLineRegex = new Regex(@"^\s*#");
         }
 
-        public IEnumerable<SnapshotRecord> ReadSnapshotFile(string path)
+        public ISnapshot GetSnapshot(string backupRootPath, string name, string timestampMask)
         {
-            using (var stream = FilesystemService.OpenFileForRead(path))
-            {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    var line = reader.ReadLine();
-                    while (line != null)
-                    {
-                        SnapshotRecord snapshotRecord = null;
-                        try
-                        {
-                            if (!CommentLineRegex.IsMatch(line))
-                            {
-                                snapshotRecord = new SnapshotRecord(line);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            DomainEvents.Raise(new ErrorEvent(ex));
-                        }
-
-                        if (snapshotRecord != null)
-                        {
-                            yield return snapshotRecord;
-                        }
-
-                        line = reader.ReadLine();
-                    }
-                }
-            }
-        }
-
-        public string FindSnapshotPath(string snapshotName, string snapshotDate = null)
-        {
-            return FindSnapshotFile(CurrentDirectory, snapshotName, snapshotDate)?.FullPath;
-        }
-
-        public SnapshotFile FindSnapshotFile(string rootPath, string snapshotName, string snapshotDate)
-        {
-            var snapshotDirectory = GetSnapshotDirectory(rootPath, snapshotName);
+            var snapshotDirectory = GetSnapshotDirectory(backupRootPath, name);
             var allSnapshots = GetSnapshotFiles(snapshotDirectory).Select(d => d.Name).OrderBy(s => s).ToList();
 
             if (allSnapshots.Count == 0)
@@ -71,37 +26,26 @@ namespace Ctlg.Service.Services
                 return null;
             }
 
-            var fileName = SelectSnapshotByDate(allSnapshots, snapshotDate);
-            if (string.IsNullOrEmpty(fileName))
+            var timestamp = SelectSnapshotByDate(allSnapshots, timestampMask);
+            if (string.IsNullOrEmpty(timestamp))
             {
                 return null;
             }
 
-            string fullPath = FilesystemService.CombinePath(snapshotDirectory, fileName);
+            string fullPath = FilesystemService.CombinePath(snapshotDirectory, timestamp);
 
-            return new SnapshotFile(snapshotName, fileName, fullPath);
+            return new Snapshot(FilesystemService, fullPath, name, timestamp);
         }
 
-        public StreamWriter CreateSnapshotWriter(string name, string timestamp = null)
+        public ISnapshot CreateSnapshot(string backupRootPath, string name, string timestamp)
         {
-            var snapshotDirectory = GetSnapshotDirectory(CurrentDirectory, name);
+            var snapshotDirectory = GetSnapshotDirectory(backupRootPath, name);
             FilesystemService.CreateDirectory(snapshotDirectory);
 
             var snapshotFileName = timestamp ?? GenerateSnapshotFileName();
-            var snapshotPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
+            var fullPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
 
-            var snapshot = FilesystemService.CreateNewFileForWrite(snapshotPath);
-            return new StreamWriter(snapshot);
-        }
-
-        public SnapshotRecord CreateSnapshotRecord(File file)
-        {
-            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
-            var date = file.FileModifiedDateTime ?? DateTime.MinValue;
-            var size = file.Size ?? 0;
-            var path = file.RelativePath;
-
-            return new SnapshotRecord(hash, date, size, path);
+            return new Snapshot(FilesystemService, fullPath, name, snapshotFileName);
         }
 
         public File CreateFile(SnapshotRecord record)
@@ -117,8 +61,6 @@ namespace Ctlg.Service.Services
 
             return file;
         }
-
-        private string CurrentDirectory { get; set; }
 
         private string GetSnapshotDirectory(string root, string snapshotName)
         {
@@ -161,6 +103,5 @@ namespace Ctlg.Service.Services
         }
 
         private IFilesystemService FilesystemService { get; }
-        private Regex CommentLineRegex { get; }
     }
 }

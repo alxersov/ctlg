@@ -77,7 +77,6 @@
     <Compile Include="Events\Warning.cs" />
     <Compile Include="Events\BackupCommandEnded.cs" />
     <Compile Include="Utils\BackupStatusHelper.cs" />
-    <Compile Include="BackupStatus.cs" />
     <Compile Include="Commands\Steps\FileEnumerateStep.cs" />
     <Compile Include="Commands\Steps\ISnapshotReader.cs" />
     <Compile Include="Commands\Steps\ITreeProvider.cs" />
@@ -85,10 +84,13 @@
     <Compile Include="Commands\Steps\TreeWalker.cs" />
     <Compile Include="Services\CtlgService.cs" />
     <Compile Include="Services\IndexFileService.cs" />
-    <Compile Include="Services\IndexService.cs" />
+    <Compile Include="Services\FileIndex.cs" />
     <Compile Include="Services\SnapshotService.cs" />
     <Compile Include="Services\FileStorageService.cs" />
     <Compile Include="Commands\BackupPullCommand.cs" />
+    <Compile Include="FileStorage.cs" />
+    <Compile Include="Snapshot.cs" />
+    <Compile Include="SnapshotWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">

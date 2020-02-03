@@ -109,8 +109,7 @@ namespace Ctlg
             builder.RegisterType<CtlgContext>().As<ICtlgContext>().InstancePerLifetimeScope();
             builder.RegisterType<CtlgService>().As<ICtlgService>().InstancePerLifetimeScope();
             builder.RegisterType<FileStorageService>().As<IFileStorageService>().InstancePerLifetimeScope();
-            builder.RegisterType<IndexService>().WithParameter("hashLength", 32).As<IIndexService>().InstancePerLifetimeScope();
-            builder.RegisterType<IndexFileService>().WithParameter("hashLength", 32).As<IIndexFileService>().InstancePerLifetimeScope();
+            builder.RegisterType<IndexFileService>().As<IFileStorageIndexService>().InstancePerLifetimeScope();
 
             var genericHandlerType = typeof(IHandle<>);
             builder.RegisterAssemblyTypes(typeof(Program).Assembly)

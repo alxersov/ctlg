@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Autofac;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -12,12 +11,11 @@ namespace Ctlg.Service.Services
     public sealed class CtlgService : ICtlgService
     {
         public CtlgService(IDataService dataService, IFilesystemService filesystemService,
-            IIndex<string, IHashFunction> hashFunction, IComponentContext componentContext)
+            IIndex<string, IHashFunction> hashFunction)
         {
             DataService = dataService;
             FilesystemService = filesystemService;
             HashFunctions = hashFunction;
-            ComponentContext = componentContext;
         }
 
 
@@ -121,25 +119,9 @@ namespace Ctlg.Service.Services
             return container.Contents[index];
         }
 
-        public IBackupWriter CreateBackupWriter(string name, string timestamp,
-            bool shouldUseIndex, bool shouldExistingHashMatchCaclulated)
-        {
-            NamedParameter[] parameters =
-            {
-                new NamedParameter("hashFunction", GetHashFunction("SHA-256")),
-                new NamedParameter("name", name),
-                new NamedParameter("timestamp", timestamp),
-                new NamedParameter("shouldUseIndex", shouldUseIndex),
-                new NamedParameter("shouldExistingHashMatchCaclulated", shouldExistingHashMatchCaclulated)
-            };
-
-            return ComponentContext.Resolve<BackupWriter>(parameters);
-        }
-
         private IDataService DataService { get; }
         private IFilesystemService FilesystemService { get; }
         private IIndex<string, IHashFunction> HashFunctions { get; set; }
-        private IComponentContext ComponentContext { get; set; }
         private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Ctlg.Core.Interfaces
 {
-    public interface IIndexService
+    public interface IFileStorageIndex
     {
         void Add(byte[] hash);
         bool IsInIndex(byte[] hash);
-        IEnumerable<byte[]> GetAllHashes();
+        void Load();
+        void Save();
     }
 }

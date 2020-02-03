@@ -12,43 +12,53 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider, ISnapshotReader snapshotReader, ICtlgService ctlgService,
-            IIndexFileService indexFileService)
+        public BackupCommand(ITreeProvider treeProvider, ISnapshotReader snapshotReader,
+            IFileStorageService fileStorageService,
+            IFilesystemService filesystemService, ISnapshotService snapshotService)
         {
             TreeProvider = treeProvider;
             SnapshotReader = snapshotReader;
-            CtlgService = ctlgService;
-            IndexFileService = indexFileService;
+            FileStorageService = fileStorageService;
+            FilesystemService = filesystemService;
+            SnapshotService = snapshotService;
         }
 
         public void Execute()
         {
-            IndexFileService.Load();
+            var currentDirectory = FilesystemService.GetCurrentDirectory();
 
             var root = TreeProvider.ReadTree(Path, SearchPattern);
 
             if (IsFastMode)
             {
-                SnapshotReader.ReadHashesFromLatestSnapshot(Name, root);
+                var latestSnapshot = SnapshotService.GetSnapshot(currentDirectory, Name, null);
+                if (latestSnapshot != null)
+                {
+                    SnapshotReader.ReadHashesFromSnapshot(latestSnapshot, root);
+                }
             }
 
-            var treeWalker = new TreeWalker(root);
-
-            using (var writer = CtlgService.CreateBackupWriter(Name, null, IsFastMode, false))
+            using (var fileStorage = FileStorageService.GetFileStorage(currentDirectory, IsFastMode, false))
             {
-                writer.AddComment($"ctlg {AppVersion.Version}");
-                writer.AddComment($"FastMode={IsFastMode}");
-                treeWalker.Walk(writer.AddFile);
-            }
+                var snapshot = SnapshotService.CreateSnapshot(currentDirectory, Name, null);
 
-            IndexFileService.Save();
+                using (var snapshotWriter = snapshot.GetWriter())
+                {
+                    snapshotWriter.AddComment($"ctlg {AppVersion.Version}");
+                    snapshotWriter.AddComment($"FastMode={IsFastMode}");
+                    var backupWriter = new BackupWriter(fileStorage, snapshotWriter);
+                    var treeWalker = new TreeWalker(root);
+                    treeWalker.Walk(backupWriter.AddFile);
+                }
+            }
 
             DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ITreeProvider TreeProvider { get; set; }
-        private ICtlgService CtlgService { get; set; }
-        private IIndexFileService IndexFileService { get; set; }
+        private IFileStorageService FileStorageService { get; }
+        private IFilesystemService FilesystemService { get; }
+        public ISnapshotService SnapshotService { get; }
         private ISnapshotReader SnapshotReader { get; set; }
     }
 }

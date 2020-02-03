@@ -2,9 +2,8 @@
 
 namespace Ctlg.Core.Interfaces
 {
-    public interface IBackupWriter: IDisposable
+    public interface IBackupWriter
     {
         void AddFile(File file);
-        void AddComment(string message);
     }
 }

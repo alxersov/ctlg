@@ -24,18 +24,20 @@ namespace Ctlg.Service.Commands
 
         public void Execute()
         {
-            var snapshotPath = SnapshotService.FindSnapshotPath(Name, Date);
-            if (string.IsNullOrEmpty(snapshotPath))
+            var currentDir = FileSystemService.GetCurrentDirectory();
+            var snapshot = SnapshotService.GetSnapshot(currentDir, Name, Date);
+            if (snapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found");
             }
 
-            var snapshotRecords = SnapshotService.ReadSnapshotFile(snapshotPath);
+            var fileStorage = FileStorageService.GetFileStorage(currentDir, true, true);
+            var snapshotRecords = snapshot.EnumerateFiles();
             foreach (var record in snapshotRecords)
             {
                 try
                 {
-                    ProcessSnapshotRecord(record);
+                    ProcessSnapshotRecord(fileStorage, record);
                 }
                 catch (Exception ex)
                 {
@@ -44,9 +46,9 @@ namespace Ctlg.Service.Commands
             }
         }
 
-        private void ProcessSnapshotRecord(SnapshotRecord record)
+        private void ProcessSnapshotRecord(IFileStorage fileStorage, SnapshotRecord record)
         {
-            var backupFilePath = FileStorageService.GetBackupFilePath(record.Hash);
+            var backupFilePath = fileStorage.GetBackupFilePath(record.Hash);
             if (!FileSystemService.FileExists(backupFilePath))
             {
                 throw new Exception($"Could not restore {record.Name}. Backup file {backupFilePath} not found.");

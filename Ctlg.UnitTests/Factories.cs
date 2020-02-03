@@ -1,19 +1,12 @@
 ﻿using System;
 using Ctlg.Core;
+using Ctlg.Core.Interfaces;
+using Moq;
 
 namespace Ctlg.UnitTests
 {
     public static class Factories
     {
-        public static SnapshotFile CreateSnapshotFile()
-        {
-            var name = "foo";
-            var date = "2019-01-01_00-00-00";
-            var fullPath = $"some/path/{name}/{date}";
-
-            return new SnapshotFile(name, date, fullPath);
-        }
-
         public static SnapshotRecord[] SnapshotRecords
         {
             get
@@ -24,6 +17,15 @@ namespace Ctlg.UnitTests
                     new SnapshotRecord($"{Hash2} 2019-01-22T00:00:00.0000000Z 12345 foo/bar.txt")
                 };
             }
+        }
+
+        public static Mock<ISnapshot> CreateSnapshotMock(string name, string timestamp)
+        {
+            var snapshotMock = new Mock<ISnapshot>();
+            snapshotMock.SetupGet(m => m.Name).Returns(name);
+            snapshotMock.SetupGet(m => m.Timestamp).Returns(timestamp);
+            snapshotMock.Setup(m => m.EnumerateFiles()).Returns(new[] { SnapshotRecords[0] });
+            return snapshotMock;
         }
 
         private const string Hash1 = "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c";
