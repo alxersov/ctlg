@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Autofac;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -203,10 +204,8 @@ namespace Ctlg.UnitTests.Tests.Services
         [TestCase("foo")]
         public void GetHashFunction_WhenFunctionExists_ReturnsIt(string name)
         {
-            using (var mock = AutoMock.GetLoose())
+            using (var mock = AutoMock.GetLoose(builder => MockHelper.SetupHashFunction(builder, "FOO", null)))
             {
-                mock.SetupHashFunction("FOO", null);
-
                 var service = mock.Create<HashingService>();
                 var function = service.GetHashFunction(name);
 
@@ -217,10 +216,8 @@ namespace Ctlg.UnitTests.Tests.Services
         [Test]
         public void GetHashFunction_WhenFunctionDoesNotExists()
         {
-            using (var mock = AutoMock.GetLoose())
+            using (var mock = AutoMock.GetLoose(builder => MockHelper.SetupHashFunction(builder, "FOO", null)))
             {
-                mock.SetupHashFunction("FOO", null);
-
                 var service = mock.Create<HashingService>();
 
                 Assert.That(() => service.GetHashFunction("BAR"),
@@ -275,7 +272,7 @@ namespace Ctlg.UnitTests.Tests.Services
 
         private static File AddDirectory(Mock<IFilesystemDirectory> fakeDir)
         {
-            using (var mock = AutoMock.GetLoose())
+            using (var mock = AutoMock.GetLoose(builder => builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>()))
             {
                 File addedDirectory = null;
                 mock.Mock<IDataService>()
@@ -286,13 +283,9 @@ namespace Ctlg.UnitTests.Tests.Services
                 fs
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
-
-                var treeProvider = new FileEnumerateStep(fs.Object);
-                mock.Provide<ITreeProvider>(treeProvider);
-
-                var hashFunctionMock = new Mock<IHashFunction>();
-                hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
-                                .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
+                    var hashFunctionMock = new Mock<IHashFunction>();
+                    hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
+                                    .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
 
                 mock.Mock<IHashingService>()
                     .Setup(s => s.CalculateHashForFile(It.IsAny<File>(), It.IsAny<IHashFunction>()))

@@ -19,23 +19,21 @@ namespace Ctlg.UnitTests.Tests.Services
         private readonly string HashString = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
         private readonly Hash Hash1;
 
+        private VirtualFileSystem VirtualFileSystem;
+
         public SimpleFileStorageTests()
         {
             Hash1 = new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(HashString));
+            VirtualFileSystem = new VirtualFileSystem();
         }
 
         [Test]
         public void AddsFileFromOtherStorage()
         {
-            var fs = new VirtualFileSystem();
-
             var sourceStorageMock = new Mock<IFileStorage>();
             sourceStorageMock
                 .Setup(s => s.CopyFileTo(Hash1.ToString(), It.IsAny<string>()))
-                .Callback((string hash, string path) => fs.SetFile(path, "Hello"));
-
-
-            AutoMock.Provide<IFilesystemService>(fs);
+                .Callback((string hash, string path) => VirtualFileSystem.SetFile(path, "Hello"));
 
             var storage = AutoMock.Create<SimpleFileStorage>(new[] { new NamedParameter("backupRoot", "foo") });
 
@@ -43,11 +41,12 @@ namespace Ctlg.UnitTests.Tests.Services
             file.Hashes.Add(Hash1);
             storage.AddFileFromStorage(file, sourceStorageMock.Object);
 
-            Assert.That(fs.GetFileAsString($"foo/file_storage/18/{HashString}"), Is.EqualTo("Hello"));
+            Assert.That(VirtualFileSystem.GetFileAsString($"foo/file_storage/18/{HashString}"), Is.EqualTo("Hello"));
         }
 
         protected override void ConfigureDependencies(ContainerBuilder builder)
         {
+            builder.RegisterInstance<IFilesystemService>(VirtualFileSystem);
             builder.RegisterType<HashingService>().As<IHashingService>().InstancePerLifetimeScope();
             builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256", HashAlgorithmId.SHA256);
         }

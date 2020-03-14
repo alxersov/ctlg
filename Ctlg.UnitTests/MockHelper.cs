@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Autofac;
 using Autofac.Extras.Moq;
 using Autofac.Features.Indexed;
 using Ctlg.Core;
@@ -67,15 +68,13 @@ namespace Ctlg.UnitTests
             return stream;
         }
 
-        public static void SetupHashFunction(this AutoMock mock, string hashFunctionName, Hash valueToReturn)
+        public static void SetupHashFunction(ContainerBuilder builder, string hashFunctionName, Hash valueToReturn)
         {
             var hashFunctionMock = new Mock<IHashFunction>();
             hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
                             .Returns(valueToReturn);
 
-            var index = new Index<string, IHashFunction>();
-            index.Add(hashFunctionName, hashFunctionMock.Object);
-            mock.Provide<IIndex<string, IHashFunction>>(index);
+            builder.RegisterInstance(hashFunctionMock.Object).Named<IHashFunction>(hashFunctionName);
         }
 
         public static void VerifyAppVersionWritten(this Mock<IBackupWriter> backupWriterMock)
