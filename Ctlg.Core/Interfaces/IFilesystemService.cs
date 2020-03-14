@@ -16,6 +16,7 @@ namespace Ctlg.Core.Interfaces
         bool DirectoryExists(string path);
         long GetFileSize(string path);
         void Copy(string from, string to);
+        void Move(string from, string to);
         string CombinePath(string path1, string path2);
         string CombinePath(string path1, string path2, string path3);
         string GetDirectoryName(string path);

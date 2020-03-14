@@ -118,7 +118,6 @@
     <Compile Include="Tests\Commands\BackupPullCommandTests.cs" />
     <Compile Include="Tests\Commands\FindCommandTests.cs" />
     <Compile Include="Tests\Commands\ListCommandTests.cs" />
-    <Compile Include="Tests\Commands\RebuildIndexCommandTests.cs" />
     <Compile Include="Tests\Commands\RestoreCommandTests.cs" />
     <Compile Include="Tests\Commands\Steps\FileEnumerateTests.cs" />
     <Compile Include="Tests\Commands\Steps\SnapshotReaderTests.cs" />
@@ -129,8 +128,11 @@
     <Compile Include="Tests\Services\FileIndexTests.cs" />
     <Compile Include="Tests\Services\MigrationServiceTests.cs" />
     <Compile Include="Tests\Services\SnapshotServiceTests.cs" />
-    <Compile Include="Tests\Services\FileStorageTests.cs" />
     <Compile Include="Tests\SnapshotTests.cs" />
+    <Compile Include="TestDoubles\VirtualFileSystem.cs" />
+    <Compile Include="Tests\VirtualFilesystemTests.cs" />
+    <Compile Include="TestDoubles\VirtualFileContent.cs" />
+    <Compile Include="Tests\Services\SimpleFileStorageTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -168,6 +170,7 @@
     <Folder Include="Tests\Commands\" />
     <Folder Include="Tests\Commands\Steps\" />
     <Folder Include="Tests\Services\" />
+    <Folder Include="TestDoubles\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

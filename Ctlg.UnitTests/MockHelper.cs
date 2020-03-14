@@ -78,7 +78,7 @@ namespace Ctlg.UnitTests
             mock.Provide<IIndex<string, IHashFunction>>(index);
         }
 
-        public static void VerifyAppVersionWritten(this Mock<ISnapshotWriter> backupWriterMock)
+        public static void VerifyAppVersionWritten(this Mock<IBackupWriter> backupWriterMock)
         {
             backupWriterMock.Verify(m => m.AddComment(It.Is<string>(
                 s => AppVersionRegEx.IsMatch(s))));
@@ -103,26 +103,23 @@ namespace Ctlg.UnitTests
         }
 
         public static Mock<IFileStorage> SetupGetFileStorage(this Mock<IFileStorageService> mock,
-            string backupRootDirectory, bool shouldUseIndex, bool shouldExistingHashMatchCaclulated)
+            string backupRootDirectory, bool shouldUseIndex)
         {
             var fileStorageMock = new Mock<IFileStorage>();
 
-            mock.Setup(s => s.GetFileStorage(backupRootDirectory, shouldUseIndex, shouldExistingHashMatchCaclulated))
+            mock.Setup(s => s.GetFileStorage(backupRootDirectory, shouldUseIndex))
                 .Returns(fileStorageMock.Object);
 
             return fileStorageMock;
         }
 
-        public static Mock<ISnapshotWriter> SetupCreateSnapshot(this Mock<ISnapshotService> mock,
+        public static Mock<IBackupWriter> SetupCreateWriter(this Mock<IBackupService> mock,
             string backupRootPath, string name, string timestamp)
         {
-            var snapshotMock = new Mock<ISnapshot>();
-            mock.Setup(s => s.CreateSnapshot(backupRootPath, name, timestamp))
-                .Returns(snapshotMock.Object);
-
-            var snapshotWriterMock = new Mock<ISnapshotWriter>();
-            snapshotMock.Setup(s => s.GetWriter()).Returns(snapshotWriterMock.Object);
-            return snapshotWriterMock;
+            var backupWriterMock = new Mock<IBackupWriter>();
+            mock.Setup(s => s.CreateWriter(backupRootPath, It.IsAny<bool>(), name, timestamp))
+                .Returns(backupWriterMock.Object);
+            return backupWriterMock;
         }
 
         private static readonly Regex AppVersionRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");

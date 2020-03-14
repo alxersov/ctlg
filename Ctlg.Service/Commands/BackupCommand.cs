@@ -13,14 +13,15 @@ namespace Ctlg.Service.Commands
         public bool IsFastMode { get; set; }
 
         public BackupCommand(ITreeProvider treeProvider, ISnapshotReader snapshotReader,
-            IFileStorageService fileStorageService,
-            IFilesystemService filesystemService, ISnapshotService snapshotService)
+
+            IFilesystemService filesystemService, ISnapshotService snapshotService,
+            IBackupService backupService)
         {
             TreeProvider = treeProvider;
             SnapshotReader = snapshotReader;
-            FileStorageService = fileStorageService;
             FilesystemService = filesystemService;
             SnapshotService = snapshotService;
+            BackupService = backupService;
         }
 
         public void Execute()
@@ -38,27 +39,22 @@ namespace Ctlg.Service.Commands
                 }
             }
 
-            using (var fileStorage = FileStorageService.GetFileStorage(currentDirectory, IsFastMode, false))
+            using (var backupWriter = BackupService.CreateWriter(currentDirectory, IsFastMode, Name, null))
             {
-                var snapshot = SnapshotService.CreateSnapshot(currentDirectory, Name, null);
-
-                using (var snapshotWriter = snapshot.GetWriter())
-                {
-                    snapshotWriter.AddComment($"ctlg {AppVersion.Version}");
-                    snapshotWriter.AddComment($"FastMode={IsFastMode}");
-                    var backupWriter = new BackupWriter(fileStorage, snapshotWriter);
-                    var treeWalker = new TreeWalker(root);
-                    treeWalker.Walk(backupWriter.AddFile);
-                }
+                backupWriter.AddComment($"ctlg {AppVersion.Version}");
+                backupWriter.AddComment($"FastMode={IsFastMode}");
+                var treeWalker = new TreeWalker(root);
+                treeWalker.Walk(file => backupWriter.AddFile(file));
             }
+
 
             DomainEvents.Raise(new BackupCommandEnded());
         }
 
         private ITreeProvider TreeProvider { get; set; }
-        private IFileStorageService FileStorageService { get; }
         private IFilesystemService FilesystemService { get; }
         public ISnapshotService SnapshotService { get; }
+        public IBackupService BackupService { get; }
         private ISnapshotReader SnapshotReader { get; set; }
     }
 }

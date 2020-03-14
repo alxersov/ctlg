@@ -12,11 +12,13 @@ namespace Ctlg.Service.Commands
         public string Date { get; set; }
 
         public BackupPullCommand(ISnapshotService snapshotService,
-            IFileStorageService fileStorageService, IFilesystemService filesystemService)
+            IFileStorageService fileStorageService, IFilesystemService filesystemService,
+            IBackupService backupService)
         {
             SnapshotService = snapshotService;
             FileStorageService = fileStorageService;
             FilesystemService = filesystemService;
+            BackupService = backupService;
         }
 
         public void Execute()
@@ -28,25 +30,17 @@ namespace Ctlg.Service.Commands
             }
 
             var currentDirectory = FilesystemService.GetCurrentDirectory();
-            using (var fileStorage = FileStorageService.GetFileStorage(currentDirectory, false, true))
+            var sourceFileStorage = FileStorageService.GetFileStorage(Path, true);
+            using (var backupWriter = BackupService.CreateWriter(currentDirectory, false,
+                sourceSnapshot.Name, sourceSnapshot.Timestamp))
             {
-                var sourceFileStorage = FileStorageService.GetFileStorage(Path, true, true);
-                var destinationSnapshot = SnapshotService.CreateSnapshot(currentDirectory,
-                    sourceSnapshot.Name, sourceSnapshot.Timestamp);
-                using (var snapshotWriter = destinationSnapshot.GetWriter())
+                backupWriter.AddComment($"ctlg {AppVersion.Version}");
+                backupWriter.AddComment($"Created with pull-backup command.");
+
+                foreach (var snapshotRecord in sourceSnapshot.EnumerateFiles())
                 {
-                    snapshotWriter.AddComment($"ctlg {AppVersion.Version}");
-                    snapshotWriter.AddComment($"Created with pull-backup command.");
-
-                    var backupWriter = new BackupWriter(fileStorage, snapshotWriter);
-
-                    foreach (var snapshotRecord in sourceSnapshot.EnumerateFiles())
-                    {
-                        var file = SnapshotService.CreateFile(snapshotRecord);
-                        file.FullPath = sourceFileStorage.GetBackupFilePath(snapshotRecord.Hash);
-
-                        backupWriter.AddFile(file);
-                    }
+                    var file = SnapshotService.CreateFile(snapshotRecord);
+                    backupWriter.AddFile(file, sourceFileStorage);
                 }
             }
 
@@ -56,5 +50,6 @@ namespace Ctlg.Service.Commands
         private ISnapshotService SnapshotService { get; }
         private IFileStorageService FileStorageService { get; }
         private IFilesystemService FilesystemService { get; }
+        public IBackupService BackupService { get; }
     }
 }

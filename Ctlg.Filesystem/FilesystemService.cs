@@ -20,6 +20,11 @@ namespace Ctlg.Filesystem
             File.Copy(from, to, false);
         }
 
+        public void Move(string from, string to)
+        {
+            File.Move(from, to);
+        }
+
         public void CreateDirectory(string path)
         {
             Directory.CreateDirectory(path);

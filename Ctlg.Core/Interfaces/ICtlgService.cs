@@ -10,10 +10,7 @@
 
         HashAlgorithm GetHashAlgorithm(string hashAlgorithmName);
 
-        IHashFunction GetHashFunction(string name);
-
         void SortTree(File directory);
-        Hash CalculateHashForFile(File file, IHashFunction hashFunction);
         File GetInnerFile(File container, string name);
     }
 }

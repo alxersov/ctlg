@@ -1,9 +1,10 @@
 ﻿using System;
-
 namespace Ctlg.Core.Interfaces
 {
-    public interface IBackupWriter
+    public interface IBackupWriter : IDisposable
     {
-        void AddFile(File file);
+        IFileStorage Storage { get; }
+        void AddFile(File file, IFileStorage sourceStorage = null);
+        void AddComment(string message);
     }
 }
