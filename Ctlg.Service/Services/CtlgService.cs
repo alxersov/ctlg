@@ -10,14 +10,10 @@ namespace Ctlg.Service.Services
 {
     public sealed class CtlgService : ICtlgService
     {
-        public CtlgService(IDataService dataService, IFilesystemService filesystemService,
-            IIndex<string, IHashFunction> hashFunction)
+        public CtlgService(IDataService dataService)
         {
             DataService = dataService;
-            FilesystemService = filesystemService;
-            HashFunctions = hashFunction;
         }
-
 
         public void ApplyDbMigrations()
         {
@@ -65,17 +61,6 @@ namespace Ctlg.Service.Services
             return algorithm;
         }
 
-        public IHashFunction GetHashFunction(string name)
-        {
-            var canonicalName = name.ToUpperInvariant();
-            if (!HashFunctions.TryGetValue(canonicalName, out IHashFunction hashFunction))
-            {
-                throw new Exception($"Unsupported hash function {name}");
-            }
-
-            return hashFunction;
-        }
-
         private void OutputFiles(IEnumerable<File> files, int level = 0)
         {
             foreach (var file in files)
@@ -83,18 +68,6 @@ namespace Ctlg.Service.Services
                 DomainEvents.Raise(new TreeItemEnumerated(file, level));
 
                 OutputFiles(file.Contents, level + 1);
-            }
-        }
-
-        public Hash CalculateHashForFile(File file, IHashFunction hashFunction)
-        {
-            using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-            {
-                var hash = hashFunction.CalculateHash(stream);
-
-                file.Hashes.Add(hash);
-
-                return hash;
             }
         }
 
@@ -120,8 +93,6 @@ namespace Ctlg.Service.Services
         }
 
         private IDataService DataService { get; }
-        private IFilesystemService FilesystemService { get; }
-        private IIndex<string, IHashFunction> HashFunctions { get; set; }
         private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

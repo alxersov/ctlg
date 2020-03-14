@@ -31,7 +31,7 @@ namespace Ctlg.Service.Commands
                 throw new Exception($"Snapshot {Name} is not found");
             }
 
-            var fileStorage = FileStorageService.GetFileStorage(currentDir, true, true);
+            var fileStorage = FileStorageService.GetFileStorage(currentDir, true);
             var snapshotRecords = snapshot.EnumerateFiles();
             foreach (var record in snapshotRecords)
             {
@@ -48,16 +48,8 @@ namespace Ctlg.Service.Commands
 
         private void ProcessSnapshotRecord(IFileStorage fileStorage, SnapshotRecord record)
         {
-            var backupFilePath = fileStorage.GetBackupFilePath(record.Hash);
-            if (!FileSystemService.FileExists(backupFilePath))
-            {
-                throw new Exception($"Could not restore {record.Name}. Backup file {backupFilePath} not found.");
-            }
-
-            var destinationFile = FileSystemService.CombinePath(Path, record.Name);
-            var destinationDir = FileSystemService.GetDirectoryName(destinationFile);
-            FileSystemService.CreateDirectory(destinationDir);
-            FileSystemService.Copy(backupFilePath, destinationFile);
+            var destinationPath = FileSystemService.CombinePath(Path, record.Name);
+            fileStorage.CopyFileTo(record.Hash, destinationPath);
 
             DomainEvents.Raise(new BackupEntryRestored(record.Name));
         }

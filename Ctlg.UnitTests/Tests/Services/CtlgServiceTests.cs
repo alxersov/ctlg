@@ -207,7 +207,7 @@ namespace Ctlg.UnitTests.Tests.Services
             {
                 mock.SetupHashFunction("FOO", null);
 
-                var service = mock.Create<CtlgService>();
+                var service = mock.Create<HashingService>();
                 var function = service.GetHashFunction(name);
 
                 Assert.That(function, Is.Not.Null);
@@ -221,7 +221,7 @@ namespace Ctlg.UnitTests.Tests.Services
             {
                 mock.SetupHashFunction("FOO", null);
 
-                var service = mock.Create<CtlgService>();
+                var service = mock.Create<HashingService>();
 
                 Assert.That(() => service.GetHashFunction("BAR"),
                     Throws.InstanceOf<Exception>()
@@ -294,7 +294,7 @@ namespace Ctlg.UnitTests.Tests.Services
                 hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
                                 .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
 
-                mock.Mock<ICtlgService>()
+                mock.Mock<IHashingService>()
                     .Setup(s => s.CalculateHashForFile(It.IsAny<File>(), It.IsAny<IHashFunction>()))
                     .Returns<File, IHashFunction>((file, _) =>
                     {

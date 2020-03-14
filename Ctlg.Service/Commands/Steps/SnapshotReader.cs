@@ -13,7 +13,6 @@ namespace Ctlg.Service.Commands
         }
 
         public ICtlgService CtlgService { get; }
-        public ISnapshotService SnapshotService { get; }
 
         public void ReadHashesFromSnapshot(ISnapshot snapshot, File destinationTree)
         {

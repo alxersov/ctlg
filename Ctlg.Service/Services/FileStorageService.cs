@@ -2,26 +2,25 @@
 using System.Linq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.FileStorage;
 
 namespace Ctlg.Service.Services
 {
     public sealed class FileStorageService: IFileStorageService
     {
-        public FileStorageService(IFilesystemService filesystemService, ICtlgService ctlgService, IFileStorageIndexService indexService)
+        public FileStorageService(IFilesystemService filesystemService, IHashingService hashingService)
         {
             FilesystemService = filesystemService;
-            CtlgService = ctlgService;
-            IndexService = indexService;
+            HashingService = hashingService;
         }
 
-        public IFileStorage GetFileStorage(string backupRootDirectory, bool shouldUseIndex, bool shouldExistingHashMatchCaclulated)
+        public IFileStorage GetFileStorage(string backupRootDirectory, bool shouldUseIndex)
         {
-            return new FileStorage(FilesystemService, CtlgService, IndexService,
-                backupRootDirectory, shouldUseIndex, shouldExistingHashMatchCaclulated);
+            return new SimpleFileStorage(FilesystemService, HashingService, backupRootDirectory);
         }
 
         private IFilesystemService FilesystemService { get; }
-        public ICtlgService CtlgService { get; }
+        public IHashingService HashingService { get; }
         public IFileStorageIndexService IndexService { get; }
     }
 }

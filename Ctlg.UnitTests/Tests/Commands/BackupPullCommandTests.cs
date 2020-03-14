@@ -19,12 +19,11 @@ namespace Ctlg.UnitTests.Tests.Commands
 
         public ISnapshot SourceSnapshot;
 
-        public Mock<ISnapshotWriter> SnapshotWriterMock;
-        public Mock<IFileStorage> DestinationFileStorageMock;
-
+        public Mock<IBackupService> BackupServiceMock;
+        public Mock<IBackupWriter> BackupWriterMock;
+        public Mock<IFileStorage> SourceFileStorageMock;
 
         private File File;
-
 
         public BackupPullCommandTests()
         {
@@ -38,16 +37,16 @@ namespace Ctlg.UnitTests.Tests.Commands
             Command.Name = Name;
             Command.Date = DateToSearch;
 
+            BackupServiceMock = AutoMock.Mock<IBackupService>();
+
             FilesystemServiceMock.Setup(m => m.GetCurrentDirectory()).Returns(CurrentDir);
 
             SnapshotServiceMock.Setup(s => s.GetSnapshot(Path, Name, DateToSearch))
                 .Returns(() => SourceSnapshot);
 
-            DestinationFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDir, false, true);
+            SourceFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(Path, true);
 
-            var sourceFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(Path, true, true);
-
-            SnapshotWriterMock = SnapshotServiceMock.SetupCreateSnapshot(CurrentDir, Name, Timestamp);
+            BackupWriterMock = BackupServiceMock.SetupCreateWriter(CurrentDir, Name, Timestamp);
 
             SnapshotServiceMock.Setup(s => s.CreateFile(It.IsAny<SnapshotRecord>()))
                 .Returns(File);
@@ -69,8 +68,7 @@ namespace Ctlg.UnitTests.Tests.Commands
         {
             Command.Execute();
 
-            SnapshotWriterMock.Verify(m => m.AddFile(File), Times.Once);
-            DestinationFileStorageMock.Verify(m => m.AddFileToStorage(File), Times.Once);
+            BackupWriterMock.Verify(m => m.AddFile(File, SourceFileStorageMock.Object), Times.Once);
         }
     }
 }

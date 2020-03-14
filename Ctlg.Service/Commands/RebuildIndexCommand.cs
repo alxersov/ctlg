@@ -5,22 +5,28 @@ namespace Ctlg.Service.Commands
 {
     public class RebuildIndexCommand : ICommand
     {
-        public RebuildIndexCommand(IFileStorageService fileStorageService, IFilesystemService filesystemService)
+        public RebuildIndexCommand(IFileStorageService fileStorageService, IFilesystemService filesystemService,
+            IFileStorageIndexService fileStorageIndexService)
         {
             FileStorageService = fileStorageService;
             FilesystemService = filesystemService;
+            FileStorageIndexService = fileStorageIndexService;
         }
 
         public void Execute()
         {
             var currentDirectory = FilesystemService.GetCurrentDirectory();
-            using (var fileStorage = FileStorageService.GetFileStorage(currentDirectory, false, false))
+            var fileStorage = FileStorageService.GetFileStorage(currentDirectory, false);
+            var index = FileStorageIndexService.GetIndex(currentDirectory);
+            foreach (var hash in fileStorage.GetAllHashes())
             {
-                fileStorage.RebuildIndex();
+                index.Add(hash);
             }
+            index.Save();
         }
 
         private IFileStorageService FileStorageService { get; }
         private IFilesystemService FilesystemService { get; }
+        public IFileStorageIndexService FileStorageIndexService { get; }
     }
 }
