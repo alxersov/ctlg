@@ -78,7 +78,7 @@
       <HintPath>..\packages\AutoMapper.9.0.0\lib\net461\AutoMapper.dll</HintPath>
     </Reference>
     <Reference Include="NLog">
-      <HintPath>..\packages\NLog.4.6.7\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.IO.Compression" />
