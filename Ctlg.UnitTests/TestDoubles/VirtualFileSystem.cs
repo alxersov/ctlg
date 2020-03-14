@@ -7,13 +7,15 @@ namespace Ctlg.UnitTests.TestDoubles
 {
     public class VirtualFileSystem : IFilesystemService
     {
+        private const string Separator = "/";
+
         public VirtualFileSystem()
         {
         }
 
         public string CombinePath(string path1, string path2)
         {
-            return Path.Combine(path1, path2);
+            return $"{path1}{Separator}{path2}";
         }
 
         public string CombinePath(string path1, string path2, string path3)

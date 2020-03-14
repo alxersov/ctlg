@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using Ctlg.UnitTests.TestDoubles;
 using NUnit.Framework;
@@ -26,7 +27,6 @@ namespace Ctlg.UnitTests.Tests
             {
                 Assert.That(stream.ReadByte(), Is.EqualTo(123));
                 Assert.That(stream.ReadByte(), Is.EqualTo(-1));
-
             }
         }
 
@@ -65,9 +65,7 @@ namespace Ctlg.UnitTests.Tests
         {
             var fs = new VirtualFileSystem();
 
-            var result = fs.CombinePath("foo", "bar");
-
-            Assert.That(new Regex("^foo[\\/]bar$").IsMatch(result), Is.True);
+            Assert.That(fs.CombinePath("foo", "bar"), Is.EqualTo("foo/bar"));
         }
 
         [Test]
