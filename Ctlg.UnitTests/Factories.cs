@@ -28,6 +28,14 @@ namespace Ctlg.UnitTests
             return snapshotMock;
         }
 
+        public static HashAlgorithm HashAlgorithm
+        {
+            get
+            {
+                return new HashAlgorithm() { HashAlgorithmId = 2, Name = "SHA-256" };
+            }
+        }
+
         private const string Hash1 = "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c";
         private const string Hash2 = "0123456789012345678901234567890123456789012345678901234567890123";
     }

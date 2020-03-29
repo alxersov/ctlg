@@ -3,7 +3,6 @@ namespace Ctlg.Core.Interfaces
 {
     public interface IHashingService
     {
-        IHashFunction GetHashFunction(string name);
-        Hash CalculateHashForFile(File file, IHashFunction hashFunction);
+        HashCalculator CreateHashCalculator(HashAlgorithm algorithm);
     }
 }

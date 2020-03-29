@@ -11,7 +11,7 @@ namespace Ctlg.Service.Commands
         public string Path { get; set; }
         public string SearchPattern { get; set; }
 
-        private IHashFunction HashFunction;
+        private HashCalculator HashCalculator;
 
         private ITreeProvider TreeProvider { get; }
         private IHashingService HashingService { get; }
@@ -31,7 +31,8 @@ namespace Ctlg.Service.Commands
 
         public void Execute()
         {
-            HashFunction = HashingService.GetHashFunction(HashFunctionName ?? "SHA-256");
+            var hashAlgorithm = DataService.GetHashAlgorithm(HashFunctionName ?? "SHA-256");
+            HashCalculator = HashingService.CreateHashCalculator(hashAlgorithm);
 
             var root = TreeProvider.ReadTree(Path, SearchPattern);
             var treeWalker = new TreeWalker(root);
@@ -48,7 +49,7 @@ namespace Ctlg.Service.Commands
         {
             try
             {
-                var hash = HashingService.CalculateHashForFile(file, HashFunction);
+                var hash = HashCalculator.CalculateHashForFile(file, FilesystemService);
                 DomainEvents.Raise(new HashCalculated(file.RelativePath, hash.Value));
             }
             catch (Exception e)

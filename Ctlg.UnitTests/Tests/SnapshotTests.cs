@@ -21,7 +21,9 @@ namespace Ctlg.UnitTests.Tests
         private readonly string SnapshotPath = "some/path";
         private readonly string Timestamp = "2019-01-01_02-30-00";
 
+
         private Mock<IFilesystemService> FilesystemServiceMock;
+        private Mock<IDataService> DataServiceMock;
 
         public SnapshotTests()
         {
@@ -32,6 +34,8 @@ namespace Ctlg.UnitTests.Tests
         public void Setup()
         {
             FilesystemServiceMock = AutoMock.Mock<IFilesystemService>();
+            DataServiceMock = AutoMock.Mock<IDataService>();
+            AutoMock.SetupHashAlgorithm(Factories.HashAlgorithm);
         }
 
         [Test]
@@ -72,7 +76,7 @@ namespace Ctlg.UnitTests.Tests
 
         private Snapshot CreateSnapshot()
         {
-            return new Snapshot(FilesystemServiceMock.Object, SnapshotPath, SnapshotName, Timestamp);
+            return new Snapshot(FilesystemServiceMock.Object, DataServiceMock.Object, SnapshotPath, SnapshotName, Timestamp);
         }
 
         private IList<SnapshotRecord> EnumerateFiles()

@@ -12,13 +12,16 @@ namespace Ctlg.Service.FileStorage
     public class SimpleFileStorage : IFileStorage
     {
 
-        public SimpleFileStorage(IFilesystemService filesystemService, IHashingService hashingService, string backupRoot)
+        public SimpleFileStorage(IFilesystemService filesystemService, IHashingService hashingService, IDataService dataService,
+            string backupRoot)
         {
             BackupRoot = backupRoot;
             FilesystemService = filesystemService;
             HashingService = hashingService;
+            DataService = dataService;
             BackupRootDirectory = backupRoot;
-            HashFunction = hashingService.GetHashFunction("SHA-256");
+            HashAlgorithm = DataService.GetHashAlgorithm("SHA-256");
+            HashCalculator = HashingService.CreateHashCalculator(HashAlgorithm);
 
             FileStorageDirectory = FilesystemService.CombinePath(backupRoot, "file_storage");
             TempDirectory = FilesystemService.CombinePath(backupRoot, "temp");
@@ -26,21 +29,23 @@ namespace Ctlg.Service.FileStorage
 
         public IFilesystemService FilesystemService { get; }
         public IHashingService HashingService { get; }
+        public IDataService DataService { get; }
         public string BackupRoot { get; }
         public string FileStorageDirectory { get; }
         public string TempDirectory { get; }
         public string BackupRootDirectory { get; }
-        public IHashFunction HashFunction { get; }
+        private HashAlgorithm HashAlgorithm { get; }
+        private HashCalculator HashCalculator { get; }
 
         public void AddFileFromStorage(File file, IFileStorage sourceStorage)
         {
-            var previousHash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+            var previousHash = file.Hashes.First(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
             file.Hashes.Clear();
             var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
             var tempFilePath = FilesystemService.CombinePath(TempDirectory, $"{timestamp}_{previousHash}");
             sourceStorage.CopyFileTo(previousHash.ToString(), tempFilePath);
             file.FullPath = tempFilePath;
-            var calculatedHash = HashingService.CalculateHashForFile(file, HashFunction);
+            var calculatedHash = HashCalculator.CalculateHashForFile(file, FilesystemService);
             if (previousHash != calculatedHash)
             {
                 throw new Exception($"Caclulated hash does not match expected for file {file.Name}.");
@@ -126,7 +131,7 @@ namespace Ctlg.Service.FileStorage
 
         private string GetBackupPathForFile(File file)
         {
-            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+            var hash = file.Hashes.First(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
 
             return GetBackupFilePath(hash.ToString());
         }

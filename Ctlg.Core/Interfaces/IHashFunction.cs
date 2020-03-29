@@ -4,7 +4,6 @@ namespace Ctlg.Core.Interfaces
 {
     public interface IHashFunction
     {
-        string Name { get; }
-        Hash CalculateHash(Stream stream);
+        byte[] Calculate(Stream stream);
     }
 }

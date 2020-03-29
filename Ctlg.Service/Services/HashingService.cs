@@ -7,13 +7,17 @@ namespace Ctlg.Service.Services
 {
     public class HashingService : IHashingService
     {
-        public HashingService(IFilesystemService filesystemService, IIndex<string, IHashFunction> hashFunction)
+        public HashingService(IIndex<string, IHashFunction> hashFunction)
         {
-            FilesystemService = filesystemService;
             HashFunctions = hashFunction;
         }
 
-        public IHashFunction GetHashFunction(string name)
+        public HashCalculator CreateHashCalculator(HashAlgorithm algorithm)
+        {
+            return new HashCalculator(algorithm, GetHashFunction(algorithm.Name));
+        }
+
+        private IHashFunction GetHashFunction(string name)
         {
             var canonicalName = name.ToUpperInvariant();
             if (!HashFunctions.TryGetValue(canonicalName, out IHashFunction hashFunction))
@@ -24,19 +28,6 @@ namespace Ctlg.Service.Services
             return hashFunction;
         }
 
-        public Hash CalculateHashForFile(File file, IHashFunction hashFunction)
-        {
-            using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-            {
-                var hash = hashFunction.CalculateHash(stream);
-
-                file.Hashes.Add(hash);
-
-                return hash;
-            }
-        }
-
-        private IFilesystemService FilesystemService { get; }
         private IIndex<string, IHashFunction> HashFunctions { get; set; }
     }
 }

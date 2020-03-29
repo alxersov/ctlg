@@ -99,12 +99,12 @@ namespace Ctlg
             }
             builder.RegisterType<ArchiveService>().As<IArchiveService>().InstancePerLifetimeScope();
             builder.RegisterType<SnapshotService>().As<ISnapshotService>().InstancePerLifetimeScope();
-            builder.RegisterCryptographyHashFunction<MD5Cng>("MD5", HashAlgorithmId.MD5);
-            builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1", HashAlgorithmId.SHA1);
-            builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256", HashAlgorithmId.SHA256);
-            builder.RegisterCryptographyHashFunction<SHA384Cng>("SHA-384", HashAlgorithmId.SHA384);
-            builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512", HashAlgorithmId.SHA512);
-            builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32", HashAlgorithmId.CRC32);
+            builder.RegisterCryptographyHashFunction<MD5Cng>("MD5");
+            builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1");
+            builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256");
+            builder.RegisterCryptographyHashFunction<SHA384Cng>("SHA-384");
+            builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512");
+            builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32");
 
             builder.RegisterType<CtlgContext>().As<ICtlgContext>().InstancePerLifetimeScope();
             builder.RegisterType<CtlgService>().As<ICtlgService>().InstancePerLifetimeScope();

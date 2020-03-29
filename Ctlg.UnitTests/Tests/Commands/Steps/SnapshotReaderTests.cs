@@ -26,6 +26,8 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
         private File File;
         private ISnapshot Snapshot;
 
+        private HashAlgorithm HashAlgorithm;
+
         [SetUp]
         public void Setup()
         {
@@ -45,6 +47,9 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
             CtlgServiceMock.Setup(s => s.GetInnerFile(
                 It.IsAny<File>(), It.IsAny<string>()))
                 .Returns(() => File);
+
+            HashAlgorithm = Factories.HashAlgorithm;
+            AutoMock.SetupHashAlgorithm(HashAlgorithm);
         }
 
         [Test]
@@ -92,7 +97,7 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
 
             Assert.That(File.Hashes.Count, Is.EqualTo(1));
             Assert.That(File.Hashes.First, Is.EqualTo(new Hash(
-                HashAlgorithmId.SHA256, FormatBytes.ToByteArray(SnapshotRecord.Hash))));
+                HashAlgorithm.HashAlgorithmId, FormatBytes.ToByteArray(SnapshotRecord.Hash))));
         }
 
         private void ReadHashes()

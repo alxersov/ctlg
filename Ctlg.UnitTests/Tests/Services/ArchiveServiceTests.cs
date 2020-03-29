@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
+using Ctlg.Core;
 using Ctlg.Service;
 using Ctlg.Service.Utils;
 using NUnit.Framework;
@@ -43,6 +44,8 @@ namespace Ctlg.UnitTests.Tests.Services
             using (var mock = AutoMock.GetLoose())
             {
                 var service = mock.Create<ArchiveService>();
+
+                mock.SetupHashAlgorithm(new HashAlgorithm() { Name = "CRC32", HashAlgorithmId = 100 });
 
                 var zip = string.Join("", new[] {
                     "504b03040a00000000008c66ec4e000000000000000000000000020000006869",

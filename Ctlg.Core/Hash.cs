@@ -18,15 +18,6 @@ namespace Ctlg.Core
             Value = BitConverter.GetBytes(value).Reverse().ToArray();
         }
 
-
-        public Hash(HashAlgorithmId id, byte[] value) : this((int)id, value)
-        {
-        }
-
-        public Hash(HashAlgorithmId id, uint value) : this((int)id, value)
-        {
-        }
-
         protected Hash()
         {
         }
