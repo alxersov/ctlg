@@ -9,9 +9,10 @@ namespace Ctlg.Filesystem
 {
     public class SharpCompressArchive : IArchive
     {
-        public SharpCompressArchive(Stream stream)
+        public SharpCompressArchive(Stream stream, HashAlgorithm crc32HashAlgorithm)
         {
             _archive = ReaderFactory.Open(stream);
+            Crc32HashAlgorithm = crc32HashAlgorithm;
         }
 
         public IEnumerable<File> EnumerateEntries()
@@ -28,7 +29,7 @@ namespace Ctlg.Filesystem
                         Size = entry.Size
                     };
 
-                    file.Hashes.Add(new Hash(HashAlgorithmId.CRC32, (uint)entry.Crc));
+                    file.Hashes.Add(new Hash(Crc32HashAlgorithm.HashAlgorithmId, (uint)entry.Crc));
 
                     yield return file;
                 }
@@ -45,5 +46,6 @@ namespace Ctlg.Filesystem
         }
 
         private IReader _archive;
+        private HashAlgorithm Crc32HashAlgorithm { get; }
     }
 }

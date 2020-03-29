@@ -23,10 +23,6 @@ namespace Ctlg.UnitTests.Tests.Commands
                     .Setup(d => d.ReadTree(It.Is<string>(s => s == "test-path"), It.Is<string>(s => s == null)))
                     .Returns(tree);
 
-                mock.Mock<IHashingService>()
-                    .Setup(s => s.GetHashFunction(It.Is<string>(name => name == "SHA-256")))
-                    .Returns(hashFunctionMock.Object);
-
                 var command = mock.Create<AddCommand>();
                 command.Path = "test-path";
 

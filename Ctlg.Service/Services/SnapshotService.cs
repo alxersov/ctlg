@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -11,9 +10,11 @@ namespace Ctlg.Service.Services
 {
     public class SnapshotService : ISnapshotService
     {
-        public SnapshotService(IFilesystemService filesystemService)
+        public SnapshotService(IFilesystemService filesystemService, IDataService dataService)
         {
             FilesystemService = filesystemService;
+            DataService = dataService;
+            HashAlgorithm = dataService.GetHashAlgorithm("SHA-256");
         }
 
         public ISnapshot GetSnapshot(string backupRootPath, string name, string timestampMask)
@@ -34,7 +35,7 @@ namespace Ctlg.Service.Services
 
             string fullPath = FilesystemService.CombinePath(snapshotDirectory, timestamp);
 
-            return new Snapshot(FilesystemService, fullPath, name, timestamp);
+            return new Snapshot(FilesystemService, DataService, fullPath, name, timestamp);
         }
 
         public ISnapshot CreateSnapshot(string backupRootPath, string name, string timestamp)
@@ -45,7 +46,7 @@ namespace Ctlg.Service.Services
             var snapshotFileName = timestamp ?? GenerateSnapshotFileName();
             var fullPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
 
-            return new Snapshot(FilesystemService, fullPath, name, snapshotFileName);
+            return new Snapshot(FilesystemService, DataService, fullPath, name, snapshotFileName);
         }
 
         public File CreateFile(SnapshotRecord record)
@@ -57,7 +58,7 @@ namespace Ctlg.Service.Services
                 RelativePath = record.Name
             };
 
-            file.Hashes.Add(new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(record.Hash)));
+            file.Hashes.Add(new Hash(HashAlgorithm.HashAlgorithmId, FormatBytes.ToByteArray(record.Hash)));
 
             return file;
         }
@@ -103,5 +104,7 @@ namespace Ctlg.Service.Services
         }
 
         private IFilesystemService FilesystemService { get; }
+        private IDataService DataService { get; }
+        private HashAlgorithm HashAlgorithm { get; }
     }
 }

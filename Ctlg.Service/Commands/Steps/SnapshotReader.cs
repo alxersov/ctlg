@@ -7,12 +7,14 @@ namespace Ctlg.Service.Commands
 {
     public class SnapshotReader : ISnapshotReader
     {
-        public SnapshotReader(ICtlgService ctlgService)
+        public SnapshotReader(ICtlgService ctlgService, IDataService dataService)
         {
             CtlgService = ctlgService;
+            HashAlgorithm = dataService.GetHashAlgorithm("SHA-256");
         }
 
         public ICtlgService CtlgService { get; }
+        public HashAlgorithm HashAlgorithm { get; }
 
         public void ReadHashesFromSnapshot(ISnapshot snapshot, File destinationTree)
         {
@@ -40,7 +42,7 @@ namespace Ctlg.Service.Commands
                 currentFile.Size == record.Size &&
                 currentFile.FileModifiedDateTime == record.Date)
             {
-                currentFile.Hashes.Add(new Hash(HashAlgorithmId.SHA256, FormatBytes.ToByteArray(record.Hash)));
+                currentFile.Hashes.Add(new Hash(HashAlgorithm.HashAlgorithmId, FormatBytes.ToByteArray(record.Hash)));
             }
         }
     }

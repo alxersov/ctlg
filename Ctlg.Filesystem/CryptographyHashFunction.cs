@@ -1,5 +1,5 @@
-﻿using System.IO;
-using Ctlg.Core;
+﻿using System;
+using System.IO;
 using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Filesystem
@@ -9,22 +9,16 @@ namespace Ctlg.Filesystem
     /// </summary>
     public class CryptographyHashFunction<THashAlgorithm> : IHashFunction where THashAlgorithm : System.Security.Cryptography.HashAlgorithm
     {
-        public CryptographyHashFunction(THashAlgorithm algorithm, int algorithmId, string name)
+        public CryptographyHashFunction(THashAlgorithm algorithm)
         {
             Algorithm = algorithm;
-            HashAlgorithmId = algorithmId;
-            Name = name;
         }
 
-        public string Name { get; }
-
-        public Hash CalculateHash(Stream stream)
+        public byte[] Calculate(Stream stream)
         {
-            var hashValue = Algorithm.ComputeHash(stream);
-            return new Hash(HashAlgorithmId, hashValue);
+            return Algorithm.ComputeHash(stream);
         }
 
         private readonly THashAlgorithm Algorithm;
-        private readonly int HashAlgorithmId;
     }
 }

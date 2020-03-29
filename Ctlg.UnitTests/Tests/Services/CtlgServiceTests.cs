@@ -53,7 +53,7 @@ namespace Ctlg.UnitTests.Tests.Services
             var addedDirectory = AddDirectory(fakeDir);
 
             Assert.That(addedDirectory.Contents[0].Hashes.Count, Is.EqualTo(1));
-            Assert.That(addedDirectory.Contents[0].Hashes[0], Is.EqualTo(new Hash(1, new byte[] {1, 2, 3, 4})));
+            Assert.That(addedDirectory.Contents[0].Hashes[0], Is.EqualTo(new Hash(1000, new byte[] {1, 2, 3, 4})));
         }
 
 
@@ -200,32 +200,6 @@ namespace Ctlg.UnitTests.Tests.Services
             }
         }
 
-        [TestCase("FOO")]
-        [TestCase("foo")]
-        public void GetHashFunction_WhenFunctionExists_ReturnsIt(string name)
-        {
-            using (var mock = AutoMock.GetLoose(builder => MockHelper.SetupHashFunction(builder, "FOO", null)))
-            {
-                var service = mock.Create<HashingService>();
-                var function = service.GetHashFunction(name);
-
-                Assert.That(function, Is.Not.Null);
-            }
-        }
-
-        [Test]
-        public void GetHashFunction_WhenFunctionDoesNotExists()
-        {
-            using (var mock = AutoMock.GetLoose(builder => MockHelper.SetupHashFunction(builder, "FOO", null)))
-            {
-                var service = mock.Create<HashingService>();
-
-                Assert.That(() => service.GetHashFunction("BAR"),
-                    Throws.InstanceOf<Exception>()
-                        .With.Message.Contain("Unsupported hash function BAR"));
-            }
-        }
-
         private void ListFiles(IList<File> files)
         {
             using (var mock = AutoMock.GetLoose())
@@ -272,8 +246,10 @@ namespace Ctlg.UnitTests.Tests.Services
 
         private static File AddDirectory(Mock<IFilesystemDirectory> fakeDir)
         {
-            using (var mock = AutoMock.GetLoose(builder => builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>()))
+            using (var mock = AutoMock.GetLoose(ConfigureDependencies))
             {
+                mock.SetupHashAlgorithm(new HashAlgorithm() { Name = "XHASH", HashAlgorithmId = 1000 } );
+
                 File addedDirectory = null;
                 mock.Mock<IDataService>()
                     .Setup(d => d.AddDirectory(It.IsAny<File>()))
@@ -283,17 +259,6 @@ namespace Ctlg.UnitTests.Tests.Services
                 fs
                     .Setup(f => f.GetDirectory(It.Is<string>(s => s == "somepath")))
                     .Returns(fakeDir.Object);
-                    var hashFunctionMock = new Mock<IHashFunction>();
-                    hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
-                                    .Returns(new Hash(1, new byte[] {1, 2, 3, 4}));
-
-                mock.Mock<IHashingService>()
-                    .Setup(s => s.CalculateHashForFile(It.IsAny<File>(), It.IsAny<IHashFunction>()))
-                    .Returns<File, IHashFunction>((file, _) =>
-                    {
-                        file.Hashes.Add(new Hash(1, new byte[] { 1, 2, 3, 4 }));
-                        return new Hash(1, new byte[] { 1, 2, 3, 4 });
-                    });
 
                 var addCommand = mock.Create<AddCommand>();
 
@@ -304,6 +269,17 @@ namespace Ctlg.UnitTests.Tests.Services
 
                 return addedDirectory;
             }
+        }
+
+        private static void ConfigureDependencies(ContainerBuilder builder)
+        {
+            builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>();
+            builder.RegisterType<HashingService>().As<IHashingService>().InstancePerLifetimeScope();
+
+            var hashFunctionMock = new Mock<IHashFunction>();
+            hashFunctionMock.Setup(f => f.Calculate(It.IsAny<Stream>()))
+                .Returns(new byte[] { 1, 2, 3, 4 });
+            builder.RegisterInstance(hashFunctionMock.Object).Named<IHashFunction>("XHASH");
         }
     }
 }

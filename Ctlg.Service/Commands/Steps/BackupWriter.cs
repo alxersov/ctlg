@@ -14,14 +14,19 @@ namespace Ctlg.Service
             ISnapshotWriter snapshotWriter,
             bool shouldUseIndex,
             IFileStorageIndex index,
-            IHashingService hashingService)
+            IHashingService hashingService,
+            IDataService dataService,
+            IFilesystemService filesystemService)
         {
             Storage = fileStorage;
             SnapshotWriter = snapshotWriter;
             Index = index;
             ShouldUseIndex = shouldUseIndex;
             HashingService = hashingService;
-            HashFunction = hashingService.GetHashFunction("SHA-256");
+            DataService = dataService;
+            FilesystemService = filesystemService;
+            HashAlgorithm = dataService.GetHashAlgorithm("SHA-256");
+            HashCalculator = hashingService.CreateHashCalculator(HashAlgorithm);
 
             index.Load();
         }
@@ -59,7 +64,7 @@ namespace Ctlg.Service
         protected BackupFileStatus AddFileFromFilesystem(File file)
         {
             file.Hashes.Clear();
-            HashingService.CalculateHashForFile(file, HashFunction);
+            HashCalculator.CalculateHashForFile(file, FilesystemService);
             var fileStatus = FindFile(file) | BackupFileStatus.HashRecalculated;
 
             if (fileStatus.IsNotFound())
@@ -97,9 +102,9 @@ namespace Ctlg.Service
             return status;
         }
 
-        protected static Hash GetExistingHashValue(File file)
+        private Hash GetExistingHashValue(File file)
         {
-            return file.Hashes.FirstOrDefault(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+            return file.Hashes.FirstOrDefault(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
         }
 
         public void AddComment(string message)
@@ -118,7 +123,9 @@ namespace Ctlg.Service
         protected bool ShouldUseIndex { get; }
         protected IFileStorageIndex Index { get; }
         public IHashingService HashingService { get; }
-        public IHashFunction HashFunction { get; }
-
+        public IDataService DataService { get; }
+        public IFilesystemService FilesystemService { get; }
+        public HashCalculator HashCalculator { get; }
+        private HashAlgorithm HashAlgorithm { get; }
     }
 }

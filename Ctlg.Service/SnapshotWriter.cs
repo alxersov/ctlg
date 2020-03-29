@@ -9,12 +9,14 @@ namespace Ctlg.Service
 {
     public class SnapshotWriter: ISnapshotWriter
     {
-        public SnapshotWriter(StreamWriter streamWriter)
+        public SnapshotWriter(StreamWriter streamWriter, HashAlgorithm hashAlgorithm)
         {
             StreamWriter = streamWriter;
+            HashAlgorithm = hashAlgorithm;
         }
 
         private StreamWriter StreamWriter { get; }
+        public HashAlgorithm HashAlgorithm { get; }
 
         public void AddComment(string message)
         {
@@ -40,7 +42,7 @@ namespace Ctlg.Service
 
         private SnapshotRecord CreateSnapshotRecord(File file)
         {
-            var hash = file.Hashes.First(h => h.HashAlgorithmId == (int)HashAlgorithmId.SHA256);
+            var hash = file.Hashes.First(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
             var date = file.FileModifiedDateTime ?? DateTime.MinValue;
             var size = file.Size ?? 0;
             var path = file.RelativePath;

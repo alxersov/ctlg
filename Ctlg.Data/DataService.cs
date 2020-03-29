@@ -138,7 +138,8 @@ namespace Ctlg.Data
 
         public HashAlgorithm GetHashAlgorithm(string name)
         {
-            return _ctlgContext.HashAlgorithm.FirstOrDefault(a => a.Name == name);
+            var canonicalName = name.ToUpperInvariant();
+            return _ctlgContext.HashAlgorithm.FirstOrDefault(a => a.Name == canonicalName);
         }
 
         private void LoadContents(File file)

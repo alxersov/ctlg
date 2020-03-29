@@ -46,7 +46,6 @@
     <Compile Include="File.cs" />
     <Compile Include="Hash.cs" />
     <Compile Include="HashAlgorithm.cs" />
-    <Compile Include="HashAlgorithmId.cs" />
     <Compile Include="Interfaces\IArchive.cs" />
     <Compile Include="Interfaces\IDataService.cs" />
     <Compile Include="Interfaces\IFilesystemDirectory.cs" />
@@ -74,6 +73,7 @@
     <Compile Include="Interfaces\IBackupService.cs" />
     <Compile Include="Interfaces\IBackupWriter.cs" />
     <Compile Include="Interfaces\IHashingService.cs" />
+    <Compile Include="HashCalculator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Utils\" />

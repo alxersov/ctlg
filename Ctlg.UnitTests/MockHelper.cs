@@ -68,15 +68,6 @@ namespace Ctlg.UnitTests
             return stream;
         }
 
-        public static void SetupHashFunction(ContainerBuilder builder, string hashFunctionName, Hash valueToReturn)
-        {
-            var hashFunctionMock = new Mock<IHashFunction>();
-            hashFunctionMock.Setup(f => f.CalculateHash(It.IsAny<Stream>()))
-                            .Returns(valueToReturn);
-
-            builder.RegisterInstance(hashFunctionMock.Object).Named<IHashFunction>(hashFunctionName);
-        }
-
         public static void VerifyAppVersionWritten(this Mock<IBackupWriter> backupWriterMock)
         {
             backupWriterMock.Verify(m => m.AddComment(It.Is<string>(
@@ -119,6 +110,13 @@ namespace Ctlg.UnitTests
             mock.Setup(s => s.CreateWriter(backupRootPath, It.IsAny<bool>(), name, timestamp))
                 .Returns(backupWriterMock.Object);
             return backupWriterMock;
+        }
+
+        public static void SetupHashAlgorithm(this AutoMock mock, HashAlgorithm hashAlgorithm)
+        {
+            mock.Mock<IDataService>()
+                .Setup(s => s.GetHashAlgorithm(It.Is<string>(p => p == hashAlgorithm.Name)))
+                .Returns(hashAlgorithm);
         }
 
         private static readonly Regex AppVersionRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");

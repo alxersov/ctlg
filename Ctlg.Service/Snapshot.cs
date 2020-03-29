@@ -11,24 +11,28 @@ namespace Ctlg.Service
 {
     public class Snapshot: ISnapshot
     {
-        public Snapshot(IFilesystemService filesystemService,
+        public Snapshot(IFilesystemService filesystemService, IDataService dataService,
             string snapshotFilePath, string name, string timestamp)
         {
             FilesystemService = filesystemService;
+            DataService = dataService;
             SnapshotFilePath = snapshotFilePath;
             Name = name;
             Timestamp = timestamp;
 
             CommentLineRegex = new Regex(@"^\s*#");
+            HashAlgorithm = DataService.GetHashAlgorithm("SHA-256");
         }
 
         private IFilesystemService FilesystemService { get; }
+        public IDataService DataService { get; }
         private string SnapshotFilePath { get; }
         public string Name { get; }
 
         public string Timestamp { get; }
 
         private Regex CommentLineRegex { get; }
+        private HashAlgorithm HashAlgorithm { get; }
 
         public IEnumerable<SnapshotRecord> EnumerateFiles()
         {
@@ -67,7 +71,7 @@ namespace Ctlg.Service
         {
             var snapshot = FilesystemService.CreateNewFileForWrite(SnapshotFilePath); 
 
-            return new SnapshotWriter(new StreamWriter(snapshot));
+            return new SnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
         }
     }
 }

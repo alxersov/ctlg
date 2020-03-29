@@ -6,18 +6,23 @@ namespace Ctlg.Service.Services
     public class BackupService : IBackupService
     {
         public BackupService(IFileStorageService fileStorageService, ISnapshotService snapshotService,
-            IFileStorageIndexService indexService, IHashingService hashingService)
+            IFileStorageIndexService indexService, IHashingService hashingService, IDataService dataService,
+            IFilesystemService filesystemService)
         {
             FileStorageService = fileStorageService;
             SnapshotService = snapshotService;
             IndexService = indexService;
             HashingService = hashingService;
+            DataService = dataService;
+            FilesystemService = filesystemService;
         }
 
         public IFileStorageService FileStorageService { get; }
         public ISnapshotService SnapshotService { get; }
         public IFileStorageIndexService IndexService { get; }
         public IHashingService HashingService { get; }
+        public IDataService DataService { get; }
+        public IFilesystemService FilesystemService { get; }
 
         public IBackupWriter CreateWriter(string directory, bool isFastMode, string name, string timestamp)
         {
@@ -25,7 +30,8 @@ namespace Ctlg.Service.Services
             var fileStorage = FileStorageService.GetFileStorage(directory, isFastMode);
             var snapshot = SnapshotService.CreateSnapshot(directory, name, timestamp);
 
-            return new BackupWriter(fileStorage, snapshot.GetWriter(), isFastMode, index, HashingService);
+            return new BackupWriter(fileStorage, snapshot.GetWriter(), isFastMode, index,
+                HashingService, DataService, FilesystemService);
         }
     }
 }
