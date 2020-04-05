@@ -84,6 +84,28 @@ namespace Ctlg.Core
             return Contents[index];
         }
 
+        public IEnumerable<File> EnumerateFiles()
+        {
+            var queue = new Queue<File>();
+            queue.Enqueue(this);
+
+            while (queue.Count > 0)
+            {
+                var file = queue.Dequeue();
+                foreach (var child in file.Contents)
+                {
+                    if (child.IsDirectory)
+                    {
+                        queue.Enqueue(child);
+                    }
+                    else
+                    {
+                        yield return child;
+                    }
+                }
+            }
+        }
+
         private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

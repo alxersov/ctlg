@@ -41,10 +41,11 @@ namespace Ctlg.Service.Commands
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"FastMode={IsFastMode}");
-                var treeWalker = new TreeWalker(root);
-                treeWalker.Walk(file => backupWriter.AddFile(file));
+                foreach (var file in root.EnumerateFiles())
+                {
+                    backupWriter.AddFile(file);
+                }
             }
-
 
             DomainEvents.Raise(new BackupCommandEnded());
         }

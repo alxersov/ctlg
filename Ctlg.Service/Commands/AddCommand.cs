@@ -35,8 +35,10 @@ namespace Ctlg.Service.Commands
             HashCalculator = HashingService.CreateHashCalculator(hashAlgorithm);
 
             var root = TreeProvider.ReadTree(Path, SearchPattern);
-            var treeWalker = new TreeWalker(root);
-            treeWalker.Walk(ProcessFile);
+            foreach (var file in root.EnumerateFiles())
+            {
+                ProcessFile(file);
+            }
 
             DataService.AddDirectory(root);
 
