@@ -40,7 +40,6 @@ namespace Ctlg.Core
         public string RelativePath { get; set; }
         public string FullPath { get; set; }
 
-        // TODO: move to services
         public string BuildFullPath()
         {
             if (FullPath == null)
@@ -63,5 +62,50 @@ namespace Ctlg.Core
 
             return FullPath;
         }
+
+        public void SortTree()
+        {
+            Contents.Sort(FileNameComparer);
+
+            foreach (var file in Contents)
+            {
+                file.SortTree();
+            }
+        }
+
+        public File GetInnerFile(string name)
+        {
+            var index = Contents.BinarySearch(new File(name), FileNameComparer);
+            if (index < 0)
+            {
+                return null;
+            }
+
+            return Contents[index];
+        }
+
+        public IEnumerable<File> EnumerateFiles()
+        {
+            var queue = new Queue<File>();
+            queue.Enqueue(this);
+
+            while (queue.Count > 0)
+            {
+                var file = queue.Dequeue();
+                foreach (var child in file.Contents)
+                {
+                    if (child.IsDirectory)
+                    {
+                        queue.Enqueue(child);
+                    }
+                    else
+                    {
+                        yield return child;
+                    }
+                }
+            }
+        }
+
+        private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

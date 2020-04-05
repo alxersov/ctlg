@@ -13,8 +13,8 @@ namespace Ctlg.UnitTests
             {
                 return new[]
                 {
-                    new SnapshotRecord($"{Hash1} 2018-04-22T18:05:12.0000000Z 11 1.txt"),
-                    new SnapshotRecord($"{Hash2} 2019-01-22T00:00:00.0000000Z 12345 foo/bar.txt")
+                    new SnapshotRecord($"{Hash1} 2018-04-22T18:05:12.0000000Z 11 1.txt", HashAlgorithm),
+                    new SnapshotRecord($"{Hash2} 2019-01-22T00:00:00.0000000Z 12345 foo/bar.txt", HashAlgorithm)
                 };
             }
         }

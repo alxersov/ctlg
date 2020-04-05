@@ -171,7 +171,7 @@ namespace Ctlg.EventHandlers
 
         private string FormatSnapshotRecord(SnapshotRecord record)
         {
-            return $"{record.Hash.Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
+            return $"{record.Hash.ToString().Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
         }
 
         private int _filesFound = 0;

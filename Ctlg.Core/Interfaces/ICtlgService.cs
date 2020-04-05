@@ -9,8 +9,5 @@
         void Show(int catalgoEntryId);
 
         HashAlgorithm GetHashAlgorithm(string hashAlgorithmName);
-
-        void SortTree(File directory);
-        File GetInnerFile(File container, string name);
     }
 }

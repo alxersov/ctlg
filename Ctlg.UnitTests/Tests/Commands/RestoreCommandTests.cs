@@ -1,9 +1,7 @@
 ﻿using System;
-using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
-using Ctlg.Service.Events;
 using Ctlg.UnitTests.Fixtures;
 using Moq;
 using NUnit.Framework;
@@ -52,7 +50,7 @@ namespace Ctlg.UnitTests.Tests.Commands
         {
             Execute();
 
-            FileStorageMock.Verify(m => m.CopyFileTo(SnapshotRecord.Hash, DestinationFilePath));
+            FileStorageMock.Verify(m => m.CopyFileTo(SnapshotRecord.Hash.ToString(), DestinationFilePath));
         }
 
         private void Execute()

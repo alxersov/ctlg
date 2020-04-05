@@ -21,8 +21,6 @@ namespace Ctlg.UnitTests.Tests.Commands
         private bool IsFastMode;
         private File Tree;
 
-        private Mock<ISnapshotReader> SnapshotReaderMock;
-
         private Mock<IBackupService> BackupServiceMock;
         private Mock<IBackupWriter> BackupWriterMock;
 
@@ -36,7 +34,6 @@ namespace Ctlg.UnitTests.Tests.Commands
             Tree = new File(Path, true) { Contents = { File } };
 
             SetupTreeProvider();
-            SetupSnapshotReader();
 
             BackupServiceMock = AutoMock.Mock<IBackupService>();
             BackupWriterMock = BackupServiceMock.SetupCreateWriter(CurrentDirectory, BackupName, null);
@@ -60,8 +57,6 @@ namespace Ctlg.UnitTests.Tests.Commands
             BackupWriterMock.Verify(m => m.AddComment("FastMode=False"), Times.Once);
 
             Assert.That(BackupCommandEndedEvents.Count, Is.EqualTo(1));
-            SnapshotReaderMock.Verify(s => s.ReadHashesFromSnapshot(
-                It.IsAny<ISnapshot>(), Tree), Times.Never);
         }
 
         [Test]
@@ -71,8 +66,6 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             Execute();
 
-            SnapshotReaderMock.Verify(s => s.ReadHashesFromSnapshot(
-                It.IsAny<ISnapshot>(), Tree), Times.Once);
             BackupWriterMock.Verify(m => m.AddComment("FastMode=True"), Times.Once);
         }
 
@@ -83,11 +76,6 @@ namespace Ctlg.UnitTests.Tests.Commands
             Command.IsFastMode = IsFastMode;
 
             Command.Execute();
-        }
-
-        private void SetupSnapshotReader()
-        {
-            SnapshotReaderMock = AutoMock.Mock<ISnapshotReader>();
         }
 
         private void SetupTreeProvider()
