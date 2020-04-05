@@ -12,13 +12,10 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider, ISnapshotReader snapshotReader,
-
-            IFilesystemService filesystemService, ISnapshotService snapshotService,
-            IBackupService backupService)
+        public BackupCommand(ITreeProvider treeProvider, IFilesystemService filesystemService,
+            ISnapshotService snapshotService, IBackupService backupService)
         {
             TreeProvider = treeProvider;
-            SnapshotReader = snapshotReader;
             FilesystemService = filesystemService;
             SnapshotService = snapshotService;
             BackupService = backupService;
@@ -35,7 +32,8 @@ namespace Ctlg.Service.Commands
                 var latestSnapshot = SnapshotService.GetSnapshot(currentDirectory, Name, null);
                 if (latestSnapshot != null)
                 {
-                    SnapshotReader.ReadHashesFromSnapshot(latestSnapshot, root);
+                    var reader = new SnapshotReader();
+                    reader.ReadHashesFromSnapshot(latestSnapshot, root);
                 }
             }
 
@@ -55,6 +53,5 @@ namespace Ctlg.Service.Commands
         private IFilesystemService FilesystemService { get; }
         public ISnapshotService SnapshotService { get; }
         public IBackupService BackupService { get; }
-        private ISnapshotReader SnapshotReader { get; set; }
     }
 }

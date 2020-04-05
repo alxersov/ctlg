@@ -88,7 +88,6 @@
     <Compile Include="Events\BackupCommandEnded.cs" />
     <Compile Include="Utils\BackupStatusHelper.cs" />
     <Compile Include="Commands\Steps\FileEnumerateStep.cs" />
-    <Compile Include="Commands\Steps\ISnapshotReader.cs" />
     <Compile Include="Commands\Steps\ITreeProvider.cs" />
     <Compile Include="Commands\Steps\SnapshotReader.cs" />
     <Compile Include="Commands\Steps\TreeWalker.cs" />

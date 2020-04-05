@@ -125,7 +125,6 @@ namespace Ctlg
                 .InstancePerDependency();
 
             builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>().InstancePerLifetimeScope();
-            builder.RegisterType<SnapshotReader>().As<ISnapshotReader>().InstancePerLifetimeScope();
             builder.RegisterType<BackupWriter>().AsSelf().InstancePerDependency();
             builder.Register(context => CreateMappingConfiguration())
                 .As<IConfigurationProvider>().InstancePerLifetimeScope();

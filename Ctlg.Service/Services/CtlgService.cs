@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Autofac.Features.Indexed;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
@@ -71,28 +70,6 @@ namespace Ctlg.Service.Services
             }
         }
 
-        public void SortTree(File directory)
-        {
-            directory.Contents.Sort(FileNameComparer);
-
-            foreach (var f in directory.Contents)
-            {
-                SortTree(f);
-            }
-        }
-
-        public File GetInnerFile(File container, string name)
-        {
-            var index = container.Contents.BinarySearch(new File(name), FileNameComparer);
-            if (index < 0)
-            {
-                return null;
-            }
-
-            return container.Contents[index];
-        }
-
         private IDataService DataService { get; }
-        private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }

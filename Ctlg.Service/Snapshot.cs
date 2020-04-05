@@ -48,7 +48,7 @@ namespace Ctlg.Service
                         {
                             if (!CommentLineRegex.IsMatch(line))
                             {
-                                snapshotRecord = new SnapshotRecord(line);
+                                snapshotRecord = new SnapshotRecord(line, HashAlgorithm);
                             }
                         }
                         catch (Exception ex)

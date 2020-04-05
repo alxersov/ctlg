@@ -58,7 +58,7 @@ namespace Ctlg.Service.Services
                 RelativePath = record.Name
             };
 
-            file.Hashes.Add(new Hash(HashAlgorithm.HashAlgorithmId, FormatBytes.ToByteArray(record.Hash)));
+            file.Hashes.Add(record.Hash);
 
             return file;
         }

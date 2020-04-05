@@ -1,24 +1,14 @@
 ﻿using System;
 using Ctlg.Core;
-using Ctlg.Service.Utils;
 using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Service.Commands
 {
-    public class SnapshotReader : ISnapshotReader
+    public class SnapshotReader
     {
-        public SnapshotReader(ICtlgService ctlgService, IDataService dataService)
-        {
-            CtlgService = ctlgService;
-            HashAlgorithm = dataService.GetHashAlgorithm("SHA-256");
-        }
-
-        public ICtlgService CtlgService { get; }
-        public HashAlgorithm HashAlgorithm { get; }
-
         public void ReadHashesFromSnapshot(ISnapshot snapshot, File destinationTree)
         {
-            CtlgService.SortTree(destinationTree);
+            destinationTree.SortTree();
 
             foreach (var record in snapshot.EnumerateFiles())
             {
@@ -34,7 +24,7 @@ namespace Ctlg.Service.Commands
             File currentFile = root;
             while (i < path.Length && currentFile != null)
             {
-                currentFile = CtlgService.GetInnerFile(currentFile, path[i]);
+                currentFile = currentFile.GetInnerFile(path[i]);
                 ++i;
             }
 
@@ -42,7 +32,7 @@ namespace Ctlg.Service.Commands
                 currentFile.Size == record.Size &&
                 currentFile.FileModifiedDateTime == record.Date)
             {
-                currentFile.Hashes.Add(new Hash(HashAlgorithm.HashAlgorithmId, FormatBytes.ToByteArray(record.Hash)));
+                currentFile.Hashes.Add(record.Hash);
             }
         }
     }

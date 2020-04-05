@@ -49,7 +49,7 @@ namespace Ctlg.Service.Commands
         private void ProcessSnapshotRecord(IFileStorage fileStorage, SnapshotRecord record)
         {
             var destinationPath = FileSystemService.CombinePath(Path, record.Name);
-            fileStorage.CopyFileTo(record.Hash, destinationPath);
+            fileStorage.CopyFileTo(record.Hash.ToString(), destinationPath);
 
             DomainEvents.Raise(new BackupEntryRestored(record.Name));
         }

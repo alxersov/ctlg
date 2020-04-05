@@ -110,7 +110,6 @@
     <Compile Include="MockHelper.cs" />
     <Compile Include="Factories.cs" />
     <Compile Include="Fixtures\AutoMockTestFixture.cs" />
-    <Compile Include="Fixtures\BackupTestFixture.cs" />
     <Compile Include="Fixtures\BaseTestFixture.cs" />
     <Compile Include="Tests\ByteArrayComparerTests.cs" />
     <Compile Include="Fixtures\CommandTestFixture.cs" />
