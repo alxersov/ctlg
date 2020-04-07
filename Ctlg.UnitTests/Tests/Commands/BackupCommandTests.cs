@@ -1,88 +1,89 @@
 ﻿using System;
-using System.Collections.Generic;
-using Autofac.Extras.Moq;
-using Ctlg.Core;
-using Ctlg.Core.Interfaces;
+using System.Linq;
 using Ctlg.Service.Commands;
-using Ctlg.Service.Events;
 using Ctlg.UnitTests.Fixtures;
-using Moq;
 using NUnit.Framework;
 
 namespace Ctlg.UnitTests.Tests.Commands
 {
-    public class BackupCommandTests: CommandTestFixture<BackupCommand>
+    public class BackupCommandTests : CommonDependenciesFixture
     {
-        private readonly string Path = "test-path";
-        private readonly string BackupName = "test-name";
-        private readonly string CurrentDirectory = "current-dir";
-        private readonly string FileName = "test-1.txt";
-        private File File;
-        private bool IsFastMode;
-        private File Tree;
-
-        private Mock<IBackupService> BackupServiceMock;
-        private Mock<IBackupWriter> BackupWriterMock;
-
-        private IList<BackupCommandEnded> BackupCommandEndedEvents;
-
-        [SetUp]
-        public void Init()
+        public BackupCommandTests()
         {
-            IsFastMode = false;
-            File = new File(FileName);
-            Tree = new File(Path, true) { Contents = { File } };
-
-            SetupTreeProvider();
-
-            BackupServiceMock = AutoMock.Mock<IBackupService>();
-            BackupWriterMock = BackupServiceMock.SetupCreateWriter(CurrentDirectory, BackupName, null);
-
-            FilesystemServiceMock.Setup(s => s.GetCurrentDirectory()).Returns(CurrentDirectory);
-
-            SnapshotServiceMock
-                .Setup(s => s.GetSnapshot(CurrentDirectory, BackupName, null))
-                .Returns(new Mock<ISnapshot>().Object);
-
-            BackupCommandEndedEvents = SetupEvents<BackupCommandEnded>();
         }
 
-        [Test]
-        public void AddsFilesToBackup()
-        {
-            Execute();
-
-            BackupWriterMock.Verify(m => m.AddFile(File, null), Times.Once);
-            BackupWriterMock.VerifyAppVersionWritten();
-            BackupWriterMock.Verify(m => m.AddComment("FastMode=False"), Times.Once);
-
-            Assert.That(BackupCommandEndedEvents.Count, Is.EqualTo(1));
-        }
+        private string HelloHash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
+        private string HiHash = "cd08abb273b1619e82e78c29a7df02c1051b1820e99fc395dcaa3326b8";
+        private string AppleHash = "f223faa96f22916294922b171a2696d868fd1f9129302eb41a45b2a2ea2ebbfd";
+        private string SourcePath = "source";
+        private string BackupName = "Backup1";
+        private DateTime ModifiedTime = new DateTime(2020, 1, 2);
 
         [Test]
-        public void Execute_WhenFastMode_ReadsLatestSnapshot()
+        public void Adds_file_to_storage_and_snapshot()
         {
-            IsFastMode = true;
+            FS.SetFile("source/hi.txt", "Hello", ModifiedTime);
 
             Execute();
 
-            BackupWriterMock.Verify(m => m.AddComment("FastMode=True"), Times.Once);
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HelloHash));
+            Assert.That(FS.GetFileAsString($"home/file_storage/18/{HelloHash}"), Is.EqualTo("Hello"));
         }
 
-        private void Execute()
+        [Test]
+        public void In_FastMode_date_and_size_is_checked()
         {
-            Command.Path = Path;
-            Command.Name = BackupName;
-            Command.IsFastMode = IsFastMode;
+            CreateOldHelloSnapshot();
+            FS.SetFile("source/hi.txt", "12345", ModifiedTime);
 
-            Command.Execute();
+            Execute(true);
+
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HelloHash));
         }
 
-        private void SetupTreeProvider()
+        [Test]
+        public void In_FastMode_size_is_checked()
         {
-            AutoMock.Mock<ITreeProvider>()
-                .Setup(d => d.ReadTree(Path, null))
-                .Returns(Tree);
+            CreateOldHelloSnapshot();
+            FS.SetFile("source/hi.txt", "Hi", ModifiedTime);
+
+            Execute(true);
+
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HiHash));
+        }
+
+        [Test]
+        public void In_FastMode_date_is_checked()
+        {
+            CreateOldHelloSnapshot();
+            FS.SetFile("source/hi.txt", "Apple", ModifiedTime.AddDays(1));
+
+            Execute(true);
+
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(AppleHash));
+        }
+
+        private void Execute(bool isFastMode = false)
+        {
+            var command = AutoMock.Create<BackupCommand>();
+
+            command.Path = SourcePath;
+            command.Name = BackupName;
+            command.IsFastMode = isFastMode;
+
+            command.Execute();
+        }
+
+        private string GetLastSnapshot(string path)
+        {
+            var fileName = FS.GetVirtualDirectory(path).Files.Keys.Last();
+            return FS.GetFileAsString($"{path}/{fileName}");
+        }
+
+        private void CreateOldHelloSnapshot()
+        {
+            FS.SetFile($"home/file_storage/18/{HelloHash}", "Hello");
+            FS.SetFile($"home/snapshots/{BackupName}/2018-01-01_00-00-00", $"{HelloHash} 2020-01-02T00:00:00.0000000 5 hi.txt\n");
         }
     }
 }

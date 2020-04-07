@@ -9,6 +9,9 @@ namespace Ctlg.UnitTests.TestDoubles
         {
         }
 
+        public DateTime? FileCreatedDateTime { get; set; }
+        public DateTime? FileModifiedDateTime { get; set; }
+
         public Stream GetReadStream()
         {
             return new MemoryStream(Content);
