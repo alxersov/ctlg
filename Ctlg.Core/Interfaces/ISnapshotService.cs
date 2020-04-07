@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace Ctlg.Core.Interfaces
 {

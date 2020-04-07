@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Text.RegularExpressions;
+using System.Linq;
 using Ctlg.UnitTests.TestDoubles;
 using NUnit.Framework;
 
@@ -69,20 +68,38 @@ namespace Ctlg.UnitTests.Tests
         }
 
         [Test]
+        public void GetDirectoryName_when_file_is_in_root()
+        {
+            var fs = new VirtualFileSystem();
+
+            Assert.That(fs.GetDirectoryName("foo"), Is.EqualTo(""));
+        }
+
+        [Test]
+        public void GetDirectoryName()
+        {
+            var fs = new VirtualFileSystem();
+
+            Assert.That(fs.GetDirectoryName("foo/bar/1/2/3"), Is.EqualTo("foo/bar/1/2"));
+        }
+
+        [Test]
         public void When_directory_does_not_exist()
         {
             var fs = new VirtualFileSystem();
 
-            Assert.That(fs.DirectoryExists("foo"), Is.False);
+            fs.CreateDirectory("foo/1");
+
+            Assert.That(fs.DirectoryExists("foo/1/2"), Is.False);
         }
 
         [Test]
         public void When_directory_exists()
         {
             var fs = new VirtualFileSystem();
-            fs.CreateDirectory("foo");
+            fs.CreateDirectory("foo/1/2");
 
-            Assert.That(fs.DirectoryExists("foo"), Is.True);
+            Assert.That(fs.DirectoryExists("foo/1/2"), Is.True);
         }
 
         [Test]
@@ -103,6 +120,31 @@ namespace Ctlg.UnitTests.Tests
             fs.Move("foo", "baz");
 
             Assert.That(fs.GetFileAsString("baz"), Is.EqualTo("test"));
+        }
+
+        [Test]
+        public void CurrentDirectory()
+        {
+            var fs = new VirtualFileSystem();
+
+            Assert.That(fs.GetCurrentDirectory(), Is.EqualTo("home"));
+        }
+
+        [Test]
+        public void EnumeratingDirectories()
+        {
+            var fs = new VirtualFileSystem();
+
+            fs.CreateDirectory("foo/bar/1/a");
+            fs.CreateDirectory("foo/bar/1/b");
+
+            var bar = fs.GetDirectory("foo/bar");
+
+            var dirs = bar.EnumerateDirectories().First().EnumerateDirectories().ToList();
+
+            Assert.That(dirs.First().Directory.Name, Is.EqualTo("a"));
+            Assert.That(dirs.First().Directory.RelativePath, Is.EqualTo("1/a"));
+            Assert.That(dirs.First().Directory.FullPath, Is.EqualTo("foo/bar/1/a"));
         }
     }
 }

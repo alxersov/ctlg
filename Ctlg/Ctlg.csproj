@@ -113,6 +113,7 @@
     <Compile Include="CommandLineOptions\RebuildIndex.cs" />
     <Compile Include="EventHandlers\Logging.cs" />
     <Compile Include="CommandLineOptions\BackupPull.cs" />
+    <Compile Include="ContainerConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,13 +1,11 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Data.SQLite;
 using Ctlg.Core;
 
 namespace Ctlg.Data
 {
     public interface ICtlgContext
     {
-        SQLiteConnection Connection { get; }
         int DbVersion { get; }
 
         DbSet<File> Files { get; set; }

@@ -1,16 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using Ctlg.Core.Interfaces;
+using Ctlg.Filesystem;
 
 namespace Ctlg.UnitTests.TestDoubles
 {
-    public class VirtualFileSystem : IFilesystemService
+    public class VirtualFileSystem : FilesystemServiceBase, IFilesystemService
     {
-        private const string Separator = "/";
+        public const string Separator = "/";
+
+        public string CurrentDirectory { get; set; } = "home";
 
         public VirtualFileSystem()
         {
+            Root = new VirtualFilesystemNode("", "");
+
+            CreateDirectory(CurrentDirectory);
         }
 
         public string CombinePath(string path1, string path2)
@@ -20,83 +25,137 @@ namespace Ctlg.UnitTests.TestDoubles
 
         public string CombinePath(string path1, string path2, string path3)
         {
-            throw new NotImplementedException();
+            return CombinePath(CombinePath(path1, path2), path3);
         }
 
         public void Copy(string from, string to)
         {
-            throw new NotImplementedException();
+            var directoryFromPath = GetDirectoryName(from);
+            var fileFromName = GetFileName(from);
+            var fromDirectory = GetVirtualDirectory(directoryFromPath);
+
+            var original = fromDirectory.Files[fileFromName];
+
+            using (var output = CreateFileForWrite(to))
+            {
+                original.GetReadStream().CopyTo(output);
+            }
         }
 
         public void CreateDirectory(string path)
         {
-            Directories.Add(path);
+            var names = SplitPath(path);
+
+            var dir = Root;
+            foreach (var name in names)
+            {
+                dir = dir.CreateDirectory(name);
+            }
+        }
+
+        public VirtualFilesystemNode GetVirtualDirectory(string path)
+        {
+            var names = SplitPath(path);
+
+            var dir = Root;
+            foreach (var name in names)
+            {
+                dir = dir.GetDirectory(name);
+                if (dir == null)
+                {
+                    return null;
+                }
+            }
+
+            return dir;
         }
 
         public Stream CreateFileForWrite(string path)
         {
             var content = new VirtualFileContent();
-            Files[path] = content;
+            SetFileContent(path, content);
             return content.GetWriteStream();
         }
 
         public Stream CreateNewFileForWrite(string path)
         {
-            throw new NotImplementedException();
+            return CreateFileForWrite(path);
         }
 
         public bool DirectoryExists(string path)
         {
-            return Directories.Contains(path);
-        }
-
-        public IEnumerable<Core.File> EnumerateFiles(string path, string searchMask = null)
-        {
-            throw new NotImplementedException();
+            return GetVirtualDirectory(path) != null;
         }
 
         public bool FileExists(string path)
         {
-            return Files.ContainsKey(path);
+            return GetFileContent(path) != null;
         }
 
         public string GetCurrentDirectory()
         {
-            throw new NotImplementedException();
+            return CurrentDirectory;
         }
 
-        public IFilesystemDirectory GetDirectory(string path)
+        public override IFilesystemDirectory GetDirectory(string path)
         {
-            throw new NotImplementedException();
+            return new VirtualDirectory(GetVirtualDirectory(path));
         }
 
         public string GetDirectoryName(string path)
         {
-            return Path.GetDirectoryName(path);
+            var index = path.LastIndexOf(Separator);
+
+            return index < 0 ? string.Empty : path.Substring(0, index);
+        }
+
+        public string GetFileName(string path)
+        {
+            var index = path.LastIndexOf(Separator);
+
+            return index < 0 ? path : path.Substring(index + 1);
         }
 
         public long GetFileSize(string path)
         {
-            return Files[path].GetSize();
+            return GetFileContent(path).GetSize();
         }
 
         public void Move(string from, string to)
         {
-            Files[to] = Files[from];
-            Files.Remove(from);
+            var content = GetFileContent(from);
+            RemoveFile(from);
+            SetFileContent(to, content);
         }
 
         public Stream OpenFileForRead(string path)
         {
-            return Files[path].GetReadStream();
+            var content = GetFileContent(path);
+
+            if (content == null)
+            {
+                throw new FileNotFoundException();
+            }
+
+            return content.GetReadStream();
         }
 
-        public void SetFile(string path, string content)
+        public void SetFile(string path, string content, DateTime modifiedTime = default)
         {
+            CreateDirectory(GetDirectoryName(path));
             using (var writer = new StreamWriter(CreateFileForWrite(path)))
             {
                 writer.Write(content);
             }
+
+            GetFileContent(path).FileModifiedDateTime = modifiedTime;
+        }
+
+        public void RemoveFile(string path)
+        {
+            var directory = GetVirtualDirectory(GetDirectoryName(path));
+            var fileName = GetFileName(path);
+            directory.Files.Remove(fileName);
         }
 
         public string GetFileAsString(string path)
@@ -107,7 +166,25 @@ namespace Ctlg.UnitTests.TestDoubles
             }
         }
 
-        private Dictionary<string, VirtualFileContent> Files = new Dictionary<string, VirtualFileContent>();
-        private HashSet<string> Directories = new HashSet<string>();
+        private string[] SplitPath(string path)
+        {
+            return path.Split(new[] { Separator }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        private VirtualFileContent GetFileContent(string path)
+        {
+            var directory = GetVirtualDirectory(GetDirectoryName(path));
+            var fileName = GetFileName(path);
+            return directory != null && directory.Files.ContainsKey(fileName) ? directory.Files[fileName] : null;
+        }
+
+        private void SetFileContent(string path, VirtualFileContent content)
+        {
+            var directory = GetVirtualDirectory(GetDirectoryName(path));
+            var fileName = GetFileName(path);
+            directory.Files[fileName] = content;
+        }
+
+        private VirtualFilesystemNode Root { get; }
     }
 }
