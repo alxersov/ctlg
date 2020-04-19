@@ -28,10 +28,7 @@ namespace Ctlg.UnitTests.TestDoubles
         {
             foreach (var node in Node.Directories.Values)
             {
-                var dir = new VirtualDirectory(node);
-                dir.Directory.RelativePath = CombineRelativePath(node.Name);
-
-                yield return dir;
+                yield return new VirtualDirectory(node);
             }
         }
 
@@ -42,7 +39,6 @@ namespace Ctlg.UnitTests.TestDoubles
                 yield return new File(file.Key)
                 {
                     FullPath = VirtualFilesystemNode.CombinePath(Directory.FullPath, file.Key),
-                    RelativePath = CombineRelativePath(file.Key),
                     FileCreatedDateTime = file.Value.FileCreatedDateTime,
                     FileModifiedDateTime = file.Value.FileModifiedDateTime,
                     Size = file.Value.GetSize(),
@@ -52,13 +48,5 @@ namespace Ctlg.UnitTests.TestDoubles
         }
 
         private VirtualFilesystemNode Node { get; }
-
-
-        private string CombineRelativePath(string name)
-        {
-            return Directory.IsRoot ?
-                name :
-                VirtualFilesystemNode.CombinePath(Directory.RelativePath, name);
-        }
     }
 }

@@ -18,14 +18,16 @@ namespace Ctlg.Service.Commands
                 searchPattern = "*";
             }
 
-            var di = FilesystemService.GetDirectory(path);
-            var root = ParseDirectory(di, searchPattern);
-            root.Name = di.Directory.FullPath;
+            var fsDirectory = FilesystemService.GetDirectory(path);
+            ParseDirectory(fsDirectory, searchPattern);
+
+            var root = fsDirectory.Directory;
+            root.Name = root.FullPath;
 
             return root;
         }
 
-        private File ParseDirectory(IFilesystemDirectory fsDirectory, string searchPattern)
+        private void ParseDirectory(IFilesystemDirectory fsDirectory, string searchPattern)
         {
             var directory = fsDirectory.Directory;
 
@@ -33,19 +35,26 @@ namespace Ctlg.Service.Commands
 
             foreach (var file in fsDirectory.EnumerateFiles(searchPattern))
             {
+                AddNode(directory, file);
+
                 DomainEvents.Raise(new FileFound(file.RelativePath));
-
-                directory.Contents.Add(file);
             }
 
-            foreach (var dir in fsDirectory.EnumerateDirectories())
+            foreach (var fsSubdir in fsDirectory.EnumerateDirectories())
             {
-                directory.Contents.Add(ParseDirectory(dir, searchPattern));
-            }
+                AddNode(directory, fsSubdir.Directory);
 
-            return directory;
+                ParseDirectory(fsSubdir, searchPattern);
+            }
         }
 
+        private void AddNode(File directory, File node)
+        {
+            node.RelativePath = string.IsNullOrEmpty(directory.RelativePath) ?
+                node.Name :
+                FilesystemService.CombinePath(directory.RelativePath, node.Name);
+            directory.Contents.Add(node);
+        }
 
         protected IFilesystemService FilesystemService { get; }
     }

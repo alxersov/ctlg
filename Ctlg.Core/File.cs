@@ -27,7 +27,6 @@ namespace Ctlg.Core
         public int? ParentFileId { get; set; }
         public File ParentFile { get; set; }
         public bool IsDirectory { get; set; }
-        public bool IsRoot { get { return string.IsNullOrEmpty(RelativePath); }}
         public string Name { get; set; }
         public long? Size { get; set; }
         public DateTime? FileCreatedDateTime { get; set; }
