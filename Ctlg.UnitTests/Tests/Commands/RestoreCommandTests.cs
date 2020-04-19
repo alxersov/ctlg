@@ -24,13 +24,13 @@ namespace Ctlg.UnitTests.Tests.Commands
         public void Init()
         {
             FilesystemServiceMock.Setup(s => s.GetCurrentDirectory()).Returns(CurrentDirectory);
-            SnapshotServiceMock.Setup(s => s.GetSnapshot(CurrentDirectory, Name, Date))
+            SnapshotServiceMock.Setup(s => s.GetSnapshot(CurrentDirectory, "SHA-256", Name, Date))
                 .Returns(() => Snapshot);
 
             Snapshot = Factories.CreateSnapshotMock(Name, Date).Object;
             SnapshotRecord = Factories.SnapshotRecords[0];
 
-            FileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDirectory, true);
+            FileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDirectory);
 
             FilesystemServiceMock.Setup(s => s.CombinePath(Path, SnapshotRecord.Name))
                 .Returns(DestinationFilePath);

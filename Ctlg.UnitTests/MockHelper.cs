@@ -53,11 +53,11 @@ namespace Ctlg.UnitTests
         }
 
         public static Mock<IFileStorage> SetupGetFileStorage(this Mock<IFileStorageService> mock,
-            string backupRootDirectory, bool shouldUseIndex)
+            string backupRootDirectory)
         {
             var fileStorageMock = new Mock<IFileStorage>();
 
-            mock.Setup(s => s.GetFileStorage(backupRootDirectory, shouldUseIndex))
+            mock.Setup(s => s.GetFileStorage(backupRootDirectory, "SHA-256"))
                 .Returns(fileStorageMock.Object);
 
             return fileStorageMock;
@@ -67,7 +67,7 @@ namespace Ctlg.UnitTests
             string backupRootPath, string name, string timestamp)
         {
             var backupWriterMock = new Mock<IBackupWriter>();
-            mock.Setup(s => s.CreateWriter(backupRootPath, It.IsAny<bool>(), name, timestamp))
+            mock.Setup(s => s.CreateWriter(backupRootPath, It.IsAny<bool>(), "SHA-256", name, timestamp))
                 .Returns(backupWriterMock.Object);
             return backupWriterMock;
         }

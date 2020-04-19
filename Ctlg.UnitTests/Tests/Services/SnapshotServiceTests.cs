@@ -44,42 +44,42 @@ namespace Ctlg.UnitTests.Tests.Services
         [Test]
         public void GetsLatesSnapshot()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, SnapshotName, null);
+            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, null);
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date3));
         }
 
         [Test]
         public void GetSnapshot_WhenSnapshotDoesNotExist_ReturnsNull()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "DoesNotExist", null);
+            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", "DoesNotExist", null);
             Assert.That(snapshot, Is.Null);
         }
 
         [Test]
         public void GetSnapshot_WhenNoSnapshotMatchesProvidedDate_ReturnsNull()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, SnapshotName, "2019-09-03");
+            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, "2019-09-03");
             Assert.That(snapshot, Is.Null);
         }
 
         [Test]
         public void GetSnapshot_WithExactDate()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, SnapshotName, Date1);
+            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, Date1);
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date1));
         }
 
         [Test]
         public void GetSnapshot_WithOneDateMatching()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, SnapshotName, "2019-01-01_02");
+            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, "2019-01-01_02");
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date2));
         }
 
         [Test]
         public void GetSnapshot_WithMoreThanOneDateMatching()
         {
-            Assert.That(() => SnapshotService.GetSnapshot(RootDirectory, SnapshotName, "2019-01-01"),
+            Assert.That(() => SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, "2019-01-01"),
                 Throws.InstanceOf<Exception>().With.Message.Contain("date is ambiguous"));
         }
 
@@ -90,7 +90,7 @@ namespace Ctlg.UnitTests.Tests.Services
                 .Setup(f => f.CombinePath(TestSnapshotsDirectory, It.IsAny<string>()))
                 .Returns(SnapshotFile1);
 
-            var snapshot = SnapshotService.CreateSnapshot(RootDirectory, SnapshotName, null);
+            var snapshot = SnapshotService.CreateSnapshot(RootDirectory, "SHA-256", SnapshotName, null);
 
             Assert.That(snapshot.Timestamp, Is.Not.Null);
             Assert.That(snapshot.Name, Is.EqualTo(SnapshotName));
@@ -100,7 +100,7 @@ namespace Ctlg.UnitTests.Tests.Services
         [Test]
         public void CreateSnapshot_WhenTimestampIsSpecified()
         {
-            var snapshot = SnapshotService.CreateSnapshot(RootDirectory, SnapshotName, Date2);
+            var snapshot = SnapshotService.CreateSnapshot(RootDirectory, "SHA-256", SnapshotName, Date2);
 
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date2));
         }

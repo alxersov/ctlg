@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Service.Utils;
 using File = Ctlg.Core.File;
 
 namespace Ctlg.Service.Services
@@ -14,10 +13,9 @@ namespace Ctlg.Service.Services
         {
             FilesystemService = filesystemService;
             DataService = dataService;
-            HashAlgorithm = dataService.GetHashAlgorithm("SHA-256");
         }
 
-        public ISnapshot GetSnapshot(string backupRootPath, string name, string timestampMask)
+        public ISnapshot GetSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestampMask)
         {
             var snapshotDirectory = GetSnapshotDirectory(backupRootPath, name);
             var allSnapshots = GetSnapshotFiles(snapshotDirectory).Select(d => d.Name).OrderBy(s => s).ToList();
@@ -34,19 +32,22 @@ namespace Ctlg.Service.Services
             }
 
             string fullPath = FilesystemService.CombinePath(snapshotDirectory, timestamp);
+            var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
 
-            return new Snapshot(FilesystemService, DataService, fullPath, name, timestamp);
+            return new Snapshot(FilesystemService, hashAlgorithm, fullPath, name, timestamp);
         }
 
-        public ISnapshot CreateSnapshot(string backupRootPath, string name, string timestamp)
+        public ISnapshot CreateSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestamp)
         {
             var snapshotDirectory = GetSnapshotDirectory(backupRootPath, name);
             FilesystemService.CreateDirectory(snapshotDirectory);
 
             var snapshotFileName = timestamp ?? GenerateSnapshotFileName();
             var fullPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
+            var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
 
-            return new Snapshot(FilesystemService, DataService, fullPath, name, snapshotFileName);
+
+            return new Snapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
         }
 
         public File CreateFile(SnapshotRecord record)
