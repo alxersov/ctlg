@@ -11,17 +11,11 @@ namespace Ctlg.Filesystem
     {
         public File Directory { get; set; }
 
-        public FilesystemDirectory(string path)
+        public FilesystemDirectory(string path) : this(new DirectoryInfo(path))
         {
-            Initialize(new DirectoryInfo(path));
         }
 
         private FilesystemDirectory(DirectoryInfo directoryInfo)
-        {
-            Initialize(directoryInfo);
-        }
-
-        private void Initialize(DirectoryInfo directoryInfo)
         {
             _directoryInfo = directoryInfo;
             Directory = new File
@@ -39,10 +33,7 @@ namespace Ctlg.Filesystem
         {
             foreach (var directoryInfo in _directoryInfo.EnumerateDirectories())
             {
-                var dir = new FilesystemDirectory(directoryInfo);
-                dir.Directory.RelativePath = CombineRelativePath(directoryInfo.Name);
-
-                yield return dir;
+                yield return new FilesystemDirectory(directoryInfo);
             }
         }
 
@@ -50,21 +41,11 @@ namespace Ctlg.Filesystem
         {
             foreach (var fileInfo in _directoryInfo.EnumerateFiles(searchPattern))
             {
-                var file = CreateFilesystemEntry(fileInfo);
-                file.RelativePath = CombineRelativePath(fileInfo.Name);
-
-                yield return file;
+                yield return CreateFilesystemEntry(fileInfo);
             }
         }
 
         private DirectoryInfo _directoryInfo;
-
-        private string CombineRelativePath(string name)
-        {
-            return Directory.IsRoot ?
-                name :
-                Path.Combine(Directory.RelativePath, name);
-        }
 
         protected static File CreateFilesystemEntry(FileInfo fileInfo)
         {
