@@ -29,7 +29,7 @@ namespace Ctlg.Service.Commands
 
             if (IsFastMode)
             {
-                var latestSnapshot = SnapshotService.GetSnapshot(currentDirectory, Name, null);
+                var latestSnapshot = SnapshotService.GetSnapshot(currentDirectory, "SHA-256", Name, null);
                 if (latestSnapshot != null)
                 {
                     var reader = new SnapshotReader();
@@ -37,7 +37,7 @@ namespace Ctlg.Service.Commands
                 }
             }
 
-            using (var backupWriter = BackupService.CreateWriter(currentDirectory, IsFastMode, Name, null))
+            using (var backupWriter = BackupService.CreateWriter(currentDirectory, IsFastMode, "SHA-256", Name, null))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"FastMode={IsFastMode}");
@@ -52,7 +52,7 @@ namespace Ctlg.Service.Commands
 
         private ITreeProvider TreeProvider { get; set; }
         private IFilesystemService FilesystemService { get; }
-        public ISnapshotService SnapshotService { get; }
-        public IBackupService BackupService { get; }
+        private ISnapshotService SnapshotService { get; }
+        private IBackupService BackupService { get; }
     }
 }

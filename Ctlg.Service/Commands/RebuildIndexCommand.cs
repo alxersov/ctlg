@@ -16,7 +16,7 @@ namespace Ctlg.Service.Commands
         public void Execute()
         {
             var currentDirectory = FilesystemService.GetCurrentDirectory();
-            var fileStorage = FileStorageService.GetFileStorage(currentDirectory, false);
+            var fileStorage = FileStorageService.GetFileStorage(currentDirectory, "SHA-256");
             var index = FileStorageIndexService.GetIndex(currentDirectory);
             foreach (var hash in fileStorage.GetAllHashes())
             {

@@ -23,7 +23,6 @@ namespace Ctlg.UnitTests.Tests
 
 
         private Mock<IFilesystemService> FilesystemServiceMock;
-        private Mock<IDataService> DataServiceMock;
 
         public SnapshotTests()
         {
@@ -34,7 +33,6 @@ namespace Ctlg.UnitTests.Tests
         public void Setup()
         {
             FilesystemServiceMock = AutoMock.Mock<IFilesystemService>();
-            DataServiceMock = AutoMock.Mock<IDataService>();
             AutoMock.SetupHashAlgorithm(Factories.HashAlgorithm);
         }
 
@@ -76,7 +74,7 @@ namespace Ctlg.UnitTests.Tests
 
         private Snapshot CreateSnapshot()
         {
-            return new Snapshot(FilesystemServiceMock.Object, DataServiceMock.Object, SnapshotPath, SnapshotName, Timestamp);
+            return new Snapshot(FilesystemServiceMock.Object, Factories.HashAlgorithm, SnapshotPath, SnapshotName, Timestamp);
         }
 
         private IList<SnapshotRecord> EnumerateFiles()

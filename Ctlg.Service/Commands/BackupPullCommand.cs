@@ -11,9 +11,8 @@ namespace Ctlg.Service.Commands
         public string Name { get; set; }
         public string Date { get; set; }
 
-        public BackupPullCommand(ISnapshotService snapshotService,
-            IFileStorageService fileStorageService, IFilesystemService filesystemService,
-            IBackupService backupService)
+        public BackupPullCommand(ISnapshotService snapshotService, IFileStorageService fileStorageService,
+            IFilesystemService filesystemService, IBackupService backupService)
         {
             SnapshotService = snapshotService;
             FileStorageService = fileStorageService;
@@ -23,15 +22,15 @@ namespace Ctlg.Service.Commands
 
         public void Execute()
         {
-            var sourceSnapshot = SnapshotService.GetSnapshot(Path, Name, Date);
+            var sourceSnapshot = SnapshotService.GetSnapshot(Path, "SHA-256", Name, Date);
             if (sourceSnapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found in {Path}.");
             }
 
             var currentDirectory = FilesystemService.GetCurrentDirectory();
-            var sourceFileStorage = FileStorageService.GetFileStorage(Path, true);
-            using (var backupWriter = BackupService.CreateWriter(currentDirectory, false,
+            var sourceFileStorage = FileStorageService.GetFileStorage(Path, "SHA-256");
+            using (var backupWriter = BackupService.CreateWriter(currentDirectory, false, "SHA-256",
                 sourceSnapshot.Name, sourceSnapshot.Timestamp))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
@@ -50,6 +49,6 @@ namespace Ctlg.Service.Commands
         private ISnapshotService SnapshotService { get; }
         private IFileStorageService FileStorageService { get; }
         private IFilesystemService FilesystemService { get; }
-        public IBackupService BackupService { get; }
+        private IBackupService BackupService { get; }
     }
 }

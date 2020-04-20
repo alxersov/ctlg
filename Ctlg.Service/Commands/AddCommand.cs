@@ -31,8 +31,7 @@ namespace Ctlg.Service.Commands
 
         public void Execute()
         {
-            var hashAlgorithm = DataService.GetHashAlgorithm(HashFunctionName ?? "SHA-256");
-            HashCalculator = HashingService.CreateHashCalculator(hashAlgorithm);
+            HashCalculator = HashingService.CreateHashCalculator(HashFunctionName ?? "SHA-256");
 
             var root = TreeProvider.ReadTree(Path, SearchPattern);
             foreach (var file in root.EnumerateFiles())
@@ -51,7 +50,7 @@ namespace Ctlg.Service.Commands
         {
             try
             {
-                var hash = HashCalculator.CalculateHashForFile(file, FilesystemService);
+                var hash = HashCalculator.CalculateHashForFile(file);
                 DomainEvents.Raise(new HashCalculated(file.RelativePath, hash.Value));
             }
             catch (Exception e)

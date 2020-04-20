@@ -41,10 +41,10 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             FilesystemServiceMock.Setup(m => m.GetCurrentDirectory()).Returns(CurrentDir);
 
-            SnapshotServiceMock.Setup(s => s.GetSnapshot(Path, Name, DateToSearch))
+            SnapshotServiceMock.Setup(s => s.GetSnapshot(Path, "SHA-256", Name, DateToSearch))
                 .Returns(() => SourceSnapshot);
 
-            SourceFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(Path, true);
+            SourceFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(Path);
 
             BackupWriterMock = BackupServiceMock.SetupCreateWriter(CurrentDir, Name, Timestamp);
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
@@ -14,19 +13,13 @@ namespace Ctlg.Service
             ISnapshotWriter snapshotWriter,
             bool shouldUseIndex,
             IFileStorageIndex index,
-            IHashingService hashingService,
-            IDataService dataService,
-            IFilesystemService filesystemService)
+            HashCalculator hashCalculator)
         {
             Storage = fileStorage;
             SnapshotWriter = snapshotWriter;
             Index = index;
             ShouldUseIndex = shouldUseIndex;
-            HashingService = hashingService;
-            DataService = dataService;
-            FilesystemService = filesystemService;
-            HashAlgorithm = dataService.GetHashAlgorithm("SHA-256");
-            HashCalculator = hashingService.CreateHashCalculator(HashAlgorithm);
+            HashCalculator = hashCalculator;
 
             index.Load();
         }
@@ -44,7 +37,7 @@ namespace Ctlg.Service
 
                     if (fileStatus.IsNotFound())
                     {
-                        Index.Add(GetExistingHashValue(file).Value);
+                        Index.Add(HashCalculator.GetExistingHashValue(file).Value);
                     }
                 }
 
@@ -64,7 +57,7 @@ namespace Ctlg.Service
         protected BackupFileStatus AddFileFromFilesystem(File file)
         {
             file.Hashes.Clear();
-            HashCalculator.CalculateHashForFile(file, FilesystemService);
+            HashCalculator.CalculateHashForFile(file);
             var fileStatus = FindFile(file) | BackupFileStatus.HashRecalculated;
 
             if (fileStatus.IsNotFound())
@@ -86,7 +79,7 @@ namespace Ctlg.Service
         {
             var status = default(BackupFileStatus);
 
-            var hash = GetExistingHashValue(file);
+            var hash = HashCalculator.GetExistingHashValue(file);
             if (hash != null)
             {
                 if (ShouldUseIndex && Index.IsInIndex(hash.Value))
@@ -102,11 +95,6 @@ namespace Ctlg.Service
             return status;
         }
 
-        private Hash GetExistingHashValue(File file)
-        {
-            return file.Hashes.FirstOrDefault(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
-        }
-
         public void AddComment(string message)
         {
             SnapshotWriter.AddComment(message);
@@ -118,14 +106,10 @@ namespace Ctlg.Service
             SnapshotWriter.Dispose();
         }
 
-        public IFileStorage Storage { get; }
-        protected ISnapshotWriter SnapshotWriter { get; }
-        protected bool ShouldUseIndex { get; }
-        protected IFileStorageIndex Index { get; }
-        public IHashingService HashingService { get; }
-        public IDataService DataService { get; }
-        public IFilesystemService FilesystemService { get; }
-        public HashCalculator HashCalculator { get; }
-        private HashAlgorithm HashAlgorithm { get; }
+        private IFileStorage Storage { get; }
+        private ISnapshotWriter SnapshotWriter { get; }
+        private bool ShouldUseIndex { get; }
+        private IFileStorageIndex Index { get; }
+        private HashCalculator HashCalculator { get; }
     }
 }

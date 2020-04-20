@@ -15,7 +15,8 @@ namespace Ctlg.Service.Commands
         private IFileStorageService FileStorageService { get; }
         private ISnapshotService SnapshotService { get; }
 
-        public RestoreCommand(IFilesystemService fileSystemService, IFileStorageService fileStorageService, ISnapshotService snapshotService)
+        public RestoreCommand(IFilesystemService fileSystemService, IFileStorageService fileStorageService,
+            ISnapshotService snapshotService)
         {
             FileStorageService = fileStorageService;
             SnapshotService = snapshotService;
@@ -25,13 +26,13 @@ namespace Ctlg.Service.Commands
         public void Execute()
         {
             var currentDir = FileSystemService.GetCurrentDirectory();
-            var snapshot = SnapshotService.GetSnapshot(currentDir, Name, Date);
+            var snapshot = SnapshotService.GetSnapshot(currentDir, "SHA-256", Name, Date);
             if (snapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found");
             }
 
-            var fileStorage = FileStorageService.GetFileStorage(currentDir, true);
+            var fileStorage = FileStorageService.GetFileStorage(currentDir, "SHA-256");
             var snapshotRecords = snapshot.EnumerateFiles();
             foreach (var record in snapshotRecords)
             {

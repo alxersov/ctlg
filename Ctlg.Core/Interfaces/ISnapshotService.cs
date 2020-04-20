@@ -6,7 +6,7 @@ namespace Ctlg.Core.Interfaces
     {
         File CreateFile(SnapshotRecord record);
 
-        ISnapshot GetSnapshot(string backupRootPath, string name, string timestampMask);
-        ISnapshot CreateSnapshot(string backupRootPath, string name, string timestamp);
+        ISnapshot GetSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestampMask);
+        ISnapshot CreateSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestamp);
     }
 }

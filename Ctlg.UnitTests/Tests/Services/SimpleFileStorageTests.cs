@@ -31,7 +31,10 @@ namespace Ctlg.UnitTests.Tests.Services
                 .Setup(s => s.CopyFileTo(Hash1.ToString(), It.IsAny<string>()))
                 .Callback((string hash, string path) => FS.SetFile(path, "Hello"));
 
-            var storage = AutoMock.Create<SimpleFileStorage>(new NamedParameter("backupRoot", "foo"));
+            var hashingService = AutoMock.Create<IHashingService>();
+            var hashCalculator = hashingService.CreateHashCalculator("SHA-256");
+            var storage = AutoMock.Create<SimpleFileStorage>(new NamedParameter("backupRoot", "foo"),
+                new NamedParameter("hashCalculator", hashCalculator));
 
             var file = new File();
             file.Hashes.Add(Hash1);

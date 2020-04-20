@@ -11,27 +11,22 @@ namespace Ctlg.Service
 {
     public class Snapshot: ISnapshot
     {
-        public Snapshot(IFilesystemService filesystemService, IDataService dataService,
+        public Snapshot(IFilesystemService filesystemService, HashAlgorithm hashAlgorithm,
             string snapshotFilePath, string name, string timestamp)
         {
             FilesystemService = filesystemService;
-            DataService = dataService;
+            HashAlgorithm = hashAlgorithm;
             SnapshotFilePath = snapshotFilePath;
             Name = name;
             Timestamp = timestamp;
-
-            CommentLineRegex = new Regex(@"^\s*#");
-            HashAlgorithm = DataService.GetHashAlgorithm("SHA-256");
         }
 
-        private IFilesystemService FilesystemService { get; }
-        public IDataService DataService { get; }
-        private string SnapshotFilePath { get; }
         public string Name { get; }
-
         public string Timestamp { get; }
 
-        private Regex CommentLineRegex { get; }
+        private IFilesystemService FilesystemService { get; }
+        private string SnapshotFilePath { get; }
+        private Regex CommentLineRegex { get; } = new Regex(@"^\s*#");
         private HashAlgorithm HashAlgorithm { get; }
 
         public IEnumerable<SnapshotRecord> EnumerateFiles()
