@@ -71,7 +71,7 @@ namespace Ctlg.UnitTests.Tests.Commands
             command.Name = BackupName;
             command.IsFastMode = isFastMode;
 
-            command.Execute();
+            command.Execute(Factories.Config);
         }
 
         private string GetLastSnapshot(string path)

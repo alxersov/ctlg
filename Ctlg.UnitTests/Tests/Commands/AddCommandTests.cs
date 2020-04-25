@@ -26,7 +26,7 @@ namespace Ctlg.UnitTests.Tests.Commands
                 var command = mock.Create<AddCommand>();
                 command.Path = "test-path";
 
-                command.Execute();
+                command.Execute(Factories.Config);
 
                 mock.Mock<IDataService>().Verify(s => s.AddDirectory(tree), Times.Once);
             }

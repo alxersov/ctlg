@@ -1,4 +1,5 @@
 ﻿using System;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
@@ -12,24 +13,21 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider, IFilesystemService filesystemService,
+        public BackupCommand(ITreeProvider treeProvider,
             ISnapshotService snapshotService, IBackupService backupService)
         {
             TreeProvider = treeProvider;
-            FilesystemService = filesystemService;
             SnapshotService = snapshotService;
             BackupService = backupService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
-            var currentDirectory = FilesystemService.GetCurrentDirectory();
-
             var root = TreeProvider.ReadTree(Path, SearchPattern);
 
             if (IsFastMode)
             {
-                var latestSnapshot = SnapshotService.GetSnapshot(currentDirectory, "SHA-256", Name, null);
+                var latestSnapshot = SnapshotService.GetSnapshot(config.Path, config.HashAlgorithmName, Name, null);
                 if (latestSnapshot != null)
                 {
                     var reader = new SnapshotReader();
@@ -37,7 +35,8 @@ namespace Ctlg.Service.Commands
                 }
             }
 
-            using (var backupWriter = BackupService.CreateWriter(currentDirectory, IsFastMode, "SHA-256", Name, null))
+            using (var backupWriter = BackupService.CreateWriter(config.Path, IsFastMode, config.HashAlgorithmName,
+                Name, null))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"FastMode={IsFastMode}");
@@ -51,7 +50,6 @@ namespace Ctlg.Service.Commands
         }
 
         private ITreeProvider TreeProvider { get; set; }
-        private IFilesystemService FilesystemService { get; }
         private ISnapshotService SnapshotService { get; }
         private IBackupService BackupService { get; }
     }

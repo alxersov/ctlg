@@ -31,7 +31,7 @@ namespace Ctlg.UnitTests.Tests.Commands
                 HashFunctionName = "test",
                 Hash = "01FF"
             };
-            command.Execute();
+            command.Execute(Factories.Config);
 
             serviceMock.VerifyAll();
             Assert.That(FormatBytes.ToHexString(hashParameter), Is.EqualTo("01ff").IgnoreCase);

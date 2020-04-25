@@ -3,6 +3,6 @@ namespace Ctlg.Core.Interfaces
 {
     public interface IFileStorageIndexService
     {
-        IFileStorageIndex GetIndex(string backupRootDirectory);
+        IFileStorageIndex GetIndex(string backupRootDirectory, string hashAlgorithmName);
     }
 }

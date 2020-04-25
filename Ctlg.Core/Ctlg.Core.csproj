@@ -74,6 +74,7 @@
     <Compile Include="Interfaces\IBackupWriter.cs" />
     <Compile Include="Interfaces\IHashingService.cs" />
     <Compile Include="HashCalculator.cs" />
+    <Compile Include="Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Utils\" />
