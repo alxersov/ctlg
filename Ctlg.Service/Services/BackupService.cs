@@ -17,11 +17,12 @@ namespace Ctlg.Service.Services
         public IBackupWriter CreateWriter(string directory, bool isFastMode, string hashAlgorithmName,
             string name, string timestamp)
         {
-            var index = IndexService.GetIndex(directory);
+            var index = IndexService.GetIndex(directory, hashAlgorithmName);
             var fileStorage = FileStorageService.GetFileStorage(directory, hashAlgorithmName);
             var snapshot = SnapshotService.CreateSnapshot(directory, hashAlgorithmName, name, timestamp);
 
             var hashCalculator = HashingService.CreateHashCalculator(hashAlgorithmName);
+
             return new BackupWriter(fileStorage, snapshot.GetWriter(), isFastMode, index, hashCalculator);
         }
 

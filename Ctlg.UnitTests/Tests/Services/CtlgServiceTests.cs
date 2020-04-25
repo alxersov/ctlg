@@ -265,7 +265,7 @@ namespace Ctlg.UnitTests.Tests.Services
                 addCommand.Path = "somepath";
                 addCommand.HashFunctionName = "XHASH";
 
-                addCommand.Execute();
+                addCommand.Execute(Factories.Config);
 
                 return addedDirectory;
             }

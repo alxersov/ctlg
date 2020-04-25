@@ -1,7 +1,9 @@
-﻿namespace Ctlg.Service.Commands
+﻿using Ctlg.Core;
+
+namespace Ctlg.Service.Commands
 {
     public interface ICommand
     {
-        void Execute();
+        void Execute(Config config);
     }
 }

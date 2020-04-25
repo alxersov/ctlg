@@ -17,7 +17,7 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             var command = new ListCommand(serviceMock.Object);
 
-            command.Execute();
+            command.Execute(Factories.Config);
 
             serviceMock.VerifyAll();
         }

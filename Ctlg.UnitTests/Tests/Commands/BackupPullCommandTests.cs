@@ -11,7 +11,7 @@ namespace Ctlg.UnitTests.Tests.Commands
 {
     public class BackupPullCommandTests: CommandTestFixture<BackupPullCommand>
     {
-        public readonly string CurrentDir = "current-dir";
+        public readonly string CurrentDir = "home";
         public readonly string Path = "some-path";
         public readonly string Name = "testfoo";
         public readonly string DateToSearch = "2019-01-01";
@@ -39,8 +39,6 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             BackupServiceMock = AutoMock.Mock<IBackupService>();
 
-            FilesystemServiceMock.Setup(m => m.GetCurrentDirectory()).Returns(CurrentDir);
-
             SnapshotServiceMock.Setup(s => s.GetSnapshot(Path, "SHA-256", Name, DateToSearch))
                 .Returns(() => SourceSnapshot);
 
@@ -59,14 +57,14 @@ namespace Ctlg.UnitTests.Tests.Commands
         {
             SourceSnapshot = null;
 
-            Assert.That(() => Command.Execute(),
+            Assert.That(() => Command.Execute(Factories.Config),
                 Throws.TypeOf<Exception>().With.Message.Contain("Snapshot testfoo is not found in some-path"));
         }
 
         [Test]
         public void WritesBackup()
         {
-            Command.Execute();
+            Command.Execute(Factories.Config);
 
             BackupWriterMock.Verify(m => m.AddFile(File, SourceFileStorageMock.Object), Times.Once);
         }

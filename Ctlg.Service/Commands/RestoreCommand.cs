@@ -11,28 +11,27 @@ namespace Ctlg.Service.Commands
         public string Date { get; set; }
         public string Path { get; set; }
 
-        private IFilesystemService FileSystemService { get; }
+        private IFilesystemService FilesystemService { get; }
         private IFileStorageService FileStorageService { get; }
         private ISnapshotService SnapshotService { get; }
 
-        public RestoreCommand(IFilesystemService fileSystemService, IFileStorageService fileStorageService,
+        public RestoreCommand(IFilesystemService filesystemService, IFileStorageService fileStorageService,
             ISnapshotService snapshotService)
         {
+            FilesystemService = filesystemService;
             FileStorageService = fileStorageService;
             SnapshotService = snapshotService;
-            FileSystemService = fileSystemService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
-            var currentDir = FileSystemService.GetCurrentDirectory();
-            var snapshot = SnapshotService.GetSnapshot(currentDir, "SHA-256", Name, Date);
+            var snapshot = SnapshotService.GetSnapshot(config.Path, config.HashAlgorithmName, Name, Date);
             if (snapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found");
             }
 
-            var fileStorage = FileStorageService.GetFileStorage(currentDir, "SHA-256");
+            var fileStorage = FileStorageService.GetFileStorage(config.Path, config.HashAlgorithmName);
             var snapshotRecords = snapshot.EnumerateFiles();
             foreach (var record in snapshotRecords)
             {
@@ -49,7 +48,7 @@ namespace Ctlg.Service.Commands
 
         private void ProcessSnapshotRecord(IFileStorage fileStorage, SnapshotRecord record)
         {
-            var destinationPath = FileSystemService.CombinePath(Path, record.Name);
+            var destinationPath = FilesystemService.CombinePath(Path, record.Name);
             fileStorage.CopyFileTo(record.Hash.ToString(), destinationPath);
 
             DomainEvents.Raise(new BackupEntryRestored(record.Name));

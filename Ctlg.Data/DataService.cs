@@ -170,6 +170,6 @@ namespace Ctlg.Data
         protected ICtlgContext _ctlgContext;
         protected IMigrationService _migrationService;
 
-        public const int RequiredDbVersion = 2;
+        public const int RequiredDbVersion = 3;
     }
 }

@@ -14,7 +14,7 @@ namespace Ctlg.UnitTests.Tests.Commands
         public string Date = "2019-01-01";
         public string Path = "foo";
         public string DestinationFilePath = "foo/something";
-        private readonly string CurrentDirectory = "current-dir";
+        private readonly string CurrentDirectory = "home";
         private ISnapshot Snapshot;
         private SnapshotRecord SnapshotRecord;
         private Mock<IFileStorage> FileStorageMock;
@@ -23,7 +23,6 @@ namespace Ctlg.UnitTests.Tests.Commands
         [SetUp]
         public void Init()
         {
-            FilesystemServiceMock.Setup(s => s.GetCurrentDirectory()).Returns(CurrentDirectory);
             SnapshotServiceMock.Setup(s => s.GetSnapshot(CurrentDirectory, "SHA-256", Name, Date))
                 .Returns(() => Snapshot);
 
@@ -59,7 +58,7 @@ namespace Ctlg.UnitTests.Tests.Commands
             Command.Name = Name;
             Command.Date = Date;
 
-            Command.Execute();
+            Command.Execute(Factories.Config);
         }
     }
 }

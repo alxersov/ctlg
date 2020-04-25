@@ -1,4 +1,5 @@
-﻿using Ctlg.Core.Interfaces;
+﻿using Ctlg.Core;
+using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Service.Commands
 {
@@ -9,7 +10,7 @@ namespace Ctlg.Service.Commands
             CtlgService = ctlgService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
             CtlgService.ListFiles();
         }

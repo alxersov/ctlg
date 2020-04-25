@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Service.Commands
@@ -11,7 +12,7 @@ namespace Ctlg.Service.Commands
             CtlgService = ctlgService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
             foreach (var id in CatalogEntryIds)
             {

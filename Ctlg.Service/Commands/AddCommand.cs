@@ -29,7 +29,7 @@ namespace Ctlg.Service.Commands
             HashingService = hashingService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
             HashCalculator = HashingService.CreateHashCalculator(HashFunctionName ?? "SHA-256");
 

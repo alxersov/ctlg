@@ -17,7 +17,7 @@ namespace Ctlg.Service.Commands
             CtlgService = ctlgService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
             if (Hash != null && HashFunctionName == null)
             {

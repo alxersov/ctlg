@@ -1,4 +1,5 @@
 ﻿using System;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
@@ -12,25 +13,23 @@ namespace Ctlg.Service.Commands
         public string Date { get; set; }
 
         public BackupPullCommand(ISnapshotService snapshotService, IFileStorageService fileStorageService,
-            IFilesystemService filesystemService, IBackupService backupService)
+            IBackupService backupService)
         {
             SnapshotService = snapshotService;
             FileStorageService = fileStorageService;
-            FilesystemService = filesystemService;
             BackupService = backupService;
         }
 
-        public void Execute()
+        public void Execute(Config config)
         {
-            var sourceSnapshot = SnapshotService.GetSnapshot(Path, "SHA-256", Name, Date);
+            var sourceSnapshot = SnapshotService.GetSnapshot(Path, config.HashAlgorithmName, Name, Date);
             if (sourceSnapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found in {Path}.");
             }
 
-            var currentDirectory = FilesystemService.GetCurrentDirectory();
-            var sourceFileStorage = FileStorageService.GetFileStorage(Path, "SHA-256");
-            using (var backupWriter = BackupService.CreateWriter(currentDirectory, false, "SHA-256",
+            var sourceFileStorage = FileStorageService.GetFileStorage(Path, config.HashAlgorithmName);
+            using (var backupWriter = BackupService.CreateWriter(config.Path, false, config.HashAlgorithmName,
                 sourceSnapshot.Name, sourceSnapshot.Timestamp))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
@@ -48,7 +47,6 @@ namespace Ctlg.Service.Commands
 
         private ISnapshotService SnapshotService { get; }
         private IFileStorageService FileStorageService { get; }
-        private IFilesystemService FilesystemService { get; }
         private IBackupService BackupService { get; }
     }
 }
