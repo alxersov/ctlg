@@ -1,64 +1,51 @@
 ﻿using System;
-using Ctlg.Core;
-using Ctlg.Core.Interfaces;
 using Ctlg.Service.Commands;
 using Ctlg.UnitTests.Fixtures;
-using Moq;
 using NUnit.Framework;
 
 namespace Ctlg.UnitTests.Tests.Commands
 {
-    public class RestoreCommandTests: CommandTestFixture<RestoreCommand>
+    public class RestoreCommandTests: CommonDependenciesFixture
     {
-        public string Name = "test-name";
-        public string Date = "2019-01-01";
-        public string Path = "foo";
-        public string DestinationFilePath = "foo/something";
-        private readonly string CurrentDirectory = "home";
-        private ISnapshot Snapshot;
-        private SnapshotRecord SnapshotRecord;
-        private Mock<IFileStorage> FileStorageMock;
+        private string HelloHash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
 
-
-        [SetUp]
-        public void Init()
-        {
-            SnapshotServiceMock.Setup(s => s.GetSnapshot(CurrentDirectory, "SHA-256", Name, Date))
-                .Returns(() => Snapshot);
-
-            Snapshot = Factories.CreateSnapshotMock(Name, Date).Object;
-            SnapshotRecord = Factories.SnapshotRecords[0];
-
-            FileStorageMock = FileStorageServiceMock.SetupGetFileStorage(CurrentDirectory);
-
-            FilesystemServiceMock.Setup(s => s.CombinePath(Path, SnapshotRecord.Name))
-                .Returns(DestinationFilePath);
-        }
+        private string ResotrePath = "destination/a";
+        private string BackupName = "Backup1";
+        private string Date = "2020-04-25";
 
         [Test]
         public void Execute_WhenSnapshotNotFound_ThrowsException()
         {
-            Snapshot = null;
             Assert.That(() => Execute(),
                 Throws.TypeOf<Exception>()
-                    .With.Message.Contain($"Snapshot {Name} is not found"));
+                    .With.Message.Contain($"Snapshot {BackupName} is not found"));
         }
 
         [Test]
         public void Execute_CopiesFileToCorrectDestination()
         {
+            CreateSnapshot();
+
             Execute();
 
-            FileStorageMock.Verify(m => m.CopyFileTo(SnapshotRecord.Hash.ToString(), DestinationFilePath));
+            Assert.That(FS.GetFileAsString($"destination/a/foo/hi.txt"), Is.EqualTo("Hello"));
         }
 
         private void Execute()
         {
-            Command.Path = Path;
-            Command.Name = Name;
-            Command.Date = Date;
+            var command = AutoMock.Create<RestoreCommand>();
 
-            Command.Execute(Factories.Config);
+            command.Path = ResotrePath;
+            command.Name = BackupName;
+            command.Date = Date;
+
+            command.Execute(Factories.Config);
+        }
+
+        private void CreateSnapshot()
+        {
+            FS.SetFile($"home/file_storage/18/{HelloHash}", "Hello");
+            FS.SetFile($"home/snapshots/{BackupName}/2020-04-25_00-00-00", $"{HelloHash} 2020-01-02T00:00:00.0000000 5 foo/hi.txt\n");
         }
     }
 }

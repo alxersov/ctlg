@@ -1,72 +1,58 @@
 ﻿using System;
-using Ctlg.Core;
-using File = Ctlg.Core.File;
 using Ctlg.Service.Commands;
 using NUnit.Framework;
-using Moq;
-using Ctlg.Core.Interfaces;
 using Ctlg.UnitTests.Fixtures;
+using System.Linq;
 
 namespace Ctlg.UnitTests.Tests.Commands
 {
-    public class BackupPullCommandTests: CommandTestFixture<BackupPullCommand>
+    public class BackupPullCommandTests: CommonDependenciesFixture
     {
-        public readonly string CurrentDir = "home";
-        public readonly string Path = "some-path";
-        public readonly string Name = "testfoo";
-        public readonly string DateToSearch = "2019-01-01";
-        public readonly string Timestamp = "2019-01-01_02-02-20";
+        private string HelloHash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
 
-        public ISnapshot SourceSnapshot;
-
-        public Mock<IBackupService> BackupServiceMock;
-        public Mock<IBackupWriter> BackupWriterMock;
-        public Mock<IFileStorage> SourceFileStorageMock;
-
-        private File File;
-
-        public BackupPullCommandTests()
-        {
-            File = new File();
-        }
-
-        [SetUp]
-        public void Setup()
-        {
-            Command.Path = Path;
-            Command.Name = Name;
-            Command.Date = DateToSearch;
-
-            BackupServiceMock = AutoMock.Mock<IBackupService>();
-
-            SnapshotServiceMock.Setup(s => s.GetSnapshot(Path, "SHA-256", Name, DateToSearch))
-                .Returns(() => SourceSnapshot);
-
-            SourceFileStorageMock = FileStorageServiceMock.SetupGetFileStorage(Path);
-
-            BackupWriterMock = BackupServiceMock.SetupCreateWriter(CurrentDir, Name, Timestamp);
-
-            SnapshotServiceMock.Setup(s => s.CreateFile(It.IsAny<SnapshotRecord>()))
-                .Returns(File);
-
-            SourceSnapshot = Factories.CreateSnapshotMock(Name, Timestamp).Object;
-        }
+        private string Path = "another/backup";
+        private string BackupName = "MyBackup";
+        private string Date = "2020-04";
 
         [Test]
         public void WhenSourceSnapshotNotFound()
         {
-            SourceSnapshot = null;
-
-            Assert.That(() => Command.Execute(Factories.Config),
-                Throws.TypeOf<Exception>().With.Message.Contain("Snapshot testfoo is not found in some-path"));
+            Assert.That(() => Execute(),
+                Throws.TypeOf<Exception>().With.Message.Contain($"Snapshot MyBackup is not found in {Path}"));
         }
 
         [Test]
-        public void WritesBackup()
+        public void ImportsBackup()
         {
-            Command.Execute(Factories.Config);
+            CreateSnapshot();
 
-            BackupWriterMock.Verify(m => m.AddFile(File, SourceFileStorageMock.Object), Times.Once);
+            Execute();
+
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HelloHash));
+            Assert.That(FS.GetFileAsString($"home/file_storage/18/{HelloHash}"), Is.EqualTo("Hello"));
+        }
+
+        private void Execute()
+        {
+            var command = AutoMock.Create<BackupPullCommand>();
+
+            command.Path = Path;
+            command.Name = BackupName;
+            command.Date = Date;
+
+            command.Execute(Factories.Config);
+        }
+
+        private string GetLastSnapshot(string path)
+        {
+            var fileName = FS.GetVirtualDirectory(path).Files.Keys.Last();
+            return FS.GetFileAsString($"{path}/{fileName}");
+        }
+
+        private void CreateSnapshot()
+        {
+            FS.SetFile($"{Path}/file_storage/18/{HelloHash}", "Hello");
+            FS.SetFile($"{Path}/snapshots/{BackupName}/2020-04-25_09-20-30", $"{HelloHash} 2020-01-02T00:00:00.0000000 5 foo/hi.txt\n");
         }
     }
 }

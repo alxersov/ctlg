@@ -127,7 +127,6 @@
     <Compile Include="Fixtures\AutoMockTestFixture.cs" />
     <Compile Include="Fixtures\BaseTestFixture.cs" />
     <Compile Include="Tests\ByteArrayComparerTests.cs" />
-    <Compile Include="Fixtures\CommandTestFixture.cs" />
     <Compile Include="Tests\FileSizeTests.cs" />
     <Compile Include="Tests\FileTests.cs" />
     <Compile Include="Tests\HashTests.cs" />

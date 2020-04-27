@@ -8,10 +8,6 @@ namespace Ctlg.UnitTests.Tests.Commands
 {
     public class BackupCommandTests : CommonDependenciesFixture
     {
-        public BackupCommandTests()
-        {
-        }
-
         private string HelloHash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
         private string HiHash = "cd08abb273b1619e82e78c29a7df02c1051b1820e99fc395dcaa3326b8";
         private string AppleHash = "f223faa96f22916294922b171a2696d868fd1f9129302eb41a45b2a2ea2ebbfd";
@@ -26,7 +22,9 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             Execute();
 
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Does.Match(@"^# ctlg \d*\.\d*\.\d*\.\d*"));
             Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HelloHash));
+
             Assert.That(FS.GetFileAsString($"home/file_storage/18/{HelloHash}"), Is.EqualTo("Hello"));
         }
 

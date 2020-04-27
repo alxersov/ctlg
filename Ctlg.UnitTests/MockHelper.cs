@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
@@ -10,7 +9,6 @@ namespace Ctlg.UnitTests
 {
     public static class MockHelper
     {
-
         public static void SetupOpenFileForRead(this Mock<IFilesystemService> mock, string path, byte[] content)
         {
             var stream = new MemoryStream();
@@ -33,12 +31,6 @@ namespace Ctlg.UnitTests
             mock.Mock<IFilesystemService>().Setup(s => s.OpenFileForRead(path)).Returns(stream);
         }
 
-        public static void VerifyAppVersionWritten(this Mock<IBackupWriter> backupWriterMock)
-        {
-            backupWriterMock.Verify(m => m.AddComment(It.Is<string>(
-                s => AppVersionRegEx.IsMatch(s))));
-        }
-
         public static void SetupPath(this Mock<IFilesystemService> mock,
             string path1, string path2, string result)
         {
@@ -52,33 +44,11 @@ namespace Ctlg.UnitTests
             mock.Setup(m => m.CombinePath(path1, path2, path3)).Returns(result);
         }
 
-        public static Mock<IFileStorage> SetupGetFileStorage(this Mock<IFileStorageService> mock,
-            string backupRootDirectory)
-        {
-            var fileStorageMock = new Mock<IFileStorage>();
-
-            mock.Setup(s => s.GetFileStorage(backupRootDirectory, "SHA-256"))
-                .Returns(fileStorageMock.Object);
-
-            return fileStorageMock;
-        }
-
-        public static Mock<IBackupWriter> SetupCreateWriter(this Mock<IBackupService> mock,
-            string backupRootPath, string name, string timestamp)
-        {
-            var backupWriterMock = new Mock<IBackupWriter>();
-            mock.Setup(s => s.CreateWriter(backupRootPath, It.IsAny<bool>(), "SHA-256", name, timestamp))
-                .Returns(backupWriterMock.Object);
-            return backupWriterMock;
-        }
-
         public static void SetupHashAlgorithm(this AutoMock mock, HashAlgorithm hashAlgorithm)
         {
             mock.Mock<IDataService>()
                 .Setup(s => s.GetHashAlgorithm(It.Is<string>(p => p == hashAlgorithm.Name)))
                 .Returns(hashAlgorithm);
         }
-
-        private static readonly Regex AppVersionRegEx = new Regex(@"^ctlg \d*\.\d*\.\d*\.\d*$");
     }
 }
