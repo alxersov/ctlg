@@ -22,7 +22,7 @@ namespace Ctlg.UnitTests.Tests.Commands
 
             Execute();
 
-            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Does.Match(@"^# ctlg \d*\.\d*\.\d*\.\d*\n"));
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Does.Match(@"^# ctlg \d*\.\d*\.\d*\.\d*"));
             Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HelloHash));
 
             Assert.That(FS.GetFileAsString($"home/file_storage/18/{HelloHash}"), Is.EqualTo("Hello"));
