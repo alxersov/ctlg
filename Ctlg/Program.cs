@@ -3,7 +3,6 @@ using Autofac;
 using AutoMapper;
 using CommandLine;
 using Ctlg.CommandLineOptions;
-using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Core.Utils;
 using Ctlg.Service;
@@ -16,7 +15,7 @@ namespace Ctlg
     {
         private ICtlgService CtlgService { get; set; }
         private IMapper Mapper { get; }
-        private IFilesystemService FilesystemService { get; }
+        private IConfigService ConfigService { get; }
         private int ExitCode { get; set; }
 
         static int Main(string[] args)
@@ -33,11 +32,11 @@ namespace Ctlg
             }
         }
 
-        public Program(ICtlgService ctlgService, IMapper mapper, IFilesystemService filesystemService)
+        public Program(ICtlgService ctlgService, IMapper mapper, IConfigService configService)
         {
             CtlgService = ctlgService;
             Mapper = mapper;
-            FilesystemService = filesystemService;
+            ConfigService = configService;
         }
 
         public int Run(string[] args)
@@ -65,7 +64,7 @@ namespace Ctlg
         private void Run<T>(object options) where T : ICommand
         {
             var command = Mapper.Map<T>(options);
-            var config = ReadConfig();
+            var config = ConfigService.LoadConfig();
 
             try
             {
@@ -75,15 +74,6 @@ namespace Ctlg
             {
                 DomainEvents.Raise(new ErrorEvent(ex));
             }
-        }
-
-        private Config ReadConfig()
-        {
-            return new Config
-            {
-                Path = FilesystemService.GetCurrentDirectory(),
-                HashAlgorithmName = "SHA-256"
-            };
         }
 
         private static IContainer BuildIocContainer()

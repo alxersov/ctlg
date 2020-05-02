@@ -58,6 +58,9 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AddCommand.cs" />
@@ -102,6 +105,8 @@
     <Compile Include="Commands\Steps\BackupWriter.cs" />
     <Compile Include="Services\BackupService.cs" />
     <Compile Include="Services\HashingService.cs" />
+    <Compile Include="Services\JsonConfigService.cs" />
+    <Compile Include="JsonConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
