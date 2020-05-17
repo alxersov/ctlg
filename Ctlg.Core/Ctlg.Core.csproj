@@ -76,6 +76,7 @@
     <Compile Include="HashCalculator.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
+    <Compile Include="Utils\RandomUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Utils\" />

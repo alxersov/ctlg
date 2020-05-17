@@ -3,12 +3,15 @@ using Ctlg.Service.Commands;
 using NUnit.Framework;
 using Ctlg.UnitTests.Fixtures;
 using System.Linq;
+using Ctlg.Core;
 
 namespace Ctlg.UnitTests.Tests.Commands
 {
     public class BackupPullCommandTests: CommonDependenciesFixture
     {
         private string HelloHash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
+        private string HelloHash512 = "3615f80c9d293ed7402687f94b22d58e529b8cc7916f8fac7fddf7fbd5af4cf7" +
+            "77d3d795a7a00a16bf7e7f3fb9561ee9baae480da9fe7a18769e71886b03f315";
 
         private string Path = "another/backup";
         private string BackupName = "MyBackup";
@@ -32,7 +35,21 @@ namespace Ctlg.UnitTests.Tests.Commands
             Assert.That(FS.GetFileAsString($"home/file_storage/18/{HelloHash}"), Is.EqualTo("Hello"));
         }
 
-        private void Execute()
+        [Test]
+        public void ImportsFromBackupWithDifferentHashFunction()
+        {
+            CreateSnapshot();
+
+            var config = Factories.Config;
+            config.HashAlgorithmName = "SHA-512";
+            Execute(config);
+
+            Assert.That(Errors, Is.Empty);
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(HelloHash512));
+            Assert.That(FS.GetFileAsString($"home/file_storage/36/{HelloHash512}"), Is.EqualTo("Hello"));
+        }
+
+        private void Execute(Config config = null)
         {
             var command = AutoMock.Create<BackupPullCommand>();
 
@@ -40,7 +57,7 @@ namespace Ctlg.UnitTests.Tests.Commands
             command.Name = BackupName;
             command.Date = Date;
 
-            command.Execute(Factories.Config);
+            command.Execute(config ?? Factories.Config);
         }
 
         private string GetLastSnapshot(string path)

@@ -3,6 +3,6 @@ namespace Ctlg.Core.Interfaces
 {
     public interface IConfigService
     {
-        Config LoadConfig();
+        Config LoadConfig(string path = null);
     }
 }

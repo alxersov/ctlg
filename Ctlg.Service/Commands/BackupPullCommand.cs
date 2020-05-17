@@ -13,22 +13,24 @@ namespace Ctlg.Service.Commands
         public string Date { get; set; }
 
         public BackupPullCommand(ISnapshotService snapshotService, IFileStorageService fileStorageService,
-            IBackupService backupService)
+            IBackupService backupService, IConfigService configService)
         {
             SnapshotService = snapshotService;
             FileStorageService = fileStorageService;
             BackupService = backupService;
+            ConfigService = configService;
         }
 
         public void Execute(Config config)
         {
-            var sourceSnapshot = SnapshotService.GetSnapshot(Path, config.HashAlgorithmName, Name, Date);
+            var srouceConfig = ConfigService.LoadConfig(Path);
+            var sourceSnapshot = SnapshotService.GetSnapshot(Path, srouceConfig.HashAlgorithmName, Name, Date);
             if (sourceSnapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found in {Path}.");
             }
 
-            var sourceFileStorage = FileStorageService.GetFileStorage(Path, config.HashAlgorithmName);
+            var sourceFileStorage = FileStorageService.GetFileStorage(Path, srouceConfig.HashAlgorithmName);
             using (var backupWriter = BackupService.CreateWriter(config.Path, false, config.HashAlgorithmName,
                 sourceSnapshot.Name, sourceSnapshot.Timestamp))
             {
@@ -48,5 +50,6 @@ namespace Ctlg.Service.Commands
         private ISnapshotService SnapshotService { get; }
         private IFileStorageService FileStorageService { get; }
         private IBackupService BackupService { get; }
+        public IConfigService ConfigService { get; }
     }
 }

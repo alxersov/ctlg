@@ -26,18 +26,19 @@ namespace Ctlg.UnitTests.Tests.Services
         [Test]
         public void AddsFileFromOtherStorage()
         {
+            var file = new File();
+            file.Hashes.Add(Hash1);
+
             var sourceStorageMock = new Mock<IFileStorage>();
             sourceStorageMock
-                .Setup(s => s.CopyFileTo(Hash1.ToString(), It.IsAny<string>()))
-                .Callback((string hash, string path) => FS.SetFile(path, "Hello"));
+                .Setup(s => s.CopyFileTo(file, It.IsAny<string>()))
+                .Callback((File f, string path) => FS.SetFile(path, "Hello"));
 
             var hashingService = AutoMock.Create<IHashingService>();
             var hashCalculator = hashingService.CreateHashCalculator("SHA-256");
             var storage = AutoMock.Create<SimpleFileStorage>(new NamedParameter("backupRoot", "foo"),
                 new NamedParameter("hashCalculator", hashCalculator));
 
-            var file = new File();
-            file.Hashes.Add(Hash1);
             storage.AddFileFromStorage(file, sourceStorageMock.Object);
 
             Assert.That(FS.GetFileAsString($"foo/file_storage/18/{HashString}"), Is.EqualTo("Hello"));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 
@@ -28,19 +29,25 @@ namespace Ctlg.Service.FileStorage
         public void AddFileFromStorage(File file, IFileStorage sourceStorage)
         {
             var previousHash = HashCalculator.GetExistingHashValue(file);
-            file.Hashes.Clear();
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-            var tempFilePath = FilesystemService.CombinePath(TempDirectory, $"{timestamp}_{previousHash}");
-            sourceStorage.CopyFileTo(previousHash.ToString(), tempFilePath);
+
+            var tempFilePath = GetTempFilePath(previousHash);
+            sourceStorage.CopyFileTo(file, tempFilePath);
             file.FullPath = tempFilePath;
+            file.Hashes.Clear();
             var calculatedHash = HashCalculator.CalculateHashForFile(file);
-            if (previousHash != calculatedHash)
+            if (previousHash != null && previousHash != calculatedHash)
             {
                 throw new Exception($"Caclulated hash does not match expected for file {file.Name}.");
             }
             var path = GetBackupPathForFile(file);
             PrepareDirectoryForFile(path);
             FilesystemService.Move(tempFilePath, path);
+        }
+
+        public void CopyFileTo(File file, string destinationPath)
+        {
+            var hash = HashCalculator.GetExistingHashValue(file);
+            CopyFileTo(hash.ToString(), destinationPath);
         }
 
         public void CopyFileTo(string hash, string destinationPath)
@@ -122,6 +129,14 @@ namespace Ctlg.Service.FileStorage
             var hash = HashCalculator.GetExistingHashValue(file);
 
             return GetBackupFilePath(hash.ToString());
+        }
+
+        private string GetTempFilePath(Hash previousHash)
+        {
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+            var fileName = $"{timestamp}_{previousHash?.ToString() ?? RandomUtils.RandomHexString(8)}";
+
+            return FilesystemService.CombinePath(TempDirectory, fileName);
         }
 
         private Regex StorageSubDirRegex { get; } = new Regex("^[a-h0-9]{2}$", RegexOptions.IgnoreCase);

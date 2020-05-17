@@ -13,9 +13,9 @@ namespace Ctlg.Service.Services
             FilesystemService = filesystemService;
         }
 
-        public Config LoadConfig()
+        public Config LoadConfig(string path = null)
         {
-            var dir = FilesystemService.GetCurrentDirectory();
+            var dir = path ?? FilesystemService.GetCurrentDirectory();
             var configPath = FilesystemService.CombinePath(dir, "config.json");
 
             if (FilesystemService.FileExists(configPath))
