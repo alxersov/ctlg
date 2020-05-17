@@ -14,7 +14,8 @@ namespace Ctlg.UnitTests.TestDoubles
         {
             HashAlgorithms = new List<HashAlgorithm>(new[]
             {
-                new HashAlgorithm() { HashAlgorithmId = 1000, Name = "SHA-256", Length = 32 }
+                new HashAlgorithm() { HashAlgorithmId = 1000, Name = "SHA-256", Length = 32 },
+                new HashAlgorithm() { HashAlgorithmId = 1001, Name = "SHA-512", Length = 64 }
             });
         }
 
