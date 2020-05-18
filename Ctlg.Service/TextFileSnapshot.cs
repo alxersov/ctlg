@@ -9,9 +9,9 @@ using Ctlg.Service.Events;
 
 namespace Ctlg.Service
 {
-    public class Snapshot: ISnapshot
+    public class TextFileSnapshot: ISnapshot
     {
-        public Snapshot(IFilesystemService filesystemService, HashAlgorithm hashAlgorithm,
+        public TextFileSnapshot(IFilesystemService filesystemService, HashAlgorithm hashAlgorithm,
             string snapshotFilePath, string name, string timestamp)
         {
             FilesystemService = filesystemService;
@@ -66,7 +66,7 @@ namespace Ctlg.Service
         {
             var snapshot = FilesystemService.CreateNewFileForWrite(SnapshotFilePath); 
 
-            return new SnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
+            return new TextFileSnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
         }
     }
 }

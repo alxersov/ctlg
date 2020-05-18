@@ -72,9 +72,9 @@ namespace Ctlg.UnitTests.Tests
             Assert.That(errors.Count, Is.EqualTo(0));
         }
 
-        private Snapshot CreateSnapshot()
+        private TextFileSnapshot CreateSnapshot()
         {
-            return new Snapshot(FilesystemServiceMock.Object, Factories.HashAlgorithm, SnapshotPath, SnapshotName, Timestamp);
+            return new TextFileSnapshot(FilesystemServiceMock.Object, Factories.HashAlgorithm, SnapshotPath, SnapshotName, Timestamp);
         }
 
         private IList<SnapshotRecord> EnumerateFiles()

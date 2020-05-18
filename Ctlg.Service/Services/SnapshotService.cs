@@ -34,7 +34,7 @@ namespace Ctlg.Service.Services
             string fullPath = FilesystemService.CombinePath(snapshotDirectory, timestamp);
             var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
 
-            return new Snapshot(FilesystemService, hashAlgorithm, fullPath, name, timestamp);
+            return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, timestamp);
         }
 
         public ISnapshot CreateSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestamp)
@@ -47,7 +47,7 @@ namespace Ctlg.Service.Services
             var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
 
 
-            return new Snapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
+            return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
         }
 
         public File CreateFile(SnapshotRecord record)
