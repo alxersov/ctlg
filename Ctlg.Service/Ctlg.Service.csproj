@@ -100,8 +100,8 @@
     <Compile Include="Services\FileStorageService.cs" />
     <Compile Include="Commands\BackupPullCommand.cs" />
     <Compile Include="SimpleFileStorage.cs" />
-    <Compile Include="Snapshot.cs" />
-    <Compile Include="SnapshotWriter.cs" />
+    <Compile Include="TextFileSnapshot.cs" />
+    <Compile Include="TextFileSnapshotWriter.cs" />
     <Compile Include="Commands\Steps\BackupWriter.cs" />
     <Compile Include="Services\BackupService.cs" />
     <Compile Include="Services\HashingService.cs" />

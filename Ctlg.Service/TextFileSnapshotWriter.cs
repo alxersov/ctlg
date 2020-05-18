@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Ctlg.Service
 {
-    public class SnapshotWriter: ISnapshotWriter
+    public class TextFileSnapshotWriter: ISnapshotWriter
     {
-        public SnapshotWriter(StreamWriter streamWriter, HashAlgorithm hashAlgorithm)
+        public TextFileSnapshotWriter(StreamWriter streamWriter, HashAlgorithm hashAlgorithm)
         {
             StreamWriter = streamWriter;
             HashAlgorithm = hashAlgorithm;
