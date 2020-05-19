@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using File = Ctlg.Core.File;
 
@@ -46,22 +45,7 @@ namespace Ctlg.Service.Services
             var fullPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
             var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
 
-
             return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
-        }
-
-        public File CreateFile(SnapshotRecord record)
-        {
-            var file = new File(record.Name)
-            {
-                FileModifiedDateTime = record.Date,
-                Size = record.Size,
-                RelativePath = record.Name
-            };
-
-            file.Hashes.Add(record.Hash);
-
-            return file;
         }
 
         private string GetSnapshotDirectory(string root, string snapshotName)
@@ -106,6 +90,5 @@ namespace Ctlg.Service.Services
 
         private IFilesystemService FilesystemService { get; }
         private IDataService DataService { get; }
-        private HashAlgorithm HashAlgorithm { get; }
     }
 }

@@ -7,7 +7,7 @@ namespace Ctlg.Core.Interfaces
     {
         string Name { get; }
         string Timestamp { get; }
-        IEnumerable<SnapshotRecord> EnumerateFiles();
+        IEnumerable<File> EnumerateFiles();
         ISnapshotWriter GetWriter();
     }
 }

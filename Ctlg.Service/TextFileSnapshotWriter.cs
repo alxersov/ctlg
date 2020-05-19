@@ -23,13 +23,9 @@ namespace Ctlg.Service
             StreamWriter.WriteLine($"# {message}");
         }
 
-        public SnapshotRecord AddFile(File file)
+        public void AddFile(File file)
         {
-            var snapshotRecord = CreateSnapshotRecord(file);
-
-            StreamWriter.WriteLine(snapshotRecord);
-
-            return snapshotRecord;
+            StreamWriter.WriteLine(FormatTextLine(file));
         }
 
         public void Dispose()
@@ -40,14 +36,11 @@ namespace Ctlg.Service
             }
         }
 
-        private SnapshotRecord CreateSnapshotRecord(File file)
+        private string FormatTextLine(File file)
         {
             var hash = file.Hashes.First(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
-            var date = file.FileModifiedDateTime ?? DateTime.MinValue;
-            var size = file.Size ?? 0;
-            var path = file.RelativePath;
 
-            return new SnapshotRecord(hash, date, size, path);
+            return $"{hash} {file.FileModifiedDateTime:o} {file.Size} {file.RelativePath}";
         }
     }
 }

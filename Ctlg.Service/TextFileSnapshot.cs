@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 using Ctlg.Service.Events;
+using Ctlg.Service.Utils;
+using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {
@@ -29,7 +32,7 @@ namespace Ctlg.Service
         private Regex CommentLineRegex { get; } = new Regex(@"^\s*#");
         private HashAlgorithm HashAlgorithm { get; }
 
-        public IEnumerable<SnapshotRecord> EnumerateFiles()
+        public IEnumerable<File> EnumerateFiles()
         {
             using (var stream = FilesystemService.OpenFileForRead(SnapshotFilePath))
             {
@@ -38,12 +41,12 @@ namespace Ctlg.Service
                     var line = reader.ReadLine();
                     while (line != null)
                     {
-                        SnapshotRecord snapshotRecord = null;
+                        File snapshotRecord = null;
                         try
                         {
                             if (!CommentLineRegex.IsMatch(line))
                             {
-                                snapshotRecord = new SnapshotRecord(line, HashAlgorithm);
+                                snapshotRecord = CreateFile(line);
                             }
                         }
                         catch (Exception ex)
@@ -68,5 +71,34 @@ namespace Ctlg.Service
 
             return new TextFileSnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
         }
+
+        public File CreateFile(string snapshotFileLine)
+        {
+            var match = BackupLineRegex.Match(snapshotFileLine);
+
+            if (!match.Success)
+            {
+                throw new Exception($"Unexpected list line {snapshotFileLine}.");
+            }
+
+            var hash = new Hash(HashAlgorithm, FormatBytes.ToByteArray(match.Groups["hash"].Value));
+            var size = long.Parse(match.Groups["size"].Value);
+            var date = DateTime.ParseExact(match.Groups["date"].Value, "O", CultureInfo.InvariantCulture,
+                                       DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+            var name = match.Groups["name"].Value;
+
+            var file = new File(name)
+            {
+                FileModifiedDateTime = date,
+                Size = size,
+                RelativePath = name
+            };
+
+            file.Hashes.Add(hash);
+
+            return file;
+        }
+
+        private static Regex BackupLineRegex = new Regex(@"^(?<hash>[a-h0-9]{64,})\s(?<date>[0-9:.TZ-]{19,28})\s(?<size>[0-9]{1,10})\s(?<name>\S.*)$", RegexOptions.IgnoreCase);
     }
 }

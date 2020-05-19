@@ -56,7 +56,7 @@ namespace Ctlg.UnitTests.Tests
             var records = EnumerateFiles();
 
             Assert.That(records.Count, Is.EqualTo(1));
-            Assert.That(records[0].ToString(), Is.EqualTo(FileListLine));
+            Assert.That(records[0].Name, Is.EqualTo(FilePath));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace Ctlg.UnitTests.Tests
             var records = EnumerateFiles();
 
             Assert.That(records.Count, Is.EqualTo(1));
-            Assert.That(records[0].ToString(), Is.EqualTo(FileListLine));
+            Assert.That(records[0].Name, Is.EqualTo(FilePath));
             Assert.That(errors.Count, Is.EqualTo(0));
         }
 
@@ -77,7 +77,7 @@ namespace Ctlg.UnitTests.Tests
             return new TextFileSnapshot(FilesystemServiceMock.Object, Factories.HashAlgorithm, SnapshotPath, SnapshotName, Timestamp);
         }
 
-        private IList<SnapshotRecord> EnumerateFiles()
+        private IList<File> EnumerateFiles()
         {
             var snapshot = CreateSnapshot();
 

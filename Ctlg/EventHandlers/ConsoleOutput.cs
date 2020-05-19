@@ -123,17 +123,16 @@ namespace Ctlg.EventHandlers
                 }
             }
 
-
             Console.WriteLine();
         }
 
         public void Handle(BackupEntryCreated args)
         {
             ++_filesProcessed;
-            bytesProcessed += args.BackupEntry.Size;
+            bytesProcessed += args.File.Size ?? 0;
             if (args.NewFileAddedToStorage)
             {
-                bytesAddedToStorage += args.BackupEntry.Size;
+                bytesAddedToStorage += args.File.Size ?? 0;
             }
 
             var h = args.HashCalculated ? 'H' : ' ';
@@ -144,7 +143,7 @@ namespace Ctlg.EventHandlers
 
             var filesFound = 0 < _filesFound ? $"/{_filesFound}" : "";
 
-            Console.WriteLine($"{counter}{filesFound} {h}{n} {FormatSnapshotRecord(args.BackupEntry)}");
+            Console.WriteLine($"{counter}{filesFound} {h}{n} {FormatFileInfo(args.File, args.Hash)}");
         }
 
         public void Handle(BackupEntryRestored args)
@@ -169,9 +168,9 @@ namespace Ctlg.EventHandlers
             }
         }
 
-        private string FormatSnapshotRecord(SnapshotRecord record)
+        private string FormatFileInfo(File file, Hash hash)
         {
-            return $"{record.Hash.ToString().Substring(0, 8)} {FileSize.Format(record.Size),6} {record.Name}";
+            return $"{hash.ToString().Substring(0, 8)} {FileSize.Format(file.Size ?? 0),6} {file.Name}";
         }
 
         private int _filesFound = 0;

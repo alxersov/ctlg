@@ -1,21 +1,32 @@
 ﻿using System;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.Utils;
 using Moq;
 
 namespace Ctlg.UnitTests
 {
     public static class Factories
     {
-        public static SnapshotRecord[] SnapshotRecords
+        public static File[] SnapshotRecords
         {
             get
             {
-                return new[]
+                var file1 = new File("1.txt")
                 {
-                    new SnapshotRecord($"{Hash1} 2018-04-22T18:05:12.0000000Z 11 1.txt", HashAlgorithm),
-                    new SnapshotRecord($"{Hash2} 2019-01-22T00:00:00.0000000Z 12345 foo/bar.txt", HashAlgorithm)
+                    Size = 11,
+                    FileModifiedDateTime = new DateTime(2018, 04, 22, 18, 05, 12, DateTimeKind.Utc)
                 };
+                file1.Hashes.Add(new Hash(HashAlgorithm, FormatBytes.ToByteArray(Hash1)));
+
+                var file2 = new File("foo/bar.txt")
+                {
+                    Size = 12345,
+                    FileModifiedDateTime = new DateTime(2019, 01, 22, 0, 0, 0, DateTimeKind.Utc)
+                };
+                file2.Hashes.Add(new Hash(HashAlgorithm, FormatBytes.ToByteArray(Hash1)));
+
+                return new[] { file1, file2 };
             }
         }
 

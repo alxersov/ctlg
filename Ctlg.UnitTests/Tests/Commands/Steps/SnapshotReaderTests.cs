@@ -11,7 +11,7 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
 {
     public class SnapshotReaderTests : AutoMockTestFixture
     {
-        private SnapshotRecord SnapshotRecord;
+        private File SnapshotRecord;
         private File Root;
         private File File;
         private ISnapshot Snapshot;
@@ -29,7 +29,7 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
             File = new File("1.txt")
             {
                 Size = SnapshotRecord.Size + 10,
-                FileModifiedDateTime = SnapshotRecord.Date.Add(new TimeSpan(1,2,3))
+                FileModifiedDateTime = SnapshotRecord.FileModifiedDateTime?.Add(new TimeSpan(1,2,3))
             };
 
             Root.Contents.Add(File);
@@ -68,12 +68,12 @@ namespace Ctlg.UnitTests.Tests.Commands.Steps
         public void ReadHashesFromLatestSnapshot_WhenFileDateAndSizeMatch()
         {
             File.Size = SnapshotRecord.Size;
-            File.FileModifiedDateTime = SnapshotRecord.Date;
+            File.FileModifiedDateTime = SnapshotRecord.FileModifiedDateTime;
 
             ReadHashes();
 
             Assert.That(File.Hashes.Count, Is.EqualTo(1));
-            Assert.That(File.Hashes.First, Is.EqualTo(SnapshotRecord.Hash));
+            Assert.That(File.Hashes.First(), Is.EqualTo(SnapshotRecord.Hashes.First()));
         }
 
         private void ReadHashes()
