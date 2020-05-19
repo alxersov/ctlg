@@ -16,7 +16,7 @@ namespace Ctlg.Service.Commands
             }
         }
 
-        private void ProcessRecord(SnapshotRecord record, File root)
+        private void ProcessRecord(File record, File root)
         {
             var path = record.Name.Split('\\', '/');
 
@@ -30,9 +30,9 @@ namespace Ctlg.Service.Commands
 
             if (currentFile != null &&
                 currentFile.Size == record.Size &&
-                currentFile.FileModifiedDateTime == record.Date)
+                currentFile.FileModifiedDateTime == record.FileModifiedDateTime)
             {
-                currentFile.Hashes.Add(record.Hash);
+                currentFile.Hashes.AddRange(record.Hashes);
             }
         }
     }

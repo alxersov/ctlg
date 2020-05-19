@@ -41,9 +41,9 @@ namespace Ctlg.Service
                     }
                 }
 
-                var snapshotRecord = SnapshotWriter.AddFile(file);
+                SnapshotWriter.AddFile(file);
 
-                DomainEvents.Raise(new BackupEntryCreated(snapshotRecord,
+                DomainEvents.Raise(new BackupEntryCreated(file, HashCalculator.GetExistingHashValue(file),
                     fileStatus.HasFlag(BackupFileStatus.HashRecalculated),
                     fileStatus.HasFlag(BackupFileStatus.FoundInIndex),
                     fileStatus.IsNotFound()));

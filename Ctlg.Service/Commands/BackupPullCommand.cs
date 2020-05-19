@@ -37,9 +37,8 @@ namespace Ctlg.Service.Commands
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"Created with pull-backup command.");
 
-                foreach (var snapshotRecord in sourceSnapshot.EnumerateFiles())
+                foreach (var file in sourceSnapshot.EnumerateFiles())
                 {
-                    var file = SnapshotService.CreateFile(snapshotRecord);
                     backupWriter.AddFile(file, sourceFileStorage);
                 }
             }

@@ -9,7 +9,7 @@ namespace Ctlg.UnitTests.Tests.Commands
     public class BackupCommandTests : CommonDependenciesFixture
     {
         private string HelloHash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
-        private string HiHash = "cd08abb273b1619e82e78c29a7df02c1051b1820e99fc395dcaa3326b8";
+        private string HiHash = "3639efcd08abb273b1619e82e78c29a7df02c1051b1820e99fc395dcaa3326b8";
         private string AppleHash = "f223faa96f22916294922b171a2696d868fd1f9129302eb41a45b2a2ea2ebbfd";
         private string SourcePath = "source";
         private string BackupName = "Backup1";
@@ -59,6 +59,23 @@ namespace Ctlg.UnitTests.Tests.Commands
             Execute(true);
 
             Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"), Contains.Substring(AppleHash));
+        }
+
+        [Test]
+        public void Adds_multiple_file_to_storage_and_snapshot()
+        {
+            FS.SetFile("source/hello.txt", "Hello", ModifiedTime);
+            FS.SetFile("source/foo/hi.txt", "Hi", ModifiedTime);
+
+            Execute();
+
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"),
+                Contains.Substring($"{HelloHash} 2020-01-02T00:00:00.0000000 5 hello.txt"));
+            Assert.That(GetLastSnapshot($"home/snapshots/{BackupName}"),
+                Contains.Substring($"{HiHash} 2020-01-02T00:00:00.0000000 2 foo/hi.txt"));
+
+            Assert.That(FS.GetFileAsString($"home/file_storage/18/{HelloHash}"), Is.EqualTo("Hello"));
+            Assert.That(FS.GetFileAsString($"home/file_storage/36/{HiHash}"), Is.EqualTo("Hi"));
         }
 
         private void Execute(bool isFastMode = false)

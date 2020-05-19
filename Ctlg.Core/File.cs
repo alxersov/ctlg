@@ -34,7 +34,7 @@ namespace Ctlg.Core
         public DateTime RecordUpdatedDateTime { get; set; }
 
         public List<File> Contents { get; set; }
-        public IList<Hash> Hashes { get; set; }
+        public List<Hash> Hashes { get; set; }
 
         public string RelativePath { get; set; }
         public string FullPath { get; set; }
