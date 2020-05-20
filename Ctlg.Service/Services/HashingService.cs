@@ -7,10 +7,10 @@ namespace Ctlg.Service.Services
 {
     public class HashingService : IHashingService
     {
-        public HashingService(IIndex<string, IHashFunction> hashFunction, IFilesystemService filesystemService,
+        public HashingService(IIndex<string, IHashFunction> hashFunctions, IFilesystemService filesystemService,
             IDataService dataService)
         {
-            HashFunctions = hashFunction;
+            HashFunctions = hashFunctions;
             FilesystemService = filesystemService;
             DataService = dataService;
         }

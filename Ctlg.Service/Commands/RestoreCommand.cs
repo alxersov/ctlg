@@ -25,7 +25,7 @@ namespace Ctlg.Service.Commands
 
         public void Execute(Config config)
         {
-            var snapshot = SnapshotService.GetSnapshot(config.Path, config.HashAlgorithmName, Name, Date);
+            var snapshot = SnapshotService.FindSnapshot(config, Name, Date);
             if (snapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found");

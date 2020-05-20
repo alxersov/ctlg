@@ -107,6 +107,7 @@
     <Compile Include="Services\HashingService.cs" />
     <Compile Include="Services\JsonConfigService.cs" />
     <Compile Include="JsonConfig.cs" />
+    <Compile Include="TextFileSnapshotFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">

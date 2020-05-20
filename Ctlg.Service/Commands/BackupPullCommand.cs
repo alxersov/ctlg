@@ -23,16 +23,16 @@ namespace Ctlg.Service.Commands
 
         public void Execute(Config config)
         {
-            var srouceConfig = ConfigService.LoadConfig(Path);
-            var sourceSnapshot = SnapshotService.GetSnapshot(Path, srouceConfig.HashAlgorithmName, Name, Date);
+            var sourceConfig = ConfigService.LoadConfig(Path);
+            var sourceSnapshot = SnapshotService.FindSnapshot(sourceConfig, Name, Date);
             if (sourceSnapshot == null)
             {
                 throw new Exception($"Snapshot {Name} is not found in {Path}.");
             }
 
-            var sourceFileStorage = FileStorageService.GetFileStorage(Path, srouceConfig.HashAlgorithmName);
-            using (var backupWriter = BackupService.CreateWriter(config.Path, false, config.HashAlgorithmName,
-                sourceSnapshot.Name, sourceSnapshot.Timestamp))
+            var sourceFileStorage = FileStorageService.GetFileStorage(Path, sourceConfig.HashAlgorithmName);
+            using (var backupWriter = BackupService.CreateWriter(config, sourceSnapshot.Name, sourceSnapshot.Timestamp,
+                false))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"Created with pull-backup command.");

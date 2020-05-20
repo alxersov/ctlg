@@ -1,94 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac.Features.Indexed;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using File = Ctlg.Core.File;
 
 namespace Ctlg.Service.Services
 {
     public class SnapshotService : ISnapshotService
     {
-        public SnapshotService(IFilesystemService filesystemService, IDataService dataService)
+        public SnapshotService(IIndex<string, ISnapshotFactory> snapshotFactories)
         {
-            FilesystemService = filesystemService;
-            DataService = dataService;
+            SnapshotFactories = snapshotFactories;
         }
 
-        public ISnapshot GetSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestampMask)
+        public ISnapshot FindSnapshot(Config config, string name, string timestampMask)
         {
-            var snapshotDirectory = GetSnapshotDirectory(backupRootPath, name);
-            var allSnapshots = GetSnapshotFiles(snapshotDirectory).Select(d => d.Name).OrderBy(s => s).ToList();
+            var factory = GetFactory("TXT");
 
-            if (allSnapshots.Count == 0)
+            var allTimestamps = factory.GetTimestamps(config, name);
+            if (allTimestamps.Count == 0)
             {
                 return null;
             }
 
-            var timestamp = SelectSnapshotByDate(allSnapshots, timestampMask);
+            var timestamp = SelectSnapshotByDate(allTimestamps, timestampMask);
             if (string.IsNullOrEmpty(timestamp))
             {
                 return null;
             }
 
-            string fullPath = FilesystemService.CombinePath(snapshotDirectory, timestamp);
-            var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
-
-            return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, timestamp);
+            return factory.GetSnapshot(config, name, timestamp);
         }
 
-        public ISnapshot CreateSnapshot(string backupRootPath, string hashAlgorithmName, string name, string timestamp)
+        public ISnapshot CreateSnapshot(Config config, string name, string timestamp)
         {
-            var snapshotDirectory = GetSnapshotDirectory(backupRootPath, name);
-            FilesystemService.CreateDirectory(snapshotDirectory);
-
-            var snapshotFileName = timestamp ?? GenerateSnapshotFileName();
-            var fullPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
-            var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
-
-            return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
+            return GetFactory("TXT").GetSnapshot(config, name, timestamp);
         }
 
-        private string GetSnapshotDirectory(string root, string snapshotName)
+        private ISnapshotFactory GetFactory(string name)
         {
-            return FilesystemService.CombinePath(root, "snapshots", snapshotName);
-        }
-
-        private IEnumerable<File> GetSnapshotFiles(string snapshotDirectory)
-        {
-            if (!FilesystemService.DirectoryExists(snapshotDirectory))
+            var canonicalName = name.ToUpperInvariant();
+            if (!SnapshotFactories.TryGetValue(canonicalName, out ISnapshotFactory factory))
             {
-                return Enumerable.Empty<File>();
-            }
-            return FilesystemService.EnumerateFiles(snapshotDirectory, "????-??-??_??-??-??");
-        }
-
-        private string GenerateSnapshotFileName()
-        {
-            return FormatSnapshotName(DateTime.UtcNow);
-        }
-
-        private string FormatSnapshotName(DateTime date)
-        {
-            return date.ToString("yyyy-MM-dd_HH-mm-ss");
-        }
-
-        private string SelectSnapshotByDate(IEnumerable<string> snapshots, string snapshotDate)
-        {
-            if (string.IsNullOrEmpty(snapshotDate))
-            {
-                return snapshots.Last();
+                throw new Exception($"Unsupported snapshot type {name}");
             }
 
-            var foundFiles = snapshots.Where(s => s.StartsWith(snapshotDate, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            if (foundFiles.Count > 1)
-            {
-                    throw new Exception(
-                    $"Provided snapshot date is ambiguous. {foundFiles.Count} snapshots exist: {string.Join(", ", foundFiles)}.");
-            }
-            return foundFiles.FirstOrDefault();
+            return factory;
         }
 
-        private IFilesystemService FilesystemService { get; }
-        private IDataService DataService { get; }
+        private string SelectSnapshotByDate(IEnumerable<string> timestamps, string timestampMask)
+        {
+            if (string.IsNullOrEmpty(timestampMask))
+            {
+                return timestamps.Last();
+            }
+
+            var found = timestamps
+                .Where(s => s.StartsWith(timestampMask, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            if (found.Count > 1)
+            {
+                throw new Exception(
+                    $"Provided snapshot date is ambiguous. {found.Count} snapshots exist: {string.Join(", ", found)}.");
+            }
+
+            return found.FirstOrDefault();
+        }
+
+        private IIndex<string, ISnapshotFactory> SnapshotFactories { get; }
     }
 }

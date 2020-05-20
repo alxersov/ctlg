@@ -27,7 +27,7 @@ namespace Ctlg.Service.Commands
 
             if (IsFastMode)
             {
-                var latestSnapshot = SnapshotService.GetSnapshot(config.Path, config.HashAlgorithmName, Name, null);
+                var latestSnapshot = SnapshotService.FindSnapshot(config, Name, null);
                 if (latestSnapshot != null)
                 {
                     var reader = new SnapshotReader();
@@ -35,8 +35,7 @@ namespace Ctlg.Service.Commands
                 }
             }
 
-            using (var backupWriter = BackupService.CreateWriter(config.Path, IsFastMode, config.HashAlgorithmName,
-                Name, null))
+            using (var backupWriter = BackupService.CreateWriter(config, Name, null, IsFastMode))
             {
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"FastMode={IsFastMode}");

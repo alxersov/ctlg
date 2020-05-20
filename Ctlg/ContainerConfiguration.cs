@@ -37,6 +37,7 @@ namespace Ctlg
         {
             builder.RegisterType<ArchiveService>().As<IArchiveService>().InstancePerLifetimeScope();
             builder.RegisterType<SnapshotService>().As<ISnapshotService>().InstancePerLifetimeScope();
+            builder.RegisterType<TextFileSnapshotFactory>().Named<ISnapshotFactory>("TXT").InstancePerLifetimeScope();
             builder.RegisterCryptographyHashFunction<MD5Cng>("MD5");
             builder.RegisterCryptographyHashFunction<SHA1Cng>("SHA-1");
             builder.RegisterCryptographyHashFunction<SHA256Cng>("SHA-256");

@@ -1,7 +1,9 @@
 ﻿using System;
+using Autofac;
 using Autofac.Extras.Moq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service;
 using Ctlg.Service.Services;
 using Ctlg.UnitTests.Fixtures;
 using Moq;
@@ -21,6 +23,7 @@ namespace Ctlg.UnitTests.Tests.Services
         private readonly string SnapshotFile2;
         private readonly string SnapshotFile3;
         private readonly string SnapshotName = "Test";
+        private readonly Config Config;
 
         private SnapshotService SnapshotService;
 
@@ -32,6 +35,11 @@ namespace Ctlg.UnitTests.Tests.Services
             SnapshotFile1 = $@"{TestSnapshotsDirectory}\{Date1}";
             SnapshotFile2 = $@"{TestSnapshotsDirectory}\{Date2}";
             SnapshotFile3 = $@"{TestSnapshotsDirectory}\{Date3}";
+            Config = new Config
+            {
+                HashAlgorithmName = "SHA-256",
+                Path = RootDirectory
+            };
         }
 
         [SetUp]
@@ -44,42 +52,42 @@ namespace Ctlg.UnitTests.Tests.Services
         [Test]
         public void GetsLatesSnapshot()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, null);
+            var snapshot = SnapshotService.FindSnapshot(Config, SnapshotName, null);
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date3));
         }
 
         [Test]
         public void GetSnapshot_WhenSnapshotDoesNotExist_ReturnsNull()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", "DoesNotExist", null);
+            var snapshot = SnapshotService.FindSnapshot(Config, "DoesNotExist", null);
             Assert.That(snapshot, Is.Null);
         }
 
         [Test]
         public void GetSnapshot_WhenNoSnapshotMatchesProvidedDate_ReturnsNull()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, "2019-09-03");
+            var snapshot = SnapshotService.FindSnapshot(Config, SnapshotName, "2019-09-03");
             Assert.That(snapshot, Is.Null);
         }
 
         [Test]
         public void GetSnapshot_WithExactDate()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, Date1);
+            var snapshot = SnapshotService.FindSnapshot(Config, SnapshotName, Date1);
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date1));
         }
 
         [Test]
         public void GetSnapshot_WithOneDateMatching()
         {
-            var snapshot = SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, "2019-01-01_02");
+            var snapshot = SnapshotService.FindSnapshot(Config, SnapshotName, "2019-01-01_02");
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date2));
         }
 
         [Test]
         public void GetSnapshot_WithMoreThanOneDateMatching()
         {
-            Assert.That(() => SnapshotService.GetSnapshot(RootDirectory, "SHA-256", SnapshotName, "2019-01-01"),
+            Assert.That(() => SnapshotService.FindSnapshot(Config, SnapshotName, "2019-01-01"),
                 Throws.InstanceOf<Exception>().With.Message.Contain("date is ambiguous"));
         }
 
@@ -90,7 +98,7 @@ namespace Ctlg.UnitTests.Tests.Services
                 .Setup(f => f.CombinePath(TestSnapshotsDirectory, It.IsAny<string>()))
                 .Returns(SnapshotFile1);
 
-            var snapshot = SnapshotService.CreateSnapshot(RootDirectory, "SHA-256", SnapshotName, null);
+            var snapshot = SnapshotService.CreateSnapshot(Config, SnapshotName, null);
 
             Assert.That(snapshot.Timestamp, Is.Not.Null);
             Assert.That(snapshot.Name, Is.EqualTo(SnapshotName));
@@ -100,9 +108,14 @@ namespace Ctlg.UnitTests.Tests.Services
         [Test]
         public void CreateSnapshot_WhenTimestampIsSpecified()
         {
-            var snapshot = SnapshotService.CreateSnapshot(RootDirectory, "SHA-256", SnapshotName, Date2);
+            var snapshot = SnapshotService.CreateSnapshot(Config, SnapshotName, Date2);
 
             Assert.That(snapshot.Timestamp, Is.EqualTo(Date2));
+        }
+
+        protected override void ConfigureDependencies(ContainerBuilder builder)
+        {
+            builder.RegisterType<TextFileSnapshotFactory>().Named<ISnapshotFactory>("TXT").InstancePerLifetimeScope();
         }
 
         private void SetupMocks()

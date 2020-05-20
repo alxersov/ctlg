@@ -1,4 +1,5 @@
 ﻿using System;
+using Ctlg.Core;
 using Ctlg.Core.Interfaces;
 
 namespace Ctlg.Service.Services
@@ -14,14 +15,13 @@ namespace Ctlg.Service.Services
             HashingService = hashingService;
         }
 
-        public IBackupWriter CreateWriter(string directory, bool isFastMode, string hashAlgorithmName,
-            string name, string timestamp)
+        public IBackupWriter CreateWriter(Config config, string name, string timestamp, bool isFastMode)
         {
-            var index = IndexService.GetIndex(directory, hashAlgorithmName);
-            var fileStorage = FileStorageService.GetFileStorage(directory, hashAlgorithmName);
-            var snapshot = SnapshotService.CreateSnapshot(directory, hashAlgorithmName, name, timestamp);
+            var index = IndexService.GetIndex(config.Path, config.HashAlgorithmName);
+            var fileStorage = FileStorageService.GetFileStorage(config.Path, config.HashAlgorithmName);
+            var snapshot = SnapshotService.CreateSnapshot(config, name, timestamp);
 
-            var hashCalculator = HashingService.CreateHashCalculator(hashAlgorithmName);
+            var hashCalculator = HashingService.CreateHashCalculator(config.HashAlgorithmName);
 
             return new BackupWriter(fileStorage, snapshot.GetWriter(), isFastMode, index, hashCalculator);
         }
