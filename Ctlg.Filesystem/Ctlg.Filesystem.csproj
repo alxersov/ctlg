@@ -44,7 +44,7 @@
       <HintPath>..\packages\Pri.LongPath.2.0.47\lib\net45\Pri.LongPath.dll</HintPath>
     </Reference>
     <Reference Include="SharpCompress">
-      <HintPath>..\packages\SharpCompress.0.25.0\lib\net46\SharpCompress.dll</HintPath>
+      <HintPath>..\packages\SharpCompress.0.25.1\lib\net46\SharpCompress.dll</HintPath>
     </Reference>
     <Reference Include="System.Buffers">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -61,7 +61,7 @@
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.Encoding.CodePages">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.4.7.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+      <HintPath>..\packages\System.Text.Encoding.CodePages.4.7.1\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
