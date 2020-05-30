@@ -27,7 +27,8 @@ namespace Ctlg.Service.Services
                     return new Config
                     {
                         Path = dir,
-                        HashAlgorithmName = json.HashAlgorithm
+                        HashAlgorithmName = json.HashAlgorithm,
+                        SnapshotServiceName = json.Snapshot
                     };
                 }
             }
@@ -35,7 +36,8 @@ namespace Ctlg.Service.Services
             return new Config
             {
                 Path = dir,
-                HashAlgorithmName = "SHA-256"
+                HashAlgorithmName = "SHA-256",
+                SnapshotServiceName = "TXT"
             };
         }
 
