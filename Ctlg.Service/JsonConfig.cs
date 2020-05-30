@@ -5,5 +5,6 @@ namespace Ctlg.Service
     {
         public int Version { get; set; }
         public string HashAlgorithm { get; set; }
+        public string Snapshot { get; set; }
     }
 }

@@ -38,7 +38,8 @@ namespace Ctlg.UnitTests.Tests.Services
             Config = new Config
             {
                 HashAlgorithmName = "SHA-256",
-                Path = RootDirectory
+                Path = RootDirectory,
+                SnapshotServiceName = "TXT"
             };
         }
 

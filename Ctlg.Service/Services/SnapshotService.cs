@@ -16,7 +16,7 @@ namespace Ctlg.Service.Services
 
         public ISnapshot FindSnapshot(Config config, string name, string timestampMask)
         {
-            var factory = GetFactory("TXT");
+            var factory = GetFactory(config.SnapshotServiceName);
 
             var allTimestamps = factory.GetTimestamps(config, name);
             if (allTimestamps.Count == 0)
@@ -35,7 +35,7 @@ namespace Ctlg.Service.Services
 
         public ISnapshot CreateSnapshot(Config config, string name, string timestamp)
         {
-            return GetFactory("TXT").GetSnapshot(config, name, timestamp);
+            return GetFactory(config.SnapshotServiceName).GetSnapshot(config, name, timestamp);
         }
 
         private ISnapshotFactory GetFactory(string name)

@@ -24,7 +24,7 @@ namespace Ctlg.UnitTests
                     Size = 12345,
                     FileModifiedDateTime = new DateTime(2019, 01, 22, 0, 0, 0, DateTimeKind.Utc)
                 };
-                file2.Hashes.Add(new Hash(HashAlgorithm, FormatBytes.ToByteArray(Hash1)));
+                file2.Hashes.Add(new Hash(HashAlgorithm, FormatBytes.ToByteArray(Hash2)));
 
                 return new[] { file1, file2 };
             }
@@ -54,7 +54,8 @@ namespace Ctlg.UnitTests
                 return new Config
                 {
                     Path = "home",
-                    HashAlgorithmName = "SHA-256"
+                    HashAlgorithmName = "SHA-256",
+                    SnapshotServiceName = "TXT"
                 };
             }
         }

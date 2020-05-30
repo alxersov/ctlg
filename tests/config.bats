@@ -3,7 +3,7 @@
 load helper
 
 @test "backup and restore when hashing algorithm is specified" {
-  echo '{"Version": 1, "HashAlgorithm": "SHA-512"}' > "$CTLG_WORKDIR/config.json"
+  echo '{"Version": 1, "HashAlgorithm": "SHA-512", "Snapshot": "TXT"}' > "$CTLG_WORKDIR/config.json"
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   output=$($CTLG_EXECUTABLE backup -n Test "$CTLG_FILESDIR")
 
