@@ -140,6 +140,18 @@ namespace Ctlg.UnitTests.TestDoubles
             return content.GetReadStream();
         }
 
+        public Stream OpenFileForWrite(string path)
+        {
+            var content = GetFileContent(path);
+
+            var srcStream = content.GetReadStream();
+            var dstStream = content.GetWriteStream();
+
+            srcStream.CopyTo(dstStream);
+
+            return dstStream;
+        }
+
         public void SetFile(string path, string content, DateTime modifiedTime = default)
         {
             CreateDirectory(GetDirectoryName(path));
