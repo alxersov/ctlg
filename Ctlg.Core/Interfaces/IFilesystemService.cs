@@ -7,6 +7,7 @@ namespace Ctlg.Core.Interfaces
     {
         IFilesystemDirectory GetDirectory(string path);
         IEnumerable<File> EnumerateFiles(string path, string searchMask = null);
+        Stream OpenFileForWrite(string path);
         Stream OpenFileForRead(string path);
         Stream CreateNewFileForWrite(string path);
         Stream CreateFileForWrite(string path);

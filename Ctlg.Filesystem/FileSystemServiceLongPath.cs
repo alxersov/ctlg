@@ -78,5 +78,10 @@ namespace Ctlg.Filesystem
         {
             return File.OpenRead(path);
         }
+
+        public Stream OpenFileForWrite(string path)
+        {
+            return File.Open(path, FileMode.Append, System.IO.FileAccess.Write);
+        }
     }
 }

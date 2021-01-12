@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 using File = Ctlg.Core.File;
@@ -67,7 +68,12 @@ namespace Ctlg.Service
 
         public ISnapshotWriter GetWriter()
         {
-            var snapshot = FilesystemService.CreateNewFileForWrite(SnapshotFilePath); 
+            // Workaround to prevent Sharing violation error when opening two zero-length files from exFAT drive when
+            // running on Mono in macOS.
+            // https://github.com/mono/mono/issues/19221
+            PrepareSnapshotFile(SnapshotFilePath);
+
+            var snapshot = FilesystemService.OpenFileForWrite(SnapshotFilePath);
 
             return new TextFileSnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
         }
@@ -97,6 +103,15 @@ namespace Ctlg.Service
             file.Hashes.Add(hash);
 
             return file;
+        }
+
+        private void PrepareSnapshotFile(string path)
+        {
+            var stream = FilesystemService.CreateNewFileForWrite(SnapshotFilePath);
+            using (var writer = new TextFileSnapshotWriter(new StreamWriter(stream), HashAlgorithm))
+            {
+                writer.AddComment($"ctlg {AppVersion.Version}");
+            }
         }
 
         private static Regex BackupLineRegex = new Regex(@"^(?<hash>[a-h0-9]{64,})\s(?<date>[0-9:.TZ-]{19,28})\s(?<size>[0-9]{1,10})\s(?<name>\S.*)$", RegexOptions.IgnoreCase);

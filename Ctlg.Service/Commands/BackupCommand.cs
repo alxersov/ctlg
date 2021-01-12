@@ -37,7 +37,6 @@ namespace Ctlg.Service.Commands
 
             using (var backupWriter = BackupService.CreateWriter(config, Name, null, IsFastMode))
             {
-                backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"FastMode={IsFastMode}");
                 foreach (var file in root.EnumerateFiles())
                 {
