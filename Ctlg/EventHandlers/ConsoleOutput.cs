@@ -21,7 +21,9 @@ namespace Ctlg.EventHandlers
         IHandle<BackupEntryCreated>,
         IHandle<BackupEntryRestored>,
         IHandle<BackupCommandEnded>,
-        IHandle<Warning>
+        IHandle<Warning>,
+        IHandle<EnumeratingHashes>,
+        IHandle<EnumeratingSnapshots>
     {
         public void Handle(DirectoryFound args)
         {
@@ -171,6 +173,16 @@ namespace Ctlg.EventHandlers
         private string FormatFileInfo(File file, Hash hash)
         {
             return $"{hash.ToString().Substring(0, 8)} {FileSize.Format(file.Size ?? 0),6} {file.Name}";
+        }
+
+        public void Handle(EnumeratingHashes args)
+        {
+            Console.WriteLine($"Enumerating files in storage with {args.Prefix}.. hashes.");
+        }
+
+        public void Handle(EnumeratingSnapshots args)
+        {
+            Console.WriteLine($"Processing snapshot {args.Name} @ {args.Timestamp}");
         }
 
         private int _filesFound = 0;

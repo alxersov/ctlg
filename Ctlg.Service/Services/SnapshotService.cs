@@ -38,6 +38,16 @@ namespace Ctlg.Service.Services
             return GetFactory(config.SnapshotServiceName).GetSnapshot(config, name, timestamp);
         }
 
+        public List<string> GetSnapshotNames(Config config)
+        {
+            return GetFactory(config.SnapshotServiceName).GetSnapshotNames(config);
+        }
+
+        public List<string> GetTimestamps(Config config, string name)
+        {
+            return GetFactory(config.SnapshotServiceName).GetTimestamps(config, name);
+        }
+
         private ISnapshotFactory GetFactory(string name)
         {
             var canonicalName = name.ToUpperInvariant();

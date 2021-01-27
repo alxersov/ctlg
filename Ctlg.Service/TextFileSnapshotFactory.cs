@@ -27,6 +27,14 @@ namespace Ctlg.Service
             return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
         }
 
+        public List<string> GetSnapshotNames(Config config)
+        {
+            var snapshotsPath = FilesystemService.CombinePath(config.Path, "snapshots");
+            var dir = FilesystemService.GetDirectory(snapshotsPath);
+
+            return dir.EnumerateDirectories().Select(d => d.Directory.Name).ToList();
+        }
+
         public List<string> GetTimestamps(Config config, string name)
         {
             var snapshotDirectory = GetSnapshotDirectory(config.Path, name);

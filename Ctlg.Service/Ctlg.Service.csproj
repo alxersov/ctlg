@@ -108,6 +108,9 @@
     <Compile Include="Services\JsonConfigService.cs" />
     <Compile Include="JsonConfig.cs" />
     <Compile Include="TextFileSnapshotFactory.cs" />
+    <Compile Include="Commands\FsckCommand.cs" />
+    <Compile Include="Events\EnumeratingHashes.cs" />
+    <Compile Include="Events\EnumeratingSnapshots.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
