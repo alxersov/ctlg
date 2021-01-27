@@ -14,16 +14,21 @@ namespace Ctlg.Core
             FilesystemService = filesystemService;
         }
 
+        public Hash CalculateHashForFile(string path)
+        {
+            using (var stream = FilesystemService.OpenFileForRead(path))
+            {
+                return Calculate(stream);
+            }
+        }
+
         public Hash CalculateHashForFile(File file)
         {
-            using (var stream = FilesystemService.OpenFileForRead(file.FullPath))
-            {
-                var hash = Calculate(stream);
+            var hash = CalculateHashForFile(file.FullPath);
 
-                file.Hashes.Add(hash);
+            file.Hashes.Add(hash);
 
-                return hash;
-            }
+            return hash;
         }
 
         public Hash GetExistingHashValue(File file)

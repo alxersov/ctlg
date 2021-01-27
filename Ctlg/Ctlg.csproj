@@ -132,6 +132,7 @@
     <Compile Include="EventHandlers\Logging.cs" />
     <Compile Include="CommandLineOptions\BackupPull.cs" />
     <Compile Include="ContainerConfiguration.cs" />
+    <Compile Include="CommandLineOptions\Fsck.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

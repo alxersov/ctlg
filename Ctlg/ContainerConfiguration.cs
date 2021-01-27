@@ -94,6 +94,7 @@ namespace Ctlg
                 cfg.CreateMap<Show, ShowCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<RebuildIndex, RebuildIndexCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<BackupPull, BackupPullCommand>().ConstructUsingServiceLocator();
+                cfg.CreateMap<Fsck, FsckCommand>().ConstructUsingServiceLocator();
             });
         }
     }

@@ -93,6 +93,8 @@ namespace Ctlg.Service.FileStorage
                     continue;
                 }
 
+                DomainEvents.Raise(new EnumeratingHashes(dir.Directory.Name));
+
                 foreach (var file in dir.EnumerateFiles("*"))
                 {
                     if (StorageFileRegex.IsMatch(file.Name))
@@ -115,7 +117,7 @@ namespace Ctlg.Service.FileStorage
             {
                 if (file.Size.HasValue && FilesystemService.GetFileSize(backupFile) != file.Size)
                 {
-                    throw new Exception($"The size of \"{file.FullPath}\" and \"{backupFile}\" do not match.");
+                    throw new Exception($"The size of \"{file.FullPath ?? file.Name}\" and \"{backupFile}\" do not match.");
                 }
 
                 return true;
@@ -137,6 +139,22 @@ namespace Ctlg.Service.FileStorage
             var fileName = $"{timestamp}_{previousHash?.ToString() ?? RandomUtils.RandomHexString(8)}";
 
             return FilesystemService.CombinePath(TempDirectory, fileName);
+        }
+
+        public bool VerifyFileByHash(byte[] hash)
+        {
+            var expectedHashString = FormatBytes.ToHexString(hash);
+            var path = GetBackupFilePath(expectedHashString);
+            var calculatedHash = HashCalculator.CalculateHashForFile(path);
+            var calculatedHashString = calculatedHash.ToString();
+
+            if (expectedHashString != calculatedHashString)
+            {
+                throw new Exception($"Hash mismatch for {path} expected: {expectedHashString} got {calculatedHashString}");
+            }
+
+            return true;
+
         }
 
         private Regex StorageSubDirRegex { get; } = new Regex("^[a-h0-9]{2}$", RegexOptions.IgnoreCase);

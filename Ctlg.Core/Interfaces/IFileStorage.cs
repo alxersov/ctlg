@@ -11,5 +11,6 @@ namespace Ctlg.Core.Interfaces
         void CopyFileTo(File file, string destinationPath);
         IEnumerable<byte[]> GetAllHashes();
         bool IsFileInStorage(File file);
+        bool VerifyFileByHash(byte[] hash);
     }
 }
