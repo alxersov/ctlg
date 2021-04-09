@@ -107,9 +107,6 @@
     <Reference Include="System.Text.Encoding.CodePages">
       <HintPath>..\packages\System.Text.Encoding.CodePages.4.7.1\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
-    <Reference Include="SharpCompress">
-      <HintPath>..\packages\SharpCompress.0.25.1\lib\net46\SharpCompress.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -133,14 +130,10 @@
     <Compile Include="Tests\FileSizeTests.cs" />
     <Compile Include="Tests\FileTests.cs" />
     <Compile Include="Tests\HashTests.cs" />
-    <Compile Include="Tests\Commands\AddCommandTests.cs" />
     <Compile Include="Tests\Commands\BackupPullCommandTests.cs" />
-    <Compile Include="Tests\Commands\FindCommandTests.cs" />
-    <Compile Include="Tests\Commands\ListCommandTests.cs" />
     <Compile Include="Tests\Commands\RestoreCommandTests.cs" />
     <Compile Include="Tests\Commands\Steps\FileEnumerateTests.cs" />
     <Compile Include="Tests\Commands\Steps\SnapshotReaderTests.cs" />
-    <Compile Include="Tests\Services\ArchiveServiceTests.cs" />
     <Compile Include="Tests\Services\CtlgServiceTests.cs" />
     <Compile Include="Tests\Services\DataServiceTests.cs" />
     <Compile Include="Tests\Services\FilesystemServiceBaseTests.cs" />

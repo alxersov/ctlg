@@ -107,17 +107,11 @@
     <Reference Include="System.Text.Encoding.CodePages">
       <HintPath>..\packages\System.Text.Encoding.CodePages.4.7.1\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
-    <Reference Include="SharpCompress">
-      <HintPath>..\packages\SharpCompress.0.25.1\lib\net46\SharpCompress.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandLineOptions\Add.cs" />
-    <Compile Include="CommandLineOptions\Find.cs" />
-    <Compile Include="CommandLineOptions\Show.cs" />
     <Compile Include="ConsoleTextAttributesScope.cs" />
     <Compile Include="CryptographyHashRegistration.cs" />
     <Compile Include="EventHandlers\ErrorOutput.cs" />
@@ -126,7 +120,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandLineOptions\Backup.cs" />
     <Compile Include="CommandLineOptions\Restore.cs" />
-    <Compile Include="CommandLineOptions\List.cs" />
     <Compile Include="IProgram.cs" />
     <Compile Include="CommandLineOptions\RebuildIndex.cs" />
     <Compile Include="EventHandlers\Logging.cs" />

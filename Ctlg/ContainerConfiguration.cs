@@ -35,7 +35,6 @@ namespace Ctlg
 
         public static void RegisterCommonDependencies(this ContainerBuilder builder)
         {
-            builder.RegisterType<ArchiveService>().As<IArchiveService>().InstancePerLifetimeScope();
             builder.RegisterType<SnapshotService>().As<ISnapshotService>().InstancePerLifetimeScope();
             builder.RegisterType<TextFileSnapshotFactory>().Named<ISnapshotFactory>("TXT").InstancePerLifetimeScope();
             builder.RegisterCryptographyHashFunction<MD5Cng>("MD5");
@@ -53,7 +52,7 @@ namespace Ctlg
             builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>().InstancePerLifetimeScope();
             builder.RegisterType<JsonConfigService>().As<IConfigService>().InstancePerLifetimeScope();
 
-            builder.RegisterAssemblyTypes(typeof(AddCommand).Assembly)
+            builder.RegisterAssemblyTypes(typeof(BackupCommand).Assembly)
                 .Where(t => t.IsAssignableTo<ICommand>())
                 .AsSelf()
                 .InstancePerDependency();
@@ -86,12 +85,8 @@ namespace Ctlg
         {
             return new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Add, AddCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<Backup, BackupCommand>().ConstructUsingServiceLocator();
-                cfg.CreateMap<Find, FindCommand>().ConstructUsingServiceLocator();
-                cfg.CreateMap<List, ListCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<Restore, RestoreCommand>().ConstructUsingServiceLocator();
-                cfg.CreateMap<Show, ShowCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<RebuildIndex, RebuildIndexCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<BackupPull, BackupPullCommand>().ConstructUsingServiceLocator();
                 cfg.CreateMap<Fsck, FsckCommand>().ConstructUsingServiceLocator();

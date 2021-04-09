@@ -46,7 +46,6 @@
     <Compile Include="File.cs" />
     <Compile Include="Hash.cs" />
     <Compile Include="HashAlgorithm.cs" />
-    <Compile Include="Interfaces\IArchive.cs" />
     <Compile Include="Interfaces\IDataService.cs" />
     <Compile Include="Interfaces\IFilesystemDirectory.cs" />
     <Compile Include="Interfaces\IFilesystemService.cs" />
@@ -54,7 +53,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FileNameComparer.cs" />
     <Compile Include="Interfaces\ISnapshotService.cs" />
-    <Compile Include="Interfaces\IArchiveService.cs" />
     <Compile Include="Interfaces\IFileStorageIndex.cs" />
     <Compile Include="Interfaces\IFileStorageIndexService.cs" />
     <Compile Include="Utils\FileSize.cs" />
