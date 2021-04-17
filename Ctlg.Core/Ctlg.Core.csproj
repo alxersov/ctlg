@@ -75,6 +75,7 @@
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Interfaces\ISnapshotFactory.cs" />
+    <Compile Include="SnapshotRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Utils\" />

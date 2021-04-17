@@ -63,9 +63,9 @@ namespace Ctlg.Service.FileStorage
             FilesystemService.Copy(storageFilePath, destinationPath);
         }
 
-        public void AddFile(File file)
+        public void AddFile(File file, byte[] hash)
         {
-            var path = GetBackupPathForFile(file);
+            var path = GetBackupFilePath(hash);
             PrepareDirectoryForFile(path);
             FilesystemService.Copy(file.FullPath, path);
         }
@@ -74,6 +74,11 @@ namespace Ctlg.Service.FileStorage
         {
             var directoryPath = FilesystemService.GetDirectoryName(filePath);
             FilesystemService.CreateDirectory(directoryPath);
+        }
+
+        private string GetBackupFilePath(byte[] hash)
+        {
+            return GetBackupFilePath(FormatBytes.ToHexString(hash));
         }
 
         private string GetBackupFilePath(string hash)
@@ -112,6 +117,23 @@ namespace Ctlg.Service.FileStorage
         public bool IsFileInStorage(File file)
         {
             var backupFile = GetBackupPathForFile(file);
+
+            if (FilesystemService.FileExists(backupFile))
+            {
+                if (file.Size.HasValue && FilesystemService.GetFileSize(backupFile) != file.Size)
+                {
+                    throw new Exception($"The size of \"{file.FullPath ?? file.Name}\" and \"{backupFile}\" do not match.");
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsFileInStorage(File file, byte[] hash)
+        {
+            var backupFile = GetBackupFilePath(hash);
 
             if (FilesystemService.FileExists(backupFile))
             {

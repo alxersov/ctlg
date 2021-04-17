@@ -32,6 +32,7 @@ namespace Ctlg.Service
         private string SnapshotFilePath { get; }
         private Regex CommentLineRegex { get; } = new Regex(@"^\s*#");
         private HashAlgorithm HashAlgorithm { get; }
+        private Dictionary<string, SnapshotRecord> Records { get; set; }
 
         public IEnumerable<File> EnumerateFiles()
         {
@@ -105,6 +106,15 @@ namespace Ctlg.Service
             return file;
         }
 
+        public SnapshotRecord GetRecord(string relativePath)
+        {
+            if (Records == null) { LoadRecords(); }
+
+            Records.TryGetValue(relativePath, out SnapshotRecord record);
+
+            return record;
+        }
+
         private void PrepareSnapshotFile(string path)
         {
             var stream = FilesystemService.CreateNewFileForWrite(SnapshotFilePath);
@@ -113,6 +123,23 @@ namespace Ctlg.Service
                 writer.AddComment($"ctlg {AppVersion.Version}");
             }
         }
+
+        private void LoadRecords()
+        {
+            Records = new Dictionary<string, SnapshotRecord>();
+
+            foreach (var record in EnumerateFiles())
+            {
+                Records.Add(record.RelativePath, new SnapshotRecord()
+                {
+                    RelativePath = record.RelativePath,
+                    Size = record.Size ?? 0,
+                    FileModifiedDateTime = record.FileModifiedDateTime ?? default,
+                    Hash = record.Hashes.Find(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId).Value
+                });
+            }
+        }
+
 
         private static Regex BackupLineRegex = new Regex(@"^(?<hash>[a-h0-9]{64,})\s(?<date>[0-9:.TZ-]{19,28})\s(?<size>[0-9]{1,10})\s(?<name>\S.*)$", RegexOptions.IgnoreCase);
     }

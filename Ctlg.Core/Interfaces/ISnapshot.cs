@@ -9,5 +9,6 @@ namespace Ctlg.Core.Interfaces
         string Timestamp { get; }
         IEnumerable<File> EnumerateFiles();
         ISnapshotWriter GetWriter();
+        SnapshotRecord GetRecord(string relativePath);
     }
 }

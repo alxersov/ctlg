@@ -1,7 +1,6 @@
 ﻿using System;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
@@ -25,26 +24,29 @@ namespace Ctlg.Service.Commands
         {
             var root = TreeProvider.ReadTree(Path, SearchPattern);
 
-            if (IsFastMode)
-            {
-                var latestSnapshot = SnapshotService.FindSnapshot(config, Name, null);
-                if (latestSnapshot != null)
-                {
-                    var reader = new SnapshotReader();
-                    reader.ReadHashesFromSnapshot(latestSnapshot, root);
-                }
-            }
-
+            ISnapshot latestSnapshot = IsFastMode ? SnapshotService.FindSnapshot(config, Name, null) : null;
+               
             using (var backupWriter = BackupService.CreateWriter(config, Name, null, IsFastMode))
             {
                 backupWriter.AddComment($"FastMode={IsFastMode}");
                 foreach (var file in root.EnumerateFiles())
                 {
-                    backupWriter.AddFile(file);
+                    backupWriter.AddFile(file, GetPreviousHashForFile(latestSnapshot, file));
                 }
             }
 
             DomainEvents.Raise(new BackupCommandEnded());
+        }
+
+        private byte[] GetPreviousHashForFile(ISnapshot latestSnapshot, File file)
+        {
+            byte[] hash = null;
+            var record = latestSnapshot?.GetRecord(file.RelativePath);
+            if (record != null && record.Size == file.Size && record.FileModifiedDateTime == file.FileModifiedDateTime)
+            {
+                hash = record.Hash;
+            }
+            return hash;
         }
 
         private ITreeProvider TreeProvider { get; set; }

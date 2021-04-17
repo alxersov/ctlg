@@ -39,7 +39,8 @@ namespace Ctlg.Service.Commands
 
                 foreach (var file in sourceSnapshot.EnumerateFiles())
                 {
-                    backupWriter.AddFile(file, sourceFileStorage);
+                    var hash = sourceConfig.HashAlgorithmName == config.HashAlgorithmName ? file.Hashes[0].Value : null;
+                    backupWriter.AddFile(file, hash, sourceFileStorage);
                 }
             }
 

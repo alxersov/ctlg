@@ -77,9 +77,9 @@ namespace Ctlg.EventHandlers
             }
         }
 
-        private string FormatFileInfo(File file, Hash hash)
+        private string FormatFileInfo(File file, byte[] hash)
         {
-            return $"{hash.ToString().Substring(0, 8)} {FileSize.Format(file.Size ?? 0),6} {file.Name}";
+            return $"{FormatBytes.ToHexString(hash).Substring(0, 8)} {FileSize.Format(file.Size ?? 0),6} {file.Name}";
         }
 
         public void Handle(EnumeratingHashes args)

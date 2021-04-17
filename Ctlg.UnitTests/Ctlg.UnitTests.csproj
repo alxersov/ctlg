@@ -133,7 +133,6 @@
     <Compile Include="Tests\Commands\BackupPullCommandTests.cs" />
     <Compile Include="Tests\Commands\RestoreCommandTests.cs" />
     <Compile Include="Tests\Commands\Steps\FileEnumerateTests.cs" />
-    <Compile Include="Tests\Commands\Steps\SnapshotReaderTests.cs" />
     <Compile Include="Tests\Services\CtlgServiceTests.cs" />
     <Compile Include="Tests\Services\DataServiceTests.cs" />
     <Compile Include="Tests\Services\FilesystemServiceBaseTests.cs" />
