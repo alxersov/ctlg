@@ -25,7 +25,7 @@ namespace Ctlg.Service.FileStorage
         private string TempDirectory { get; }
         private HashCalculator HashCalculator { get; }
 
-        public string HashAlgorithmName => HashCalculator.Algorithm.Name;
+        public string HashAlgorithmName => HashCalculator.Name;
 
         public byte[] AddFileFromStorage(SnapshotRecord snapshotRecord, IFileStorage sourceStorage)
         {
@@ -34,7 +34,7 @@ namespace Ctlg.Service.FileStorage
             var tempFilePath = GetTempFilePath(previousHash);
             sourceStorage.CopyFileTo(snapshotRecord, tempFilePath);
 
-            var calculatedHash = HashCalculator.CalculateHashForFile(tempFilePath).Value;
+            var calculatedHash = HashCalculator.CalculateHashForFile(tempFilePath);
             if (sourceStorage.HashAlgorithmName == HashAlgorithmName && !ByteArrayComparer.AreEqual(previousHash, calculatedHash))
             {
                 throw new Exception($"Caclulated hash does not match expected for file {snapshotRecord.RelativePath}.");
@@ -161,7 +161,7 @@ namespace Ctlg.Service.FileStorage
             var expectedHashString = FormatBytes.ToHexString(hash);
             var path = GetBackupFilePath(expectedHashString);
             var calculatedHash = HashCalculator.CalculateHashForFile(path);
-            var calculatedHashString = calculatedHash.ToString();
+            var calculatedHashString = FormatBytes.ToHexString(calculatedHash);
 
             if (expectedHashString != calculatedHashString)
             {

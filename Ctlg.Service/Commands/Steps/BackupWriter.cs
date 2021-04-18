@@ -31,7 +31,7 @@ namespace Ctlg.Service
                 var fileStatus = FindFile(file, hash);
                 if (fileStatus.IsNotFound())
                 {
-                    hash = HashCalculator.CalculateHashForFile(root, file.RelativePath).Value;
+                    hash = HashCalculator.CalculateHashForFile(root, file.RelativePath);
                     fileStatus = FindFile(file, hash) | BackupFileStatus.HashRecalculated;
                     if (fileStatus.IsNotFound())
                     {
@@ -60,10 +60,10 @@ namespace Ctlg.Service
                 byte[] hash = null;
                 var fileStatus = default(BackupFileStatus);
 
-                if (sourceStorage.HashAlgorithmName == HashCalculator.Algorithm.Name)
+                if (sourceStorage.HashAlgorithmName == HashCalculator.Name)
                 {
                     hash = snapshotRecord.Hash;
-                    fileStatus = FindFile(snapshotRecord); // TODO: check if sourceStorage uses the same algorithm
+                    fileStatus = FindFile(snapshotRecord);
                 }
 
                 if (fileStatus.IsNotFound())

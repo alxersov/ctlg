@@ -19,6 +19,8 @@ namespace Ctlg.Filesystem
             return Algorithm.ComputeHash(stream);
         }
 
+        public int HashSize => Algorithm.HashSize / 8;
+
         private readonly THashAlgorithm Algorithm;
     }
 }
