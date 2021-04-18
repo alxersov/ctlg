@@ -2,30 +2,27 @@
 using System.IO;
 using File = Ctlg.Core.File;
 using Ctlg.Core.Interfaces;
-using Ctlg.Core;
-using System.Linq;
+using Ctlg.Service.Utils;
 
 namespace Ctlg.Service
 {
     public class TextFileSnapshotWriter: ISnapshotWriter
     {
-        public TextFileSnapshotWriter(StreamWriter streamWriter, HashAlgorithm hashAlgorithm)
+        public TextFileSnapshotWriter(StreamWriter streamWriter)
         {
             StreamWriter = streamWriter;
-            HashAlgorithm = hashAlgorithm;
         }
 
         private StreamWriter StreamWriter { get; }
-        public HashAlgorithm HashAlgorithm { get; }
 
         public void AddComment(string message)
         {
             StreamWriter.WriteLine($"# {message}");
         }
 
-        public void AddFile(File file)
+        public void AddFile(File file, byte[] hash)
         {
-            StreamWriter.WriteLine(FormatTextLine(file));
+            StreamWriter.WriteLine(FormatTextLine(file, hash));
         }
 
         public void Dispose()
@@ -36,11 +33,9 @@ namespace Ctlg.Service
             }
         }
 
-        private string FormatTextLine(File file)
+        private string FormatTextLine(File file, byte[] hash)
         {
-            var hash = file.Hashes.First(h => h.HashAlgorithmId == HashAlgorithm.HashAlgorithmId);
-
-            return $"{hash} {file.FileModifiedDateTime:o} {file.Size} {file.RelativePath}";
+            return $"{FormatBytes.ToHexString(hash)} {file.FileModifiedDateTime:o} {file.Size} {file.RelativePath}";
         }
     }
 }

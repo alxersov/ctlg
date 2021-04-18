@@ -33,7 +33,6 @@ namespace Ctlg.UnitTests.Tests
         public void Setup()
         {
             FilesystemServiceMock = AutoMock.Mock<IFilesystemService>();
-            AutoMock.SetupHashAlgorithm(Factories.HashAlgorithm);
         }
 
         [Test]
@@ -56,7 +55,7 @@ namespace Ctlg.UnitTests.Tests
             var records = EnumerateFiles();
 
             Assert.That(records.Count, Is.EqualTo(1));
-            Assert.That(records[0].Name, Is.EqualTo(FilePath));
+            Assert.That(records[0].RelativePath, Is.EqualTo(FilePath));
         }
 
         [Test]
@@ -68,16 +67,16 @@ namespace Ctlg.UnitTests.Tests
             var records = EnumerateFiles();
 
             Assert.That(records.Count, Is.EqualTo(1));
-            Assert.That(records[0].Name, Is.EqualTo(FilePath));
+            Assert.That(records[0].RelativePath, Is.EqualTo(FilePath));
             Assert.That(errors.Count, Is.EqualTo(0));
         }
 
         private TextFileSnapshot CreateSnapshot()
         {
-            return new TextFileSnapshot(FilesystemServiceMock.Object, Factories.HashAlgorithm, SnapshotPath, SnapshotName, Timestamp);
+            return new TextFileSnapshot(FilesystemServiceMock.Object, SnapshotPath, SnapshotName, Timestamp);
         }
 
-        private IList<File> EnumerateFiles()
+        private IList<SnapshotRecord> EnumerateFiles()
         {
             var snapshot = CreateSnapshot();
 

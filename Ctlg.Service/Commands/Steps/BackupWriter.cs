@@ -24,26 +24,25 @@ namespace Ctlg.Service
             index.Load();
         }
 
-        public void AddFile(File file, IFileStorage sourceStorage = null)
+        public void AddFile(File file, string root, byte[] hash)
         {
             try
             {
-                var fileStatus = FindFile(file);
+                var fileStatus = FindFile(file, hash);
                 if (fileStatus.IsNotFound())
                 {
-                    fileStatus = sourceStorage == null ?
-                        AddFileFromFilesystem(file) :
-                        AddFileFromStorage(file, sourceStorage);
-
+                    hash = HashCalculator.CalculateHashForFile(root, file.RelativePath);
+                    fileStatus = FindFile(file, hash) | BackupFileStatus.HashRecalculated;
                     if (fileStatus.IsNotFound())
                     {
-                        Index.Add(HashCalculator.GetExistingHashValue(file).Value);
+                        Storage.AddFile(file, hash);
+                        Index.Add(hash);
                     }
                 }
 
-                SnapshotWriter.AddFile(file);
+                SnapshotWriter.AddFile(file, hash);
 
-                DomainEvents.Raise(new BackupEntryCreated(file, HashCalculator.GetExistingHashValue(file),
+                DomainEvents.Raise(new BackupEntryCreated(file, hash,
                     fileStatus.HasFlag(BackupFileStatus.HashRecalculated),
                     fileStatus.HasFlag(BackupFileStatus.FoundInIndex),
                     fileStatus.IsNotFound()));
@@ -54,42 +53,67 @@ namespace Ctlg.Service
             }
         }
 
-        protected BackupFileStatus AddFileFromFilesystem(File file)
+        public void AddFile(SnapshotRecord snapshotRecord, IFileStorage sourceStorage)
         {
-            file.Hashes.Clear();
-            HashCalculator.CalculateHashForFile(file);
-            var fileStatus = FindFile(file) | BackupFileStatus.HashRecalculated;
-
-            if (fileStatus.IsNotFound())
+            try
             {
-                Storage.AddFile(file);
+                byte[] hash = null;
+                var fileStatus = default(BackupFileStatus);
+
+                if (sourceStorage.HashAlgorithmName == HashCalculator.Name)
+                {
+                    hash = snapshotRecord.Hash;
+                    fileStatus = FindFile(snapshotRecord);
+                }
+
+                if (fileStatus.IsNotFound())
+                {
+                    fileStatus = BackupFileStatus.HashRecalculated;
+                    hash = Storage.AddFileFromStorage(snapshotRecord, sourceStorage);
+                    Index.Add(hash);
+                }
+
+                var file = new File
+                {
+                    RelativePath = snapshotRecord.RelativePath,
+                    Size = snapshotRecord.Size,
+                    FileModifiedDateTime = snapshotRecord.FileModifiedDateTime
+                };
+
+                SnapshotWriter.AddFile(file, hash);
+
+                DomainEvents.Raise(new BackupEntryCreated(file, hash,
+                    fileStatus.HasFlag(BackupFileStatus.HashRecalculated),
+                    fileStatus.HasFlag(BackupFileStatus.FoundInIndex),
+                    fileStatus.IsNotFound()));
             }
-
-            return fileStatus;
+            catch (Exception e)
+            {
+                DomainEvents.Raise(new ErrorEvent(e));
+            }
         }
 
-        protected BackupFileStatus AddFileFromStorage(File file, IFileStorage storage)
+        protected BackupFileStatus FindFile(SnapshotRecord snapshotRecord)
         {
-            Storage.AddFileFromStorage(file, storage);
-
-            return BackupFileStatus.HashRecalculated;
+            return FindFile(new File { Name = snapshotRecord.RelativePath, Size = snapshotRecord.Size }, snapshotRecord.Hash);
         }
 
-        protected BackupFileStatus FindFile(File file)
+        protected BackupFileStatus FindFile(File file, byte[] hash)
         {
             var status = default(BackupFileStatus);
 
-            var hash = HashCalculator.GetExistingHashValue(file);
-            if (hash != null)
+            if (hash == null)
             {
-                if (ShouldUseIndex && Index.IsInIndex(hash.Value))
-                {
-                    status |= BackupFileStatus.FoundInIndex;
-                }
-                else if (Storage.IsFileInStorage(file))
-                {
-                    status |= BackupFileStatus.FoundInStorage;
-                }
+                return status;
+            }
+
+            if (ShouldUseIndex && Index.IsInIndex(hash))
+            {
+                status |= BackupFileStatus.FoundInIndex;
+            }
+            else if (Storage.IsFileInStorage(file, hash))
+            {
+                status |= BackupFileStatus.FoundInStorage;
             }
 
             return status;
@@ -108,6 +132,7 @@ namespace Ctlg.Service
 
         private IFileStorage Storage { get; }
         private ISnapshotWriter SnapshotWriter { get; }
+        public ISnapshot PreviousSnapshot { get; }
         private bool ShouldUseIndex { get; }
         private IFileStorageIndex Index { get; }
         private HashCalculator HashCalculator { get; }

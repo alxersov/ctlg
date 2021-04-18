@@ -5,21 +5,21 @@ namespace Ctlg.Service.Services
 {
     public sealed class IndexFileService : IFileStorageIndexService
     {
-        public IndexFileService(IFilesystemService filesystemService, IDataService dataService)
+        public IndexFileService(IFilesystemService filesystemService, IHashingService hashingService)
         {
             FilesystemService = filesystemService;
-            DataService = dataService;
+            HashingService = hashingService;
         }
 
         public IFileStorageIndex GetIndex(string backupRootDirectory, string hashAlgorithmName)
         {
             var indexPath = FilesystemService.CombinePath(backupRootDirectory, "index.bin");
-            var hashAlgorithm = DataService.GetHashAlgorithm(hashAlgorithmName);
+            var hashFunction = HashingService.GetHashFunction(hashAlgorithmName);
 
-            return new FileIndex(FilesystemService, indexPath, hashAlgorithm.Length);
+            return new FileIndex(FilesystemService, indexPath, hashFunction.HashSize);
         }
 
         private IFilesystemService FilesystemService { get; }
-        private IDataService DataService { get; }
+        private IHashingService HashingService { get; }
     }
 }

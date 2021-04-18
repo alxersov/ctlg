@@ -29,13 +29,14 @@ load helper
 @test "backup in fast mode works when files are deleted" {
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   $CTLG_EXECUTABLE backup -n Test "$CTLG_FILESDIR"
+  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-01_09-10-15"
 
   rm "$CTLG_FILESDIR/hi.txt"
 
   $CTLG_EXECUTABLE backup -f -n Test "$CTLG_FILESDIR"
 }
 
-@test "bakup in fast mode uses index" {
+@test "backup in fast mode uses index" {
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   $CTLG_EXECUTABLE backup -n Test "$CTLG_FILESDIR"
 
@@ -45,8 +46,8 @@ load helper
 
   output=$($CTLG_EXECUTABLE backup -f -n Test "${CTLG_FILESDIR}")
 
-  [[ "${output}" == *"1/2 HI 2cf24dba      5 hello.txt"* ]] || false
-  [[ "${output}" == *"2/2  I 2cf24dba      5 hi.txt"* ]] || false
+  [[ "${output}" == *"/2 HI 2cf24dba      5 hello.txt"* ]] || false
+  [[ "${output}" == *"/2  I 2cf24dba      5 hi.txt"* ]] || false
 }
 
 @test "backup and restore multiple files and directories" {

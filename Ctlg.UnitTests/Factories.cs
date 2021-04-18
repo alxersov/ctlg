@@ -8,23 +8,25 @@ namespace Ctlg.UnitTests
 {
     public static class Factories
     {
-        public static File[] SnapshotRecords
+        public static SnapshotRecord[] SnapshotRecords
         {
             get
             {
-                var file1 = new File("1.txt")
+                var file1 = new SnapshotRecord
                 {
+                    RelativePath = "1.txt",
                     Size = 11,
-                    FileModifiedDateTime = new DateTime(2018, 04, 22, 18, 05, 12, DateTimeKind.Utc)
+                    FileModifiedDateTime = new DateTime(2018, 04, 22, 18, 05, 12, DateTimeKind.Utc),
+                    Hash = FormatBytes.ToByteArray(Hash1)
                 };
-                file1.Hashes.Add(new Hash(HashAlgorithm, FormatBytes.ToByteArray(Hash1)));
 
-                var file2 = new File("foo/bar.txt")
+                var file2 = new SnapshotRecord()
                 {
+                    RelativePath = "foo/bar.txt",
                     Size = 12345,
-                    FileModifiedDateTime = new DateTime(2019, 01, 22, 0, 0, 0, DateTimeKind.Utc)
+                    FileModifiedDateTime = new DateTime(2019, 01, 22, 0, 0, 0, DateTimeKind.Utc),
+                    Hash = FormatBytes.ToByteArray(Hash2)
                 };
-                file2.Hashes.Add(new Hash(HashAlgorithm, FormatBytes.ToByteArray(Hash2)));
 
                 return new[] { file1, file2 };
             }
@@ -37,14 +39,6 @@ namespace Ctlg.UnitTests
             snapshotMock.SetupGet(m => m.Timestamp).Returns(timestamp);
             snapshotMock.Setup(m => m.EnumerateFiles()).Returns(new[] { SnapshotRecords[0] });
             return snapshotMock;
-        }
-
-        public static HashAlgorithm HashAlgorithm
-        {
-            get
-            {
-                return new HashAlgorithm() { HashAlgorithmId = 2, Name = "SHA-256", Length = 32 };
-            }
         }
 
         public static Config Config

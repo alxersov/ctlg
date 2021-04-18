@@ -7,30 +7,26 @@ namespace Ctlg.Service.Services
 {
     public class HashingService : IHashingService
     {
-        public HashingService(IIndex<string, IHashFunction> hashFunctions, IFilesystemService filesystemService,
-            IDataService dataService)
+        public HashingService(IIndex<string, IHashFunction> hashFunctions, IFilesystemService filesystemService)
         {
             HashFunctions = hashFunctions;
             FilesystemService = filesystemService;
-            DataService = dataService;
         }
 
         public HashCalculator CreateHashCalculator(string algorithmName)
         {
-            return CreateHashCalculator(DataService.GetHashAlgorithm(algorithmName));
+            var hashFunction = GetHashFunction(algorithmName);
+            var canonicalName = algorithmName.ToUpperInvariant();
+
+            return new HashCalculator(hashFunction, canonicalName, FilesystemService);
         }
 
-        public HashCalculator CreateHashCalculator(HashAlgorithm algorithm)
+        public IHashFunction GetHashFunction(string algorithmName)
         {
-            return new HashCalculator(algorithm, GetHashFunction(algorithm.Name), FilesystemService);
-        }
-
-        private IHashFunction GetHashFunction(string name)
-        {
-            var canonicalName = name.ToUpperInvariant();
+            var canonicalName = algorithmName.ToUpperInvariant();
             if (!HashFunctions.TryGetValue(canonicalName, out IHashFunction hashFunction))
             {
-                throw new Exception($"Unsupported hash function {name}");
+                throw new Exception($"Unsupported hash function {canonicalName}");
             }
 
             return hashFunction;
@@ -38,6 +34,5 @@ namespace Ctlg.Service.Services
 
         private IIndex<string, IHashFunction> HashFunctions { get; set; }
         private IFilesystemService FilesystemService { get; }
-        private IDataService DataService { get; }
     }
 }

@@ -13,7 +13,6 @@ namespace Ctlg
 {
     class Program: IProgram, IHandle<ErrorEvent>
     {
-        private ICtlgService CtlgService { get; set; }
         private IMapper Mapper { get; }
         private IConfigService ConfigService { get; }
         private int ExitCode { get; set; }
@@ -32,9 +31,8 @@ namespace Ctlg
             }
         }
 
-        public Program(ICtlgService ctlgService, IMapper mapper, IConfigService configService)
+        public Program(IMapper mapper, IConfigService configService)
         {
-            CtlgService = ctlgService;
             Mapper = mapper;
             ConfigService = configService;
         }
@@ -43,15 +41,9 @@ namespace Ctlg
         {
             ExitCode = 0;
 
-            CtlgService.ApplyDbMigrations();
-
-            Parser.Default.ParseArguments<Add, Backup, Find, List, Restore, Show, RebuildIndex, BackupPull, Fsck>(args)
-                .WithParsed<Add>(opts => Run<AddCommand>(opts))
+            Parser.Default.ParseArguments<Backup, Restore, RebuildIndex, BackupPull, Fsck>(args)
                 .WithParsed<Backup>(opts => Run<BackupCommand>(opts))
-                .WithParsed<Find>(opts => Run<FindCommand>(opts))
-                .WithParsed<List>(opts => Run<ListCommand>(opts))
                 .WithParsed<Restore>(opts => Run<RestoreCommand>(opts))
-                .WithParsed<Show>(opts => Run<ShowCommand>(opts))
                 .WithParsed<RebuildIndex>(opts => Run<RebuildIndexCommand>(opts))
                 .WithParsed<BackupPull>(opts => Run<BackupPullCommand>(opts))
                 .WithParsed<Fsck>(opts => Run<FsckCommand>(opts))

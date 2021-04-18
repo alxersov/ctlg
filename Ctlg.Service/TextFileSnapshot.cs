@@ -9,17 +9,15 @@ using Ctlg.Core.Interfaces;
 using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
-using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {
     public class TextFileSnapshot: ISnapshot
     {
-        public TextFileSnapshot(IFilesystemService filesystemService, HashAlgorithm hashAlgorithm,
+        public TextFileSnapshot(IFilesystemService filesystemService,
             string snapshotFilePath, string name, string timestamp)
         {
             FilesystemService = filesystemService;
-            HashAlgorithm = hashAlgorithm;
             SnapshotFilePath = snapshotFilePath;
             Name = name;
             Timestamp = timestamp;
@@ -31,9 +29,9 @@ namespace Ctlg.Service
         private IFilesystemService FilesystemService { get; }
         private string SnapshotFilePath { get; }
         private Regex CommentLineRegex { get; } = new Regex(@"^\s*#");
-        private HashAlgorithm HashAlgorithm { get; }
+        private Dictionary<string, SnapshotRecord> Records { get; set; }
 
-        public IEnumerable<File> EnumerateFiles()
+        public IEnumerable<SnapshotRecord> EnumerateFiles()
         {
             using (var stream = FilesystemService.OpenFileForRead(SnapshotFilePath))
             {
@@ -42,7 +40,7 @@ namespace Ctlg.Service
                     var line = reader.ReadLine();
                     while (line != null)
                     {
-                        File snapshotRecord = null;
+                        SnapshotRecord snapshotRecord = null;
                         try
                         {
                             if (!CommentLineRegex.IsMatch(line))
@@ -75,10 +73,10 @@ namespace Ctlg.Service
 
             var snapshot = FilesystemService.OpenFileForWrite(SnapshotFilePath);
 
-            return new TextFileSnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
+            return new TextFileSnapshotWriter(new StreamWriter(snapshot));
         }
 
-        public File CreateFile(string snapshotFileLine)
+        public SnapshotRecord CreateFile(string snapshotFileLine)
         {
             var match = BackupLineRegex.Match(snapshotFileLine);
 
@@ -87,30 +85,48 @@ namespace Ctlg.Service
                 throw new Exception($"Unexpected list line {snapshotFileLine}.");
             }
 
-            var hash = new Hash(HashAlgorithm, FormatBytes.ToByteArray(match.Groups["hash"].Value));
+            var hash = FormatBytes.ToByteArray(match.Groups["hash"].Value);
             var size = long.Parse(match.Groups["size"].Value);
             var date = DateTime.ParseExact(match.Groups["date"].Value, "O", CultureInfo.InvariantCulture,
                                        DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
             var name = match.Groups["name"].Value;
 
-            var file = new File(name)
+            var file = new SnapshotRecord
             {
                 FileModifiedDateTime = date,
                 Size = size,
-                RelativePath = name
+                RelativePath = name,
+                Hash = hash
             };
 
-            file.Hashes.Add(hash);
-
             return file;
+        }
+
+        public SnapshotRecord GetRecord(string relativePath)
+        {
+            if (Records == null) { LoadRecords(); }
+
+            Records.TryGetValue(relativePath, out SnapshotRecord record);
+
+            return record;
         }
 
         private void PrepareSnapshotFile(string path)
         {
             var stream = FilesystemService.CreateNewFileForWrite(SnapshotFilePath);
-            using (var writer = new TextFileSnapshotWriter(new StreamWriter(stream), HashAlgorithm))
+            using (var writer = new TextFileSnapshotWriter(new StreamWriter(stream)))
             {
                 writer.AddComment($"ctlg {AppVersion.Version}");
+            }
+        }
+
+        private void LoadRecords()
+        {
+            Records = new Dictionary<string, SnapshotRecord>();
+
+            foreach (var record in EnumerateFiles())
+            {
+                Records.Add(record.RelativePath, record);
             }
         }
 

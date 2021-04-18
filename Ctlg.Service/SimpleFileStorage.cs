@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
-using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
 
@@ -26,28 +25,29 @@ namespace Ctlg.Service.FileStorage
         private string TempDirectory { get; }
         private HashCalculator HashCalculator { get; }
 
-        public void AddFileFromStorage(File file, IFileStorage sourceStorage)
+        public string HashAlgorithmName => HashCalculator.Name;
+
+        public byte[] AddFileFromStorage(SnapshotRecord snapshotRecord, IFileStorage sourceStorage)
         {
-            var previousHash = HashCalculator.GetExistingHashValue(file);
+            var previousHash = snapshotRecord.Hash;
 
             var tempFilePath = GetTempFilePath(previousHash);
-            sourceStorage.CopyFileTo(file, tempFilePath);
-            file.FullPath = tempFilePath;
-            file.Hashes.Clear();
-            var calculatedHash = HashCalculator.CalculateHashForFile(file);
-            if (previousHash != null && previousHash != calculatedHash)
+            sourceStorage.CopyFileTo(snapshotRecord, tempFilePath);
+
+            var calculatedHash = HashCalculator.CalculateHashForFile(tempFilePath);
+            if (sourceStorage.HashAlgorithmName == HashAlgorithmName && !ByteArrayComparer.AreEqual(previousHash, calculatedHash))
             {
-                throw new Exception($"Caclulated hash does not match expected for file {file.Name}.");
+                throw new Exception($"Caclulated hash does not match expected for file {snapshotRecord.RelativePath}.");
             }
-            var path = GetBackupPathForFile(file);
+            var path = GetBackupFilePath(calculatedHash);
             PrepareDirectoryForFile(path);
             FilesystemService.Move(tempFilePath, path);
+            return calculatedHash;
         }
 
-        public void CopyFileTo(File file, string destinationPath)
+        public void CopyFileTo(SnapshotRecord snapshotRecord, string destinationPath)
         {
-            var hash = HashCalculator.GetExistingHashValue(file);
-            CopyFileTo(hash.ToString(), destinationPath);
+            CopyFileTo(FormatBytes.ToHexString(snapshotRecord.Hash), destinationPath);
         }
 
         public void CopyFileTo(string hash, string destinationPath)
@@ -63,9 +63,9 @@ namespace Ctlg.Service.FileStorage
             FilesystemService.Copy(storageFilePath, destinationPath);
         }
 
-        public void AddFile(File file)
+        public void AddFile(File file, byte[] hash)
         {
-            var path = GetBackupPathForFile(file);
+            var path = GetBackupFilePath(hash);
             PrepareDirectoryForFile(path);
             FilesystemService.Copy(file.FullPath, path);
         }
@@ -74,6 +74,11 @@ namespace Ctlg.Service.FileStorage
         {
             var directoryPath = FilesystemService.GetDirectoryName(filePath);
             FilesystemService.CreateDirectory(directoryPath);
+        }
+
+        private string GetBackupFilePath(byte[] hash)
+        {
+            return GetBackupFilePath(FormatBytes.ToHexString(hash));
         }
 
         private string GetBackupFilePath(string hash)
@@ -109,9 +114,26 @@ namespace Ctlg.Service.FileStorage
             }
         }
 
-        public bool IsFileInStorage(File file)
+        public bool IsFileInStorage(SnapshotRecord snapshotRecord)
         {
-            var backupFile = GetBackupPathForFile(file);
+            var backupFile = GetBackupFilePath(snapshotRecord.Hash);
+
+            if (FilesystemService.FileExists(backupFile))
+            {
+                if (FilesystemService.GetFileSize(backupFile) != snapshotRecord.Size)
+                {
+                    throw new Exception($"The size of \"{snapshotRecord.RelativePath}\" and \"{backupFile}\" do not match.");
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsFileInStorage(File file, byte[] hash)
+        {
+            var backupFile = GetBackupFilePath(hash);
 
             if (FilesystemService.FileExists(backupFile))
             {
@@ -126,17 +148,10 @@ namespace Ctlg.Service.FileStorage
             return false;
         }
 
-        private string GetBackupPathForFile(File file)
-        {
-            var hash = HashCalculator.GetExistingHashValue(file);
-
-            return GetBackupFilePath(hash.ToString());
-        }
-
-        private string GetTempFilePath(Hash previousHash)
+        private string GetTempFilePath(byte[] previousHash)
         {
             var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-            var fileName = $"{timestamp}_{previousHash?.ToString() ?? RandomUtils.RandomHexString(8)}";
+            var fileName = $"{timestamp}_{FormatBytes.ToHexString(previousHash)}";
 
             return FilesystemService.CombinePath(TempDirectory, fileName);
         }
@@ -146,7 +161,7 @@ namespace Ctlg.Service.FileStorage
             var expectedHashString = FormatBytes.ToHexString(hash);
             var path = GetBackupFilePath(expectedHashString);
             var calculatedHash = HashCalculator.CalculateHashForFile(path);
-            var calculatedHashString = calculatedHash.ToString();
+            var calculatedHashString = FormatBytes.ToHexString(calculatedHash);
 
             if (expectedHashString != calculatedHashString)
             {

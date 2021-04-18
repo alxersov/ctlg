@@ -7,7 +7,8 @@ namespace Ctlg.Core.Interfaces
     {
         string Name { get; }
         string Timestamp { get; }
-        IEnumerable<File> EnumerateFiles();
+        IEnumerable<SnapshotRecord> EnumerateFiles();
         ISnapshotWriter GetWriter();
+        SnapshotRecord GetRecord(string relativePath);
     }
 }

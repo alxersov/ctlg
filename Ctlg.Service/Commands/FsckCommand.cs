@@ -42,7 +42,7 @@ namespace Ctlg.Service.Commands
                         {
                             if (!fileStorage.IsFileInStorage(file))
                             {
-                                throw new Exception($"File {file.Name} is not found in storage.");
+                                throw new Exception($"File {file.RelativePath} is not found in storage.");
                             }
                         }
                         catch (Exception e)
