@@ -31,8 +31,7 @@ Restore command reads snapshot file, for every line it finds (by its checksum va
 creates a copy in the destination folder.
 
 ## Features
- - Calculates checksums. You can search files in catalog by checksum.
- - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC32.
+ - Supports hash functions: SHA-512, SHA-384, SHA-256, SHA-1, MD5.
  - Works with long paths.
 
 ## Usage
@@ -105,6 +104,5 @@ Date when backup was taken in `yyyy-MM-dd_HH-mm-ss` format. It is possible to sk
  - .NET console application (.NET Framework 4.6.2).
  - Pri.LongPath is used to support long paths.
  - Autofac is used to inject dependencies.
- - Crc32.NET is used to calculate CRC32 checksums.
  - NUnit and Moq for testing.
  - NLog is used for logging.
