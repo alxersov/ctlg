@@ -31,7 +31,7 @@ namespace Ctlg.Service.Commands
                 backupWriter.AddComment($"FastMode={IsFastMode}");
                 foreach (var file in root.EnumerateFiles())
                 {
-                    backupWriter.AddFile(file, GetPreviousHashForFile(latestSnapshot, file));
+                    backupWriter.AddFile(file, Path, GetPreviousHashForFile(latestSnapshot, file));
                 }
             }
 

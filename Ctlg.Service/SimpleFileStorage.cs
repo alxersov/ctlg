@@ -148,13 +148,6 @@ namespace Ctlg.Service.FileStorage
             return false;
         }
 
-        private string GetBackupPathForFile(File file)
-        {
-            var hash = HashCalculator.GetExistingHashValue(file);
-
-            return GetBackupFilePath(hash.ToString());
-        }
-
         private string GetTempFilePath(byte[] previousHash)
         {
             var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");

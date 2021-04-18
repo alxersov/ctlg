@@ -24,14 +24,14 @@ namespace Ctlg.Service
             index.Load();
         }
 
-        public void AddFile(File file, byte[] hash)
+        public void AddFile(File file, string root, byte[] hash)
         {
             try
             {
                 var fileStatus = FindFile(file, hash);
                 if (fileStatus.IsNotFound())
                 {
-                    hash = HashCalculator.CalculateHashForFile(file).Value;
+                    hash = HashCalculator.CalculateHashForFile(root, file.RelativePath).Value;
                     fileStatus = FindFile(file, hash) | BackupFileStatus.HashRecalculated;
                     if (fileStatus.IsNotFound())
                     {

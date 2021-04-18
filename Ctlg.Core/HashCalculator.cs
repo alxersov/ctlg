@@ -22,18 +22,10 @@ namespace Ctlg.Core
             }
         }
 
-        public Hash CalculateHashForFile(File file)
+        public Hash CalculateHashForFile(string root, string relativePath)
         {
-            var hash = CalculateHashForFile(file.FullPath);
-
-            file.Hashes.Add(hash);
-
-            return hash;
-        }
-
-        public Hash GetExistingHashValue(File file)
-        {
-            return file.Hashes.FirstOrDefault(h => h.HashAlgorithmId == Algorithm.HashAlgorithmId);
+            var path = FilesystemService.CombinePath(root, relativePath);
+            return CalculateHashForFile(path);
         }
 
         private Hash Calculate(Stream stream)
