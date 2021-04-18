@@ -41,14 +41,6 @@ namespace Ctlg.UnitTests
             return snapshotMock;
         }
 
-        public static HashAlgorithm HashAlgorithm
-        {
-            get
-            {
-                return new HashAlgorithm() { HashAlgorithmId = 2, Name = "SHA-256", Length = 32 };
-            }
-        }
-
         public static Config Config
         {
             get

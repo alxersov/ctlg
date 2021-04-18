@@ -33,7 +33,6 @@ namespace Ctlg.UnitTests.Tests
         public void Setup()
         {
             FilesystemServiceMock = AutoMock.Mock<IFilesystemService>();
-            AutoMock.SetupHashAlgorithm(Factories.HashAlgorithm);
         }
 
         [Test]

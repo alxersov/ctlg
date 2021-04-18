@@ -13,7 +13,6 @@ namespace Ctlg
 {
     class Program: IProgram, IHandle<ErrorEvent>
     {
-        private ICtlgService CtlgService { get; set; }
         private IMapper Mapper { get; }
         private IConfigService ConfigService { get; }
         private int ExitCode { get; set; }
@@ -32,9 +31,8 @@ namespace Ctlg
             }
         }
 
-        public Program(ICtlgService ctlgService, IMapper mapper, IConfigService configService)
+        public Program(IMapper mapper, IConfigService configService)
         {
-            CtlgService = ctlgService;
             Mapper = mapper;
             ConfigService = configService;
         }
@@ -42,8 +40,6 @@ namespace Ctlg
         public int Run(string[] args)
         {
             ExitCode = 0;
-
-            CtlgService.ApplyDbMigrations();
 
             Parser.Default.ParseArguments<Backup, Restore, RebuildIndex, BackupPull, Fsck>(args)
                 .WithParsed<Backup>(opts => Run<BackupCommand>(opts))

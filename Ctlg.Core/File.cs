@@ -8,14 +8,12 @@ namespace Ctlg.Core
         public File()
         {
             Contents = new List<File>();
-            Hashes = new List<Hash>();
             RelativePath = string.Empty;
         }
 
         public File(string name, bool isDirectory = false)
         {
             Contents = new List<File>();
-            Hashes = new List<Hash>();
             RelativePath = string.Empty;
             Name = name;
 
@@ -34,7 +32,6 @@ namespace Ctlg.Core
         public DateTime RecordUpdatedDateTime { get; set; }
 
         public List<File> Contents { get; set; }
-        public List<Hash> Hashes { get; set; }
 
         public string RelativePath { get; set; }
         public string FullPath { get; set; }

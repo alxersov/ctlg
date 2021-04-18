@@ -43,12 +43,5 @@ namespace Ctlg.UnitTests
         {
             mock.Setup(m => m.CombinePath(path1, path2, path3)).Returns(result);
         }
-
-        public static void SetupHashAlgorithm(this AutoMock mock, HashAlgorithm hashAlgorithm)
-        {
-            mock.Mock<IDataService>()
-                .Setup(s => s.GetHashAlgorithm(It.Is<string>(p => p == hashAlgorithm.Name)))
-                .Returns(hashAlgorithm);
-        }
     }
 }

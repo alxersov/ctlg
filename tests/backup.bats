@@ -29,6 +29,7 @@ load helper
 @test "backup in fast mode works when files are deleted" {
   echo -n "hello" > "$CTLG_FILESDIR/hi.txt"
   $CTLG_EXECUTABLE backup -n Test "$CTLG_FILESDIR"
+  mv "snapshots/Test/$(ls snapshots/Test | tail -1)" "snapshots/Test/2019-01-01_09-10-15"
 
   rm "$CTLG_FILESDIR/hi.txt"
 

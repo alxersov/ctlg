@@ -5,10 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg", "Ctlg\Ctlg.csproj", "{9D3B1072-A9ED-476E-B68B-1F7C5FAC58EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Db.Migrations", "Ctlg.Db.Migrations\Ctlg.Db.Migrations.csproj", "{B33B78F0-7A5F-46BF-8AF5-CB607F762678}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Data", "Ctlg.Data\Ctlg.Data.csproj", "{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Filesystem", "Ctlg.Filesystem\Ctlg.Filesystem.csproj", "{0B083C89-379C-4FFE-8271-93F7E94C231A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ctlg.Service", "Ctlg.Service\Ctlg.Service.csproj", "{4F7D6469-B78E-4E41-942F-207C4F17D480}"
@@ -27,14 +23,6 @@ Global
 		{9D3B1072-A9ED-476E-B68B-1F7C5FAC58EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D3B1072-A9ED-476E-B68B-1F7C5FAC58EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D3B1072-A9ED-476E-B68B-1F7C5FAC58EF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B33B78F0-7A5F-46BF-8AF5-CB607F762678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B33B78F0-7A5F-46BF-8AF5-CB607F762678}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B33B78F0-7A5F-46BF-8AF5-CB607F762678}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B33B78F0-7A5F-46BF-8AF5-CB607F762678}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF3D28FA-DBB2-4FFE-8D59-B3173E4E3C7B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0B083C89-379C-4FFE-8271-93F7E94C231A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0B083C89-379C-4FFE-8271-93F7E94C231A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B083C89-379C-4FFE-8271-93F7E94C231A}.Release|Any CPU.ActiveCfg = Release|Any CPU

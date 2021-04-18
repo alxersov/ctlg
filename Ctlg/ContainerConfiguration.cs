@@ -4,8 +4,6 @@ using Autofac;
 using AutoMapper;
 using Ctlg.CommandLineOptions;
 using Ctlg.Core.Interfaces;
-using Ctlg.Data;
-using Ctlg.Db.Migrations;
 using Ctlg.Filesystem;
 using Ctlg.Service;
 using Ctlg.Service.Commands;
@@ -19,10 +17,6 @@ namespace Ctlg
     {
         public static void RegisterExternalDependencies(this ContainerBuilder builder, bool isRunningOnMono)
         {
-            builder.RegisterType<CtlgContext>().As<ICtlgContext>().InstancePerLifetimeScope();
-            builder.RegisterType<DataService>().As<IDataService>().InstancePerLifetimeScope();
-            builder.RegisterType<MigrationService>().As<IMigrationService>().InstancePerLifetimeScope();
-
             if (isRunningOnMono)
             {
                 builder.RegisterType<FilesystemService>().As<IFilesystemService>().InstancePerLifetimeScope();
@@ -44,7 +38,6 @@ namespace Ctlg
             builder.RegisterCryptographyHashFunction<SHA512Cng>("SHA-512");
             builder.RegisterCryptographyHashFunction<Crc32Algorithm>("CRC32");
 
-            builder.RegisterType<CtlgService>().As<ICtlgService>().InstancePerLifetimeScope();
             builder.RegisterType<FileStorageService>().As<IFileStorageService>().InstancePerLifetimeScope();
             builder.RegisterType<IndexFileService>().As<IFileStorageIndexService>().InstancePerLifetimeScope();
             builder.RegisterType<BackupService>().As<IBackupService>().InstancePerLifetimeScope();

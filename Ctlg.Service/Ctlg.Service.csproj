@@ -80,7 +80,6 @@
     <Compile Include="Utils\BackupStatusHelper.cs" />
     <Compile Include="Commands\Steps\FileEnumerateStep.cs" />
     <Compile Include="Commands\Steps\ITreeProvider.cs" />
-    <Compile Include="Services\CtlgService.cs" />
     <Compile Include="Services\IndexFileService.cs" />
     <Compile Include="Services\FileIndex.cs" />
     <Compile Include="Services\SnapshotService.cs" />
