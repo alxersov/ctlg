@@ -74,7 +74,7 @@ namespace Ctlg.UnitTests.Tests
 
         private TextFileSnapshot CreateSnapshot()
         {
-            return new TextFileSnapshot(FilesystemServiceMock.Object, Factories.HashAlgorithm, SnapshotPath, SnapshotName, Timestamp);
+            return new TextFileSnapshot(FilesystemServiceMock.Object, SnapshotPath, SnapshotName, Timestamp);
         }
 
         private IList<SnapshotRecord> EnumerateFiles()

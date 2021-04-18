@@ -9,10 +9,9 @@ namespace Ctlg.Service
 {
     public class TextFileSnapshotFactory : ISnapshotFactory
     {
-        public TextFileSnapshotFactory(IFilesystemService filesystemService, IDataService dataService)
+        public TextFileSnapshotFactory(IFilesystemService filesystemService)
         {
             FilesystemService = filesystemService;
-            DataService = dataService;
         }
 
         public ISnapshot GetSnapshot(Config config, string name, string timestamp)
@@ -22,9 +21,8 @@ namespace Ctlg.Service
 
             var snapshotFileName = timestamp ?? GenerateSnapshotFileName();
             var fullPath = FilesystemService.CombinePath(snapshotDirectory, snapshotFileName);
-            var hashAlgorithm = DataService.GetHashAlgorithm(config.HashAlgorithmName);
 
-            return new TextFileSnapshot(FilesystemService, hashAlgorithm, fullPath, name, snapshotFileName);
+            return new TextFileSnapshot(FilesystemService, fullPath, name, snapshotFileName);
         }
 
         public List<string> GetSnapshotNames(Config config)
@@ -66,6 +64,5 @@ namespace Ctlg.Service
         }
 
         private IFilesystemService FilesystemService { get; }
-        private IDataService DataService { get; }
     }
 }

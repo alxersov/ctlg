@@ -9,17 +9,15 @@ using Ctlg.Core.Interfaces;
 using Ctlg.Core.Utils;
 using Ctlg.Service.Events;
 using Ctlg.Service.Utils;
-using File = Ctlg.Core.File;
 
 namespace Ctlg.Service
 {
     public class TextFileSnapshot: ISnapshot
     {
-        public TextFileSnapshot(IFilesystemService filesystemService, HashAlgorithm hashAlgorithm,
+        public TextFileSnapshot(IFilesystemService filesystemService,
             string snapshotFilePath, string name, string timestamp)
         {
             FilesystemService = filesystemService;
-            HashAlgorithm = hashAlgorithm;
             SnapshotFilePath = snapshotFilePath;
             Name = name;
             Timestamp = timestamp;
@@ -31,7 +29,6 @@ namespace Ctlg.Service
         private IFilesystemService FilesystemService { get; }
         private string SnapshotFilePath { get; }
         private Regex CommentLineRegex { get; } = new Regex(@"^\s*#");
-        private HashAlgorithm HashAlgorithm { get; }
         private Dictionary<string, SnapshotRecord> Records { get; set; }
 
         public IEnumerable<SnapshotRecord> EnumerateFiles()
@@ -76,7 +73,7 @@ namespace Ctlg.Service
 
             var snapshot = FilesystemService.OpenFileForWrite(SnapshotFilePath);
 
-            return new TextFileSnapshotWriter(new StreamWriter(snapshot), HashAlgorithm);
+            return new TextFileSnapshotWriter(new StreamWriter(snapshot));
         }
 
         public SnapshotRecord CreateFile(string snapshotFileLine)
@@ -117,7 +114,7 @@ namespace Ctlg.Service
         private void PrepareSnapshotFile(string path)
         {
             var stream = FilesystemService.CreateNewFileForWrite(SnapshotFilePath);
-            using (var writer = new TextFileSnapshotWriter(new StreamWriter(stream), HashAlgorithm))
+            using (var writer = new TextFileSnapshotWriter(new StreamWriter(stream)))
             {
                 writer.AddComment($"ctlg {AppVersion.Version}");
             }

@@ -15,15 +15,15 @@ namespace Ctlg.Service.Services
 
         public HashCalculator CreateHashCalculator(string algorithmName)
         {
+            var hashFunction = GetHashFunction(algorithmName);
             var canonicalName = algorithmName.ToUpperInvariant();
-            var hashFunction = GetHashFunction(canonicalName);
 
             return new HashCalculator(hashFunction, canonicalName, FilesystemService);
         }
 
-
-        private IHashFunction GetHashFunction(string canonicalName)
+        public IHashFunction GetHashFunction(string algorithmName)
         {
+            var canonicalName = algorithmName.ToUpperInvariant();
             if (!HashFunctions.TryGetValue(canonicalName, out IHashFunction hashFunction))
             {
                 throw new Exception($"Unsupported hash function {canonicalName}");
