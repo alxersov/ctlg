@@ -46,12 +46,12 @@ namespace Ctlg.Service.Commands
             }
         }
 
-        private void ProcessSnapshotRecord(IFileStorage fileStorage, File record)
+        private void ProcessSnapshotRecord(IFileStorage fileStorage, SnapshotRecord record)
         {
-            var destinationPath = FilesystemService.CombinePath(Path, record.Name);
+            var destinationPath = FilesystemService.CombinePath(Path, record.RelativePath);
             fileStorage.CopyFileTo(record, destinationPath);
 
-            DomainEvents.Raise(new BackupEntryRestored(record.Name));
+            DomainEvents.Raise(new BackupEntryRestored(record.RelativePath));
         }
     }
 }

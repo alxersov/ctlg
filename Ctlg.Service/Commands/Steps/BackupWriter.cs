@@ -53,18 +53,32 @@ namespace Ctlg.Service
             }
         }
 
-        public void AddFile(File file, byte[] hash, IFileStorage sourceStorage)
+        public void AddFile(SnapshotRecord snapshotRecord, IFileStorage sourceStorage)
         {
             try
             {
-                var fileStatus = FindFile(file, hash);
+                byte[] hash = null;
+                var fileStatus = default(BackupFileStatus);
+
+                if (sourceStorage.HashAlgorithmName == HashCalculator.Algorithm.Name)
+                {
+                    hash = snapshotRecord.Hash;
+                    fileStatus = FindFile(snapshotRecord); // TODO: check if sourceStorage uses the same algorithm
+                }
+
                 if (fileStatus.IsNotFound())
                 {
-
-                    fileStatus = AddFileFromStorage(file, sourceStorage);
-                    hash = HashCalculator.GetExistingHashValue(file).Value;
+                    fileStatus = BackupFileStatus.HashRecalculated;
+                    hash = Storage.AddFileFromStorage(snapshotRecord, sourceStorage);
                     Index.Add(hash);
                 }
+
+                var file = new File
+                {
+                    RelativePath = snapshotRecord.RelativePath,
+                    Size = snapshotRecord.Size,
+                    FileModifiedDateTime = snapshotRecord.FileModifiedDateTime
+                };
 
                 SnapshotWriter.AddFile(file, hash);
 
@@ -79,11 +93,9 @@ namespace Ctlg.Service
             }
         }
 
-        protected BackupFileStatus AddFileFromStorage(File file, IFileStorage storage)
+        protected BackupFileStatus FindFile(SnapshotRecord snapshotRecord)
         {
-            Storage.AddFileFromStorage(file, storage);
-
-            return BackupFileStatus.HashRecalculated;
+            return FindFile(new File { Name = snapshotRecord.RelativePath, Size = snapshotRecord.Size }, snapshotRecord.Hash);
         }
 
         protected BackupFileStatus FindFile(File file, byte[] hash)

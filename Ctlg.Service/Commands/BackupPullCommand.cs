@@ -37,10 +37,9 @@ namespace Ctlg.Service.Commands
                 backupWriter.AddComment($"ctlg {AppVersion.Version}");
                 backupWriter.AddComment($"Created with pull-backup command.");
 
-                foreach (var file in sourceSnapshot.EnumerateFiles())
+                foreach (var record in sourceSnapshot.EnumerateFiles())
                 {
-                    var hash = sourceConfig.HashAlgorithmName == config.HashAlgorithmName ? file.Hashes[0].Value : null;
-                    backupWriter.AddFile(file, hash, sourceFileStorage);
+                    backupWriter.AddFile(record, sourceFileStorage);
                 }
             }
 

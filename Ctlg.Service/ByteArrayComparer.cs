@@ -7,6 +7,16 @@ namespace Ctlg.Service
     {
         public int Compare(byte[] x, byte[] y)
         {
+            return ByteArrayComparer.DoCompare(x, y);
+        }
+
+        public static bool AreEqual(byte[] x, byte[] y)
+        {
+            return DoCompare(x, y) == 0;
+        }
+
+        private static int DoCompare(byte[] x, byte[] y)
+        {
             if (x.Length < y.Length)
             {
                 return -1;
