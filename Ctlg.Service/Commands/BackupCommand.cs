@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Ctlg.Core;
 using Ctlg.Core.Interfaces;
+using Ctlg.Service.Commands.Steps;
 using Ctlg.Service.Events;
 
 namespace Ctlg.Service.Commands
@@ -12,24 +14,25 @@ namespace Ctlg.Service.Commands
         public string SearchPattern { get; set; }
         public bool IsFastMode { get; set; }
 
-        public BackupCommand(ITreeProvider treeProvider,
+        public BackupCommand(IFilesystemService filesystemService,
             ISnapshotService snapshotService, IBackupService backupService)
         {
-            TreeProvider = treeProvider;
+            FilesystemService = filesystemService;
             SnapshotService = snapshotService;
             BackupService = backupService;
         }
 
         public void Execute(Config config)
         {
-            var root = TreeProvider.ReadTree(Path, SearchPattern);
+            var search = new FileSearch(FilesystemService, Path, SearchPattern);
+            var files = search.Run().ToList();
 
             ISnapshot latestSnapshot = IsFastMode ? SnapshotService.FindSnapshot(config, Name, null) : null;
                
             using (var backupWriter = BackupService.CreateWriter(config, Name, null, IsFastMode))
             {
                 backupWriter.AddComment($"FastMode={IsFastMode}");
-                foreach (var file in root.EnumerateFiles())
+                foreach (var file in files)
                 {
                     backupWriter.AddFile(file, Path, GetPreviousHashForFile(latestSnapshot, file));
                 }
@@ -49,7 +52,7 @@ namespace Ctlg.Service.Commands
             return hash;
         }
 
-        private ITreeProvider TreeProvider { get; set; }
+        public IFilesystemService FilesystemService { get; }
         private ISnapshotService SnapshotService { get; }
         private IBackupService BackupService { get; }
     }

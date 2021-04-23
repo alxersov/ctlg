@@ -10,19 +10,15 @@ namespace Ctlg.UnitTests.TestDoubles
         public VirtualDirectory(VirtualFilesystemNode node)
         {
             Node = node;
-
-            Directory = new File
-            {
-                IsDirectory = true,
-                Name = Node.Name,
-                FullPath = node.FullPath,
-                FileCreatedDateTime = DateTime.UtcNow,
-                FileModifiedDateTime = DateTime.UtcNow,
-                RecordUpdatedDateTime = DateTime.UtcNow
-            };
         }
 
-        public File Directory { get; set; }
+        public string Name
+        {
+            get
+            {
+                return Node?.Name;
+            }
+        }
 
         public IEnumerable<IFilesystemDirectory> EnumerateDirectories()
         {
@@ -38,11 +34,9 @@ namespace Ctlg.UnitTests.TestDoubles
             {
                 yield return new File(file.Key)
                 {
-                    FullPath = VirtualFilesystemNode.CombinePath(Directory.FullPath, file.Key),
-                    FileCreatedDateTime = file.Value.FileCreatedDateTime,
+                    FullPath = VirtualFilesystemNode.CombinePath(Node.FullPath, file.Key),
                     FileModifiedDateTime = file.Value.FileModifiedDateTime,
-                    Size = file.Value.GetSize(),
-                    RecordUpdatedDateTime = DateTime.UtcNow
+                    Size = file.Value.GetSize()
                 };
             }
         }

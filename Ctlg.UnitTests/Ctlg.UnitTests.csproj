@@ -121,10 +121,8 @@
     <Compile Include="Fixtures\BaseTestFixture.cs" />
     <Compile Include="Tests\ByteArrayComparerTests.cs" />
     <Compile Include="Tests\FileSizeTests.cs" />
-    <Compile Include="Tests\FileTests.cs" />
     <Compile Include="Tests\Commands\BackupPullCommandTests.cs" />
     <Compile Include="Tests\Commands\RestoreCommandTests.cs" />
-    <Compile Include="Tests\Commands\Steps\FileEnumerateTests.cs" />
     <Compile Include="Tests\Services\FilesystemServiceBaseTests.cs" />
     <Compile Include="Tests\Services\FileIndexTests.cs" />
     <Compile Include="Tests\Services\SnapshotServiceTests.cs" />
@@ -164,7 +162,6 @@
     <Folder Include="Tests\" />
     <Folder Include="Fixtures\" />
     <Folder Include="Tests\Commands\" />
-    <Folder Include="Tests\Commands\Steps\" />
     <Folder Include="Tests\Services\" />
     <Folder Include="TestDoubles\" />
   </ItemGroup>

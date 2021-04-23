@@ -40,7 +40,6 @@ namespace Ctlg
             builder.RegisterType<IndexFileService>().As<IFileStorageIndexService>().InstancePerLifetimeScope();
             builder.RegisterType<BackupService>().As<IBackupService>().InstancePerLifetimeScope();
             builder.RegisterType<HashingService>().As<IHashingService>().InstancePerLifetimeScope();
-            builder.RegisterType<FileEnumerateStep>().As<ITreeProvider>().InstancePerLifetimeScope();
             builder.RegisterType<JsonConfigService>().As<IConfigService>().InstancePerLifetimeScope();
 
             builder.RegisterAssemblyTypes(typeof(BackupCommand).Assembly)

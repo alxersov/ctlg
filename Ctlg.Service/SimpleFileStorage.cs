@@ -92,13 +92,13 @@ namespace Ctlg.Service.FileStorage
             var storageDir = FilesystemService.GetDirectory(FileStorageDirectory);
             foreach (var dir in storageDir.EnumerateDirectories())
             {
-                if (!StorageSubDirRegex.IsMatch(dir.Directory.Name))
+                if (!StorageSubDirRegex.IsMatch(dir.Name))
                 {
-                    DomainEvents.Raise(new Warning($"Unexpected directory in storage: {dir.Directory.Name}"));
+                    DomainEvents.Raise(new Warning($"Unexpected directory in storage: {dir.Name}"));
                     continue;
                 }
 
-                DomainEvents.Raise(new EnumeratingHashes(dir.Directory.Name));
+                DomainEvents.Raise(new EnumeratingHashes(dir.Name));
 
                 foreach (var file in dir.EnumerateFiles("*"))
                 {

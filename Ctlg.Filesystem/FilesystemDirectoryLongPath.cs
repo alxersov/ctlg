@@ -8,24 +8,21 @@ namespace Ctlg.Filesystem
 {
     public class FilesystemDirectoryLongPath: IFilesystemDirectory
     {
-        public File Directory { get; set; }
-
         public FilesystemDirectoryLongPath(string path) : this(new DirectoryInfo(path))
         {
+        }
+
+        public string Name
+        {
+            get
+            {
+                return _directoryInfo?.Name;
+            }
         }
 
         private FilesystemDirectoryLongPath(DirectoryInfo directoryInfo)
         {
             _directoryInfo = directoryInfo;
-            Directory = new File
-            {
-                IsDirectory = true,
-                Name = directoryInfo.Name,
-                FullPath = directoryInfo.FullName,
-                FileCreatedDateTime = directoryInfo.CreationTimeUtc,
-                FileModifiedDateTime = directoryInfo.LastWriteTimeUtc,
-                RecordUpdatedDateTime = DateTime.UtcNow
-            };
         }
 
         public IEnumerable<IFilesystemDirectory> EnumerateDirectories()
@@ -52,12 +49,9 @@ namespace Ctlg.Filesystem
             return new File
             {
                 FullPath = fileInfo.FullName,
-                IsDirectory = false,
                 Name = fileInfo.Name,
-                FileCreatedDateTime = fileInfo.CreationTimeUtc,
                 FileModifiedDateTime = fileInfo.LastWriteTimeUtc,
-                Size = fileInfo.Length,
-                RecordUpdatedDateTime = DateTime.UtcNow
+                Size = fileInfo.Length
             };
         }
     }

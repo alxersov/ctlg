@@ -78,8 +78,6 @@
     <Compile Include="Events\Warning.cs" />
     <Compile Include="Events\BackupCommandEnded.cs" />
     <Compile Include="Utils\BackupStatusHelper.cs" />
-    <Compile Include="Commands\Steps\FileEnumerateStep.cs" />
-    <Compile Include="Commands\Steps\ITreeProvider.cs" />
     <Compile Include="Services\IndexFileService.cs" />
     <Compile Include="Services\FileIndex.cs" />
     <Compile Include="Services\SnapshotService.cs" />
@@ -97,6 +95,7 @@
     <Compile Include="Commands\FsckCommand.cs" />
     <Compile Include="Events\EnumeratingHashes.cs" />
     <Compile Include="Events\EnumeratingSnapshots.cs" />
+    <Compile Include="Commands\Steps\FileSearch.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ctlg.Core\Ctlg.Core.csproj">
