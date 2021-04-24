@@ -30,7 +30,7 @@ namespace Ctlg.Service
             var snapshotsPath = FilesystemService.CombinePath(config.Path, "snapshots");
             var dir = FilesystemService.GetDirectory(snapshotsPath);
 
-            return dir.EnumerateDirectories().Select(d => d.Directory.Name).ToList();
+            return dir.EnumerateDirectories().Select(d => d.Name).ToList();
         }
 
         public List<string> GetTimestamps(Config config, string name)

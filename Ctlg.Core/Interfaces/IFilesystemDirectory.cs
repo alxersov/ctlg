@@ -4,7 +4,7 @@ namespace Ctlg.Core.Interfaces
 {
     public interface IFilesystemDirectory
     {
-        File Directory { get; set; }
+        string Name { get; }
 
         IEnumerable<IFilesystemDirectory> EnumerateDirectories();
         IEnumerable<File> EnumerateFiles(string searchPattern);

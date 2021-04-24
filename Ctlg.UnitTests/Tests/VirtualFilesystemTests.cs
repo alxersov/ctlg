@@ -142,8 +142,8 @@ namespace Ctlg.UnitTests.Tests
 
             var dirs = bar.EnumerateDirectories().First().EnumerateDirectories().ToList();
 
-            Assert.That(dirs.First().Directory.Name, Is.EqualTo("a"));
-            Assert.That(dirs.First().Directory.FullPath, Is.EqualTo("foo/bar/1/a"));
+            Assert.That(dirs[0].Name, Is.EqualTo("a"));
+            Assert.That(dirs[1].Name, Is.EqualTo("b"));
         }
     }
 }

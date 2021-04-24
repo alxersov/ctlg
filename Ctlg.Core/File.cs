@@ -1,107 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Ctlg.Core
 {
     public class File
     {
-        public File()
+        public File(string name = null)
         {
-            Contents = new List<File>();
-            RelativePath = string.Empty;
-        }
-
-        public File(string name, bool isDirectory = false)
-        {
-            Contents = new List<File>();
             RelativePath = string.Empty;
             Name = name;
-
-            IsDirectory = isDirectory;
-            RecordUpdatedDateTime = DateTime.UtcNow;
         }
 
-        public int FileId { get; set; }
-        public int? ParentFileId { get; set; }
-        public File ParentFile { get; set; }
         public bool IsDirectory { get; set; }
         public string Name { get; set; }
         public long? Size { get; set; }
-        public DateTime? FileCreatedDateTime { get; set; }
         public DateTime? FileModifiedDateTime { get; set; }
-        public DateTime RecordUpdatedDateTime { get; set; }
 
-        public List<File> Contents { get; set; }
 
         public string RelativePath { get; set; }
         public string FullPath { get; set; }
-
-        public string BuildFullPath()
-        {
-            if (FullPath == null)
-            {
-                if (ParentFile == null && ParentFileId != null)
-                {
-                    throw new InvalidOperationException("BuildFullPath failed because ParentFile is not loaded.");
-                }
-
-                if (ParentFile == null)
-                {
-                    FullPath = Name;
-                }
-                else
-                {
-                    // TODO: use CombinePath method
-                    FullPath = string.Format("{0}\\{1}", ParentFile.BuildFullPath(), Name);
-                }
-            }
-
-            return FullPath;
-        }
-
-        public void SortTree()
-        {
-            Contents.Sort(FileNameComparer);
-
-            foreach (var file in Contents)
-            {
-                file.SortTree();
-            }
-        }
-
-        public File GetInnerFile(string name)
-        {
-            var index = Contents.BinarySearch(new File(name), FileNameComparer);
-            if (index < 0)
-            {
-                return null;
-            }
-
-            return Contents[index];
-        }
-
-        public IEnumerable<File> EnumerateFiles()
-        {
-            var queue = new Queue<File>();
-            queue.Enqueue(this);
-
-            while (queue.Count > 0)
-            {
-                var file = queue.Dequeue();
-                foreach (var child in file.Contents)
-                {
-                    if (child.IsDirectory)
-                    {
-                        queue.Enqueue(child);
-                    }
-                    else
-                    {
-                        yield return child;
-                    }
-                }
-            }
-        }
-
-        private IComparer<File> FileNameComparer { get; } = new FileNameComparer();
     }
 }
